@@ -15,42 +15,18 @@ Login → Register → Dashboard → Select Phobia → Select Difficulty → Bas
 
 ---
 
-## Commit History & Milestones
+## Project Overview
 
-### Commit 1: Initial Unity project setup with proper folder structure
-* Initialized Unity project using Unity 2022.3 LTS.
-* Created proper FYP folder architecture (`Scenes`, `Scripts/Managers`, `Scripts/UI`, `Scripts/Player`, `Scripts/Therapy`, `Scripts/Data`, `Scripts/VR`, `Prefabs`, etc.).
-* Set up standard `.gitignore` for Unity to exclude `Library/`, `Temp/`, `Logs/`, `Build/`, `Obj/`.
+Phobia Relief Therapy is an innovative Virtual Reality (VR) application designed to assist users in overcoming specific phobias through Virtual Reality Exposure Therapy (VRET). By immersing users in controlled, safe, and gradually intensifying virtual environments, the system allows individuals to confront their fears at their own pace without real-world risks. 
 
-### Commit 2: Added Login and Register scenes with UI layout
-* Created `LoginScene` with UI (Username, Password, Login Button).
-* Created `RegisterScene` with UI (Name, Email, Password, Register Button).
-* Designed clean, functional UI structures using Unity UI (TextMeshPro).
+Exposure therapy is a proven psychological treatment, and by combining it with modern VR technology, this system provides an accessible, immersive, and highly effective therapeutic tool.
 
-### Commit 3: Implemented SceneLoader and AuthManager scripts
-* Created `SceneLoader.cs` in `Scripts/Managers` (Singleton pattern for robust scene navigation).
-* Created `AuthManager.cs` in `Scripts/Managers` to handle simulated authentication without a database.
-* Added `UserData.cs` in `Scripts/Data` to persist state (Username, Selected Phobia, Baseline HR) across scenes.
-
-### Commit 4: Added Phobia Selection and Baseline system
-* Created `DashboardScene` / `PhobiaSelectionScene`.
-* Created `PhobiaSelectionManager.cs` to capture user choices (Height, Darkness, Crowd).
-* Created `BaselineScene` and `BaselineManager.cs` to simulate a 10-second vitals baseline check before exposure begins.
-
-### Commit 5: Created Safe Room and initial exposure scenes
-* Created `SafeRoomScene` where the user prepares before entering the exposure environment.
-* Created `SafeRoomManager.cs` to dynamically route the user to their chosen exposure level.
-* Created initial block-out exposure scenes: `HeightScene`, `DarknessScene`, `CrowdScene`.
-
-### Commit 6: Updated README and project documentation
-* Added detailed `README.md` containing project details, architectural guidelines, and milestone documentation.
-
-### Commit 7: Developed Global Medical Theme Architecture
-* Shifted from manual styling to a strict `ScriptableObject`-driven Global Medical Theme System.
-* Created `ThemePreset.cs` to centrally manage all aesthetic values (Medical Blue, Slate Gray, sharp typography sizes).
-* Created `ThemeableUI.cs` base component to enforce a crisp, non-blurry, medical-grade UI.
-* Developed `UIStyleManager.cs`, a powerful Editor tool to instantly apply the `MedicalTheme` to every scene in the Build Settings.
-* Purged old procedural generator scripts to maintain a clean, solid, professional aesthetic.
+### Key Features
+* **Secure Session Management:** Local authentication and user data persistence to track therapy progress across sessions.
+* **Customizable Therapy Modules:** Users can select their target phobia (Heights, Darkness, Crowds) and scale the intensity/difficulty of the exposure.
+* **Physiological Baseline Simulation:** A pre-exposure module that simulates gathering a user's resting heart rate to establish a baseline before the stressful environment is introduced.
+* **Immersive Preparation (Safe Room):** A neutral "Safe Room" environment where users can mentally prepare before dynamically transitioning into the exposure scene.
+* **Global Medical-Grade Architecture:** A robust `ScriptableObject`-driven UI framework that strictly enforces a clean, sharp, and highly professional medical aesthetic across all screens.
 
 ---
 
