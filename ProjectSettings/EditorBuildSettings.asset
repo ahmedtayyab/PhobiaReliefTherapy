@@ -4,5 +4,35 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/LoginScene.unity
+    guid: 124ce98d9ceb2244d89524b6cf7f20ca
+  - enabled: 1
+    path: Assets/Scenes/RegisterScene.unity
+    guid: c1e45c5f6a950ec44b7e1823ecb898f4
+  - enabled: 1
+    path: Assets/Scenes/DashboardScene.unity
+    guid: bc93536c138058e49bc5ebc80de685bb
+  - enabled: 1
+    path: Assets/Scenes/PhobiaSelectionScene.unity
+    guid: 878c4a058ca684b4d862771e2ecdb146
+  - enabled: 1
+    path: Assets/Scenes/BaselineScene.unity
+    guid: 95013e0abeb1bd74593ae7f6c76246ee
+  - enabled: 1
+    path: Assets/Scenes/SafeRoomScene.unity
+    guid: b94818780811dd64fa8d1b37f46bc4ef
+  - enabled: 1
+    path: Assets/Scenes/HeightScene.unity
+    guid: 74ee41613d8f31f4fb5990b7c370c455
+  - enabled: 1
+    path: Assets/Scenes/DarknessScene.unity
+    guid: af48dba50eaf7ce40b0b5e9a684051be
+  - enabled: 1
+    path: Assets/Scenes/CrowdScene.unity
+    guid: 0377812bf696e144f88db8d1d584bbd8
+  - enabled: 1
+    path: Assets/Scenes/FeedbackScene.unity
+    guid: 6309888821bbbe04e8459139a06cb9b1
   m_configObjects: {}
