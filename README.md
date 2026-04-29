@@ -45,6 +45,13 @@ Login → Register → Dashboard → Select Phobia → Select Difficulty → Bas
 ### Commit 6: Updated README and project documentation
 * Added detailed `README.md` containing project details, architectural guidelines, and milestone documentation.
 
+### Commit 7: Developed Global Medical Theme Architecture
+* Shifted from manual styling to a strict `ScriptableObject`-driven Global Medical Theme System.
+* Created `ThemePreset.cs` to centrally manage all aesthetic values (Medical Blue, Slate Gray, sharp typography sizes).
+* Created `ThemeableUI.cs` base component to enforce a crisp, non-blurry, medical-grade UI.
+* Developed `UIStyleManager.cs`, a powerful Editor tool to instantly apply the `MedicalTheme` to every scene in the Build Settings.
+* Purged old procedural generator scripts to maintain a clean, solid, professional aesthetic.
+
 ---
 
 ## Architecture Overview
@@ -56,6 +63,7 @@ Login → Register → Dashboard → Select Phobia → Select Difficulty → Bas
 - `BaselineManager.cs`: Countdown timer and simulated vitals collection.
 - `PhobiaSelectionManager.cs`: User selection persistence.
 - `SafeRoomManager.cs`: Dynamic navigation to the final exposure scene.
+- `ThemeManager.cs` & `ThemeableUI.cs`: Global styling framework that automatically loads the `MedicalTheme` ScriptableObject from the `Resources` folder to enforce medical-grade UI consistency.
 
 ## Note for Contributors / Evaluators
 This project relies initially on *simulated* advanced systems (like heart-rate and AI) to prioritize establishing a functional 3D/VR application flow. Real hardware and backend integrations are planned for a later phase.
