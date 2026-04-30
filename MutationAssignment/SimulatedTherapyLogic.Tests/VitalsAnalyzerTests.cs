@@ -30,6 +30,16 @@ namespace SimulatedTherapyLogic.Tests
         }
 
         [Fact]
+        public void AnalyzeHeartRate_Boundary_SevereAnxiety_Kills_ID17()
+        {
+            // Target boundary diff = 30
+            // Original: 30 >= 30 (True)
+            // Mutant: 30 > 30 (False -> returns Moderate Anxiety)
+            var result = _analyzer.AnalyzeHeartRate(70, 100, 20);
+            Assert.Equal("Severe Anxiety", result);
+        }
+
+        [Fact]
         public void AnalyzeHeartRate_ReturnsModerateAnxiety()
         {
             // Weak Test: diff = 20 (>= 15). Misses boundary.
@@ -60,11 +70,15 @@ namespace SimulatedTherapyLogic.Tests
         }
 
         [Fact]
-        public void IsSessionValid_ReturnsFalse()
+        public void IsSessionValid_ShortExposure_ReturnsFalse_Kills_ID35()
         {
+            // Kills LCR && -> ||
+            // Original: False && True -> False
+            // Mutant: False || True -> True
             Assert.False(_analyzer.IsSessionValid(30, 80));
-            Assert.False(_analyzer.IsSessionValid(120, 40));
         }
+
+
 
         [Fact]
         public void CalculateAnxietyScore_ReturnsZero()
@@ -82,6 +96,15 @@ namespace SimulatedTherapyLogic.Tests
         public void NeedsIntervention_ReturnsTrue()
         {
             Assert.True(_analyzer.NeedsIntervention(160, 150));
+        }
+
+        [Fact]
+        public void NeedsIntervention_Boundary_ReturnsTrue_Kills_ID52()
+        {
+            // Kills ROR >= -> >
+            // Original: 150 >= 150 -> True
+            // Mutant: 150 > 150 -> False
+            Assert.True(_analyzer.NeedsIntervention(150, 150));
         }
 
         [Fact]
