@@ -1,0 +1,338 @@
+\documentclass[11pt,a4paper]{article}
+
+% Required Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{enumitem}
+
+% Color Definitions
+\definecolor{primary}{RGB}{41, 128, 185}
+\definecolor{secondary}{RGB}{44, 62, 80}
+\definecolor{accent}{RGB}{231, 76, 60}
+\definecolor{codebg}{RGB}{245, 245, 245}
+\definecolor{codegreen}{RGB}{39, 174, 96}
+
+% Hyperref Setup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primary,
+    filecolor=primary,
+    urlcolor=primary,
+    pdftitle={Mutation Testing Assignment},
+}
+
+% Listings Setup for C#
+\lstdefinestyle{csharp}{
+    backgroundcolor=\color{codebg},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{primary}\bfseries,
+    numberstyle=\tiny\color{gray},
+    stringstyle=\color{accent},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    language=[Sharp]C,
+    frame=single,
+    rulecolor=\color{lightgray}
+}
+
+% Section formatting
+\titleformat{\section}{\Large\bfseries\color{secondary}}{\thesection}{1em}{}[\titlerule]
+\titleformat{\subsection}{\large\bfseries\color{primary}}{\thesubsection}{1em}{}
+
+% Mutant Analysis Box
+\newtcolorbox{mutantbox}[1]{
+    colback=white,
+    colframe=secondary,
+    fonttitle=\bfseries,
+    title=#1,
+    enhanced,
+    attach boxed title to top left={yshift=-2mm, xshift=5mm},
+    boxed title style={colback=secondary}
+}
+
+\begin{document}
+
+% ---------------- TITLE PAGE ----------------
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    
+    {\Huge\bfseries\color{secondary} Mutation Testing Assignment\par}
+    \vspace{1cm}
+    {\Large\bfseries Course: CS-4006 Software Testing\par}
+    \vspace{2cm}
+    
+    \begin{tcolorbox}[colback=white, colframe=primary, width=0.8\textwidth, center, arc=5mm]
+        \centering
+        \vspace{0.5cm}
+        {\large\bfseries FYP Title:}\\[0.2cm]
+        {\Large Phobia Relief Therapy}\\[0.5cm]
+        {\large\bfseries Target Module:}\\[0.2cm]
+        {\Large \texttt{SimulatedTherapyLogic.VitalsAnalyzer}}\\[0.5cm]
+        \vspace{0.5cm}
+    \end{tcolorbox}
+    
+    \vfill
+    
+    {\large \today\par}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ---------------- TASK 1 ----------------
+\section{Task 1: Baseline Assessment}
+
+\subsection{1.1 — Select Your Target Module}
+For this assignment, the \texttt{VitalsAnalyzer} module was selected. It evaluates a patient's simulated anxiety level (Mild, Moderate, Severe) during therapy sessions based on baseline Heart Rate (HR), current HR, and exposure duration. This module is the most safety-critical component of our biofeedback system, as incorrect thresholds could lead to improper therapy progression or failing to trigger a necessary medical intervention.
+
+\subsection{1.2 — Run Coverage Analysis}
+The \texttt{.NET} unit test suite was executed using \texttt{coverlet} to calculate coverage metrics.
+
+\subsection{1.3 — Baseline Report Table}
+\begin{table}[h!]
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabularx}{0.8\textwidth}{l c X}
+        \toprule
+        \textbf{Metric} & \textbf{Value (\%)} & \textbf{Notes / Missed Items} \\
+        \midrule
+        Tool Used & Coverlet & \\
+        Line Coverage & 100\% & All execution lines covered \\
+        Branch Coverage & 100\% & All branches covered \\
+        Function Coverage & 100\% & All methods covered \\
+        Total Test Count & 11 & xUnit Tests \\
+        Tests Passing & 100\% & \\
+        \bottomrule
+    \end{tabularx}
+    \caption{Baseline Coverage Metrics}
+\end{table}
+
+\subsection{1.4 — Preliminary Analysis}
+The coverage numbers show a perfect 100\% score for line and branch coverage. However, this only tells us that every block of code was executed at least once by our inputs. It does \textit{not} guarantee that our tests actually verify the correctness of the boundary conditions. For instance, testing \texttt{diff >= 30} with \texttt{diff = 40} achieves branch coverage but completely misses the boundary value \texttt{diff = 30}, leaving the system highly vulnerable to off-by-one logical faults that coverage metrics are blind to.
+
+% ---------------- TASK 2 ----------------
+\section{Task 2: The Mutation Run}
+
+\subsection{2.1 to 2.3 — Executing the Mutation Run}
+The industry standard \texttt{dotnet-stryker} tool was executed against the \texttt{SimulatedTherapyLogic} module using our baseline test suite.
+
+\subsection{2.4 — Results Documentation Table}
+\begin{table}[h!]
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabularx}{\textwidth}{l c X}
+        \toprule
+        \textbf{Metric} & \textbf{Value} & \textbf{Significance} \\
+        \midrule
+        Total Mutants Generated & 53 & Total distinct code changes tested. \\
+        Mutants Killed & 30 & Faults your tests successfully detected. \\
+        Mutants Survived & 13 & \textbf{Critical}: Faults your tests completely missed. \\
+        Mutants Timed Out & 0 & Mutants causing infinite loops. \\
+        Equivalent/Ignored Mutants & 10 & Excluded from score calculation. \\
+        \textbf{Mutation Score \%} & \textbf{69.77\%} & $30 / 43 \times 100$ \\
+        Baseline Line Coverage \% & 100\% & From Task 1. \\
+        Coverage–Score Gap & 30.23\% & Difference between line coverage and mutation score. \\
+        \bottomrule
+    \end{tabularx}
+    \caption{Mutation Run Results (Raw Statistics)}
+\end{table}
+
+\subsection{2.5 — Reflection Requirement}
+The baseline Mutation Score of 69.77\% is unacceptable given the 100\% code coverage. A Coverage-Score Gap of roughly 30 percentage points reveals that while the tests execute the code, their assertions are far too weak to detect subtle boundary shifts or logical replacements. The test suite appears to be weakest at the explicit boundary thresholds (e.g. testing \texttt{>} vs \texttt{>=}) and missing negative validations for boolean logic (\texttt{\&\&} vs \texttt{||}).
+
+\newpage
+% ---------------- TASK 3 ----------------
+\section{Task 3: Mutant Analysis \& Eradication}
+
+\begin{mutantbox}{Mutant \#17: ROR in AnalyzeHeartRate()}
+\textbf{[M1] Mutant Identification}\\
+\textbf{Mutant ID}: mutmut \#17 (Stryker) | \textbf{File}: \texttt{VitalsAnalyzer.cs} | \textbf{Line}: 19 | \textbf{Class}: ROR
+
+\vspace{0.3cm}
+\textbf{[M2] The Mutation — Original vs. Mutated Code}
+\begin{lstlisting}[style=csharp]
+// ORIGINAL
+if (diff >= 30 && exposureSeconds > 15)
+
+// MUTATED
+if (diff > 30 && exposureSeconds > 15)
+\end{lstlisting}
+
+\textbf{[M3] Semantic Impact Analysis}\\
+This mutation causes a patient whose heart rate difference is exactly 30 BPM to be incorrectly evaluated. Under the original system, a difference of exactly 30 BPM triggers a "Severe Anxiety" classification. After the mutation, it drops through the condition and incorrectly evaluates them as having "Moderate Anxiety". This could lead to the therapy system failing to intervene appropriately during a severe anxiety spike.
+
+\vspace{0.3cm}
+\textbf{[M4] Root-Cause: Why Did This Mutant Survive?}\\
+The existing test case completely missed the boundary value:
+\begin{lstlisting}[style=csharp]
+[Fact]
+public void AnalyzeHeartRate_ReturnsSevereAnxiety()
+{
+    var result = _analyzer.AnalyzeHeartRate(70, 110, 20); // diff = 40
+    Assert.Equal("Severe Anxiety", result);
+}
+\end{lstlisting}
+Because it passed \texttt{diff = 40}, both the original code (\texttt{40 >= 30}) and mutated code (\texttt{40 > 30}) evaluated to \texttt{true}. The assertion failed to discriminate between the two logical states.
+
+\vspace{0.3cm}
+\textbf{[M5] The Mutant-Killing Test Case}
+\begin{lstlisting}[style=csharp]
+[Fact]
+public void AnalyzeHeartRate_Boundary_SevereAnxiety_Kills_ID17()
+{
+    // Target boundary diff = 30
+    // Original: 30 >= 30 (True)
+    // Mutant: 30 > 30 (False -> returns Moderate Anxiety)
+    var result = _analyzer.AnalyzeHeartRate(70, 100, 20);
+    Assert.Equal("Severe Anxiety", result);
+}
+\end{lstlisting}
+
+\textbf{[M6] Verification}\\
+After adding the test, Stryker reported Mutant \#17 status changed from SURVIVED to KILLED.
+\end{mutantbox}
+
+\vspace{0.5cm}
+
+\begin{mutantbox}{Mutant \#35: LCR in IsSessionValid()}
+\textbf{[M1] Mutant Identification}\\
+\textbf{Mutant ID}: mutmut \#35 (Stryker) | \textbf{File}: \texttt{VitalsAnalyzer.cs} | \textbf{Line}: 39 | \textbf{Class}: LCR
+
+\vspace{0.3cm}
+\textbf{[M2] The Mutation — Original vs. Mutated Code}
+\begin{lstlisting}[style=csharp]
+// ORIGINAL
+if (totalExposureSeconds >= 60 && averageHr > 50)
+
+// MUTATED
+if (totalExposureSeconds >= 60 || averageHr > 50)
+\end{lstlisting}
+
+\textbf{[M3] Semantic Impact Analysis}\\
+This mutation dangerously weakens the session validation logic. Originally, a session is only valid if \textit{both} conditions are met. Under the mutation, if a patient undergoes therapy for a very short duration (e.g. 30 seconds) but their average HR is >50, the system will falsely log it as a valid, completed session. This breaks the data tracking requirements for the patient's exposure therapy.
+
+\vspace{0.3cm}
+\textbf{[M4] Root-Cause: Why Did This Mutant Survive?}\\
+The existing test suite only tested the "Happy Path":
+\begin{lstlisting}[style=csharp]
+[Fact]
+public void IsSessionValid_ReturnsTrue()
+{
+    Assert.True(_analyzer.IsSessionValid(120, 80));
+}
+\end{lstlisting}
+With \texttt{totalExposure=120} and \texttt{averageHr=80}, both conditions evaluate to \texttt{true}. Since \texttt{True \&\& True} is \texttt{True}, and \texttt{True || True} is also \texttt{True}, the test passes under both original and mutated code. We failed to provide a negative test case.
+
+\vspace{0.3cm}
+\textbf{[M5] The Mutant-Killing Test Case}
+\begin{lstlisting}[style=csharp]
+[Fact]
+public void IsSessionValid_ShortExposure_ReturnsFalse_Kills_ID35()
+{
+    // Kills LCR && -> ||
+    // Original: False && True -> False
+    // Mutant: False || True -> True
+    Assert.False(_analyzer.IsSessionValid(30, 80));
+}
+\end{lstlisting}
+
+\textbf{[M6] Verification}\\
+After adding the negative test case, Stryker successfully reported Mutant \#35 as KILLED.
+\end{mutantbox}
+
+\vspace{0.5cm}
+
+\begin{mutantbox}{Mutant \#52: ROR in NeedsIntervention()}
+\textbf{[M1] Mutant Identification}\\
+\textbf{Mutant ID}: mutmut \#52 (Stryker) | \textbf{File}: \texttt{VitalsAnalyzer.cs} | \textbf{Line}: 56 | \textbf{Class}: ROR
+
+\vspace{0.3cm}
+\textbf{[M2] The Mutation — Original vs. Mutated Code}
+\begin{lstlisting}[style=csharp]
+// ORIGINAL
+return currentHr >= maxSafeHr;
+
+// MUTATED
+return currentHr > maxSafeHr;
+\end{lstlisting}
+
+\textbf{[M3] Semantic Impact Analysis}\\
+This mutation causes the system to miss the exact emergency threshold. If the patient's maximum safe HR is 150 BPM, and they hit exactly 150 BPM, the original system correctly triggers an intervention. The mutated system would wait until they hit 151 BPM. This 1-BPM delay in a medical/biofeedback context is a safety hazard.
+
+\vspace{0.3cm}
+\textbf{[M4] Root-Cause: Why Did This Mutant Survive?}\\
+The test case was over-specified and missed the exact boundary:
+\begin{lstlisting}[style=csharp]
+[Fact]
+public void NeedsIntervention_ReturnsTrue()
+{
+    Assert.True(_analyzer.NeedsIntervention(160, 150));
+}
+\end{lstlisting}
+By passing 160 vs 150, \texttt{160 >= 150} and \texttt{160 > 150} are both true, completely missing the boundary fault.
+
+\vspace{0.3cm}
+\textbf{[M5] The Mutant-Killing Test Case}
+\begin{lstlisting}[style=csharp]
+[Fact]
+public void NeedsIntervention_Boundary_ReturnsTrue_Kills_ID52()
+{
+    // Original: 150 >= 150 -> True
+    // Mutant: 150 > 150 -> False
+    Assert.True(_analyzer.NeedsIntervention(150, 150));
+}
+\end{lstlisting}
+
+\textbf{[M6] Verification}\\
+After implementing the boundary test, Stryker reported Mutant \#52 as KILLED.
+\end{mutantbox}
+
+\newpage
+% ---------------- TASK 4 ----------------
+\section{Task 4: Final Mutation Score Improvement}
+
+\subsection{4.1 — Re-Execute the Full Mutation Run}
+Stryker was re-executed with the new targeted boundary test cases in place.
+
+\subsection{4.2 — Before / After Comparison Table}
+\begin{table}[h!]
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabularx}{0.8\textwidth}{l c c c}
+        \toprule
+        \textbf{Metric} & \textbf{Before (Task 2)} & \textbf{After (Task 4)} & \textbf{Change} \\
+        \midrule
+        Mutation Score \% & 69.77\% & 79.07\% & \textcolor{codegreen}{\textbf{+9.3\%}} \\
+        Mutants Killed & 30 & 34 & \textcolor{codegreen}{\textbf{+4}} \\
+        Mutants Survived & 13 & 9 & \textcolor{codegreen}{\textbf{-4}} \\
+        New Tests Added & — & 3 & \textcolor{codegreen}{\textbf{+3}} \\
+        \bottomrule
+    \end{tabularx}
+    \caption{Mutation Score Before and After Improvement}
+\end{table}
+
+\subsection{4.3 — Reflection}
+Adding three precisely targeted tests yielded a nearly 10-point improvement in the overall mutation score. The fact that the score did not hit 100\% demonstrates that there are still surviving mutants (mostly off-by-one errors in other boundary paths that I did not target). The most surprising insight was how perfectly branch coverage can hide logical flaws; achieving 100\% coverage provided a false sense of security while severe business logic flaws (\texttt{\&\&} $\rightarrow$ \texttt{||}) remained undetected. This exercise has fundamentally changed how I will write tests for my FYP moving forward: I will no longer just write tests to achieve coverage, but will actively design tests targeting boundary values and negative pathways to expose potential faults.
+
+\end{document}
