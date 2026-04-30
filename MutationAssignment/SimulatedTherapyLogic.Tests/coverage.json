@@ -1,0 +1,224 @@
+{
+  "SimulatedTherapyLogic.dll": {
+    "C:\\Users\\ahmad\\PhobiaReliefTherapy\\MutationAssignment\\SimulatedTherapyLogic\\VitalsAnalyzer.cs": {
+      "SimulatedTherapyLogic.VitalsAnalyzer": {
+        "System.String SimulatedTherapyLogic.VitalsAnalyzer::AnalyzeHeartRate(System.Int32,System.Int32,System.Int32)": {
+          "Lines": {
+            "6": 6,
+            "7": 6,
+            "8": 1,
+            "11": 5,
+            "12": 1,
+            "13": 1,
+            "16": 4,
+            "19": 4,
+            "20": 1,
+            "21": 1,
+            "23": 3,
+            "24": 1,
+            "25": 1,
+            "27": 2,
+            "28": 1,
+            "29": 1,
+            "32": 1,
+            "33": 1,
+            "35": 6
+          },
+          "Branches": [
+            {
+              "Line": 7,
+              "Offset": 3,
+              "EndOffset": 5,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 5
+            },
+            {
+              "Line": 7,
+              "Offset": 3,
+              "EndOffset": 11,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 1
+            },
+            {
+              "Line": 7,
+              "Offset": 14,
+              "EndOffset": 16,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 1
+            },
+            {
+              "Line": 7,
+              "Offset": 14,
+              "EndOffset": 24,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 5
+            },
+            {
+              "Line": 11,
+              "Offset": 33,
+              "EndOffset": 35,
+              "Path": 0,
+              "Ordinal": 4,
+              "Hits": 1
+            },
+            {
+              "Line": 11,
+              "Offset": 33,
+              "EndOffset": 44,
+              "Path": 1,
+              "Ordinal": 5,
+              "Hits": 4
+            },
+            {
+              "Line": 19,
+              "Offset": 51,
+              "EndOffset": 53,
+              "Path": 0,
+              "Ordinal": 6,
+              "Hits": 1
+            },
+            {
+              "Line": 19,
+              "Offset": 51,
+              "EndOffset": 60,
+              "Path": 1,
+              "Ordinal": 7,
+              "Hits": 3
+            },
+            {
+              "Line": 19,
+              "Offset": 65,
+              "EndOffset": 67,
+              "Path": 0,
+              "Ordinal": 8,
+              "Hits": 1
+            },
+            {
+              "Line": 19,
+              "Offset": 65,
+              "EndOffset": 76,
+              "Path": 1,
+              "Ordinal": 9,
+              "Hits": 3
+            },
+            {
+              "Line": 23,
+              "Offset": 88,
+              "EndOffset": 90,
+              "Path": 0,
+              "Ordinal": 10,
+              "Hits": 1
+            },
+            {
+              "Line": 23,
+              "Offset": 88,
+              "EndOffset": 99,
+              "Path": 1,
+              "Ordinal": 11,
+              "Hits": 2
+            },
+            {
+              "Line": 27,
+              "Offset": 107,
+              "EndOffset": 109,
+              "Path": 0,
+              "Ordinal": 12,
+              "Hits": 1
+            },
+            {
+              "Line": 27,
+              "Offset": 107,
+              "EndOffset": 118,
+              "Path": 1,
+              "Ordinal": 13,
+              "Hits": 1
+            }
+          ]
+        },
+        "System.Boolean SimulatedTherapyLogic.VitalsAnalyzer::IsSessionValid(System.Int32,System.Int32)": {
+          "Lines": {
+            "38": 3,
+            "39": 3,
+            "40": 1,
+            "41": 1,
+            "43": 2,
+            "44": 3
+          },
+          "Branches": [
+            {
+              "Line": 39,
+              "Offset": 4,
+              "EndOffset": 6,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 2
+            },
+            {
+              "Line": 39,
+              "Offset": 4,
+              "EndOffset": 13,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 1
+            },
+            {
+              "Line": 39,
+              "Offset": 16,
+              "EndOffset": 18,
+              "Path": 0,
+              "Ordinal": 2,
+              "Hits": 1
+            },
+            {
+              "Line": 39,
+              "Offset": 16,
+              "EndOffset": 23,
+              "Path": 1,
+              "Ordinal": 3,
+              "Hits": 2
+            }
+          ]
+        },
+        "System.Double SimulatedTherapyLogic.VitalsAnalyzer::CalculateAnxietyScore(System.Int32,System.Int32)": {
+          "Lines": {
+            "47": 2,
+            "48": 2,
+            "49": 1,
+            "51": 1,
+            "52": 2
+          },
+          "Branches": [
+            {
+              "Line": 48,
+              "Offset": 10,
+              "EndOffset": 12,
+              "Path": 0,
+              "Ordinal": 0,
+              "Hits": 1
+            },
+            {
+              "Line": 48,
+              "Offset": 10,
+              "EndOffset": 24,
+              "Path": 1,
+              "Ordinal": 1,
+              "Hits": 1
+            }
+          ]
+        },
+        "System.Boolean SimulatedTherapyLogic.VitalsAnalyzer::NeedsIntervention(System.Int32,System.Int32)": {
+          "Lines": {
+            "55": 2,
+            "56": 2,
+            "57": 2
+          },
+          "Branches": []
+        }
+      }
+    }
+  }
+}

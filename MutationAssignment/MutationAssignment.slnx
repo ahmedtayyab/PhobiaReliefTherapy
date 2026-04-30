@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SimulatedTherapyLogic.Tests/SimulatedTherapyLogic.Tests.csproj" />
+  <Project Path="SimulatedTherapyLogic/SimulatedTherapyLogic.csproj" />
+</Solution>
