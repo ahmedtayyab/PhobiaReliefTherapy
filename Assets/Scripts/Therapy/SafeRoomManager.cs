@@ -14,17 +14,63 @@ namespace PhobiaReliefTherapy.Therapy
         [Header("UI Elements")]
         public TextMeshProUGUI welcomeText;
         public TextMeshProUGUI infoText;
+        public TextMeshProUGUI statusText;
         public Button startExposureButton;
+        public Button backToDashboardButton;
 
         private void Start()
         {
-            welcomeText.text = $"Welcome, {UserData.Username}.";
-            infoText.text = $"You have selected {UserData.SelectedPhobia} Therapy.\nTake a deep breath and relax. Your baseline HR is {UserData.BaselineHeartRate} BPM.";
+            AutoBindMissingFields();
+
+            VRManager.EnsureInstanceExists();
+            SensorManager.EnsureInstanceExists();
+
+            if (welcomeText != null)
+                welcomeText.text = $"Welcome, {UserData.Username}.";
+
+            if (infoText != null)
+                infoText.text = $"Selected phobia: {UserData.SelectedPhobia}\nBaseline HR: {UserData.BaselineHeartRate} BPM\nDifficulty: {UserData.SelectedDifficulty}";
+
+            if (statusText != null)
+                statusText.text = "Preparing your safe room...";
+
+            VRManager.Instance.InitializeVR();
+            SensorManager.Instance.StartSessionMonitoring();
+
+            if (statusText != null)
+                statusText.text = SensorManager.Instance.UseMockSensor ? "Sensor mode: mock" : "Sensor mode: live";
 
             if (startExposureButton != null)
             {
+                startExposureButton.onClick.RemoveAllListeners();
                 startExposureButton.onClick.AddListener(StartExposure);
             }
+
+            if (backToDashboardButton != null)
+            {
+                backToDashboardButton.onClick.RemoveAllListeners();
+                backToDashboardButton.onClick.AddListener(() => SceneLoader.Instance.LoadScene("DashboardScene"));
+            }
+        }
+
+        private void AutoBindMissingFields()
+        {
+            if (welcomeText == null)
+                welcomeText = AutoBindField<TextMeshProUGUI>("WelcomeText");
+            if (infoText == null)
+                infoText = AutoBindField<TextMeshProUGUI>("InfoText");
+            if (statusText == null)
+                statusText = AutoBindField<TextMeshProUGUI>("StatusText");
+            if (startExposureButton == null)
+                startExposureButton = AutoBindField<Button>("StartExposureButton");
+            if (backToDashboardButton == null)
+                backToDashboardButton = AutoBindField<Button>("BackToDashboardButton");
+        }
+
+        private T AutoBindField<T>(string objectName) where T : Component
+        {
+            T result = AutoBindHelper.FindComponentInChildrenByName<T>(transform, objectName);
+            return result != null ? result : AutoBindHelper.FindComponentByName<T>(objectName);
         }
 
         private void StartExposure()

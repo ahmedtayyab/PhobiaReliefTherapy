@@ -5,6 +5,7 @@ namespace PhobiaReliefTherapy.Data
     /// </summary>
     public static class UserData
     {
+        public static string UserId { get; set; } = "";
         public static string Username { get; set; } = "Guest";
         
         // E.g. "Height", "Darkness", "Crowd"
@@ -15,5 +16,8 @@ namespace PhobiaReliefTherapy.Data
         
         // Simulated or real baseline heart rate before starting exposure
         public static int BaselineHeartRate { get; set; } = 0;
+
+        // For session tracking
+        public static int CurrentStage { get; set; } = 1;
     }
 }
