@@ -21,6 +21,7 @@ namespace PhobiaReliefTherapy.Therapy
         private void Start()
         {
             AutoBindMissingFields();
+            InitializeSafeRoomImage();
 
             VRManager.EnsureInstanceExists();
             SensorManager.EnsureInstanceExists();
@@ -50,6 +51,71 @@ namespace PhobiaReliefTherapy.Therapy
             {
                 backToDashboardButton.onClick.RemoveAllListeners();
                 backToDashboardButton.onClick.AddListener(() => SceneLoader.Instance.LoadScene("DashboardScene"));
+            }
+        }
+
+        private void InitializeSafeRoomImage()
+        {
+            // Try to find if an image already exists
+            GameObject existingImg = GameObject.Find("SafeRoomImage");
+            if (existingImg != null)
+                return;
+
+            // Find the empty CardPanel to place it in
+            GameObject emptyCard = null;
+            var canvases = Object.FindObjectsOfType<Canvas>();
+            foreach (var canvas in canvases)
+            {
+                var panelTransform = canvas.transform.Find("Panel");
+                if (panelTransform != null)
+                {
+                    foreach (Transform child in panelTransform)
+                    {
+                        if (child.name.Contains("CardPanel") && child.childCount == 0)
+                        {
+                            emptyCard = child.gameObject;
+                            break;
+                        }
+                    }
+                }
+                if (emptyCard != null) break;
+            }
+
+            if (emptyCard == null)
+            {
+                var cards = GameObject.FindObjectsOfType<VerticalLayoutGroup>();
+                foreach (var card in cards)
+                {
+                    if (card.gameObject.name.Contains("CardPanel") && card.transform.childCount == 0)
+                    {
+                        emptyCard = card.gameObject;
+                        break;
+                    }
+                }
+            }
+
+            if (emptyCard != null)
+            {
+                var imageGO = new GameObject("SafeRoomImage", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+                imageGO.transform.SetParent(emptyCard.transform, false);
+
+                var image = imageGO.GetComponent<Image>();
+                var sprite = Resources.Load<Sprite>("safe_room_preview");
+                if (sprite != null)
+                {
+                    image.sprite = sprite;
+                    image.preserveAspect = true;
+                }
+                else
+                {
+                    Debug.LogWarning("Safe room image resource not found in Assets/Resources/safe_room_preview");
+                }
+
+                var layout = imageGO.AddComponent<LayoutElement>();
+                layout.preferredWidth = 600f;
+                layout.preferredHeight = 400f;
+                layout.minWidth = 600f;
+                layout.minHeight = 400f;
             }
         }
 
