@@ -197,9 +197,9 @@ Authentication and user data are stored in [Supabase](https://supabase.com):
 
 > **For contributors:** Supabase URL and anon key are configured in `Assets/Scripts/Data/DatabaseManager.cs`. For production deployments, move credentials to environment-based configuration rather than hardcoding them.
 
-> **Password reset note:** the reset email link must point to a real hosted callback page. If Supabase Auth is configured with `localhost` or another unreachable redirect URL, the email will open a browser page that cannot connect. Update the Supabase dashboard `Site URL` and `Additional Redirect URLs` to a live HTTPS page before testing password recovery.
+> **Auth redirect notes:** the signup confirmation flow should point to `https://ahmedtayyab.github.io/PhobiaReliefTherapy/registration-success/` and password recovery should point to `https://ahmedtayyab.github.io/PhobiaReliefTherapy/password-reset/`. Update Supabase Authentication > URL Configuration so `Site URL` uses the signup page and `Additional Redirect URLs` includes the password-reset page.
 
-> **Reset page:** a simple hosted callback page lives at `web/password-reset/index.html`. Point Supabase recovery redirects to that URL after you deploy it.
+> **Reset page:** a simple hosted callback page lives at `web/password-reset/index.html`. A matching signup page lives at `docs/registration-success/index.html` for GitHub Pages.
 
 ---
 

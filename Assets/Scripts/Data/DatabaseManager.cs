@@ -53,7 +53,8 @@ namespace PhobiaReliefTherapy.Data
         // Supabase configuration
         private const string SUPABASE_URL = "https://vzdtagvmpuhyahewooly.supabase.co";
         private const string SUPABASE_ANON_KEY = "sb_publishable_QSBY1oj2CZoXAekpLt5Xcg_72xPbbi4";
-        private const string SUPABASE_AUTH_REDIRECT_URL = "https://vzdtagvmpuhyahewooly.supabase.co"; // Must be a reachable web page configured in Supabase Auth; localhost will fail unless you are serving a local callback page.
+        private const string SUPABASE_SIGNUP_REDIRECT_URL = "https://ahmedtayyab.github.io/PhobiaReliefTherapy/registration-success/";
+        private const string SUPABASE_PASSWORD_RESET_REDIRECT_URL = "https://ahmedtayyab.github.io/PhobiaReliefTherapy/password-reset/";
 
         private void Awake()
         {
@@ -77,7 +78,7 @@ namespace PhobiaReliefTherapy.Data
             {
                 email = email,
                 password = password,
-                redirect_to = SUPABASE_AUTH_REDIRECT_URL
+                redirect_to = SUPABASE_SIGNUP_REDIRECT_URL
             };
             string jsonData = JsonUtility.ToJson(authData);
 
@@ -132,7 +133,7 @@ namespace PhobiaReliefTherapy.Data
             var recoverData = new RecoverRequest
             {
                 email = email,
-                redirect_to = SUPABASE_AUTH_REDIRECT_URL
+                redirect_to = SUPABASE_PASSWORD_RESET_REDIRECT_URL
             };
             string jsonData = JsonUtility.ToJson(recoverData);
 
