@@ -6,6 +6,7 @@ using PhobiaReliefTherapy.Data;
 using PhobiaReliefTherapy.Managers;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using PhobiaReliefTherapy;
 
 namespace PhobiaReliefTherapy.Managers
 {
@@ -32,8 +33,15 @@ namespace PhobiaReliefTherapy.Managers
         public Button goToRegisterButton;
         public Button goToLoginButton;
 
+        [Header("Login Recovery")]
+        public Button forgotPasswordButton;
+        public Button forgotUsernameButton;
+
         private void Start()
         {
+            AutoBindMissingFields();
+            EnsureLoginRecoveryButtons();
+
             // Setup listeners
             if (loginButton != null)
                 loginButton.onClick.AddListener(() => OnLoginClicked());
@@ -47,9 +55,103 @@ namespace PhobiaReliefTherapy.Managers
             if (goToLoginButton != null)
                 goToLoginButton.onClick.AddListener(() => NavigateToScene("LoginScene"));
 
+            if (forgotPasswordButton != null)
+                forgotPasswordButton.onClick.AddListener(() => OnForgotPasswordClicked());
+
+            if (forgotUsernameButton != null)
+                forgotUsernameButton.onClick.AddListener(() => OnForgotUsernameClicked());
+
             // Clear errors
             if (loginErrorText != null) loginErrorText.text = "";
             if (registerErrorText != null) registerErrorText.text = "";
+        }
+
+        private void AutoBindMissingFields()
+        {
+            bool isRegisterPage = (registerButton != null) || 
+                                  (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "RegisterScene");
+
+            if (isRegisterPage)
+            {
+                if (registerNameInput == null)
+                    registerNameInput = AutoBindHelper.FindComponentByName<TMP_InputField>("NameInput");
+                if (registerEmailInput == null)
+                    registerEmailInput = AutoBindHelper.FindComponentByName<TMP_InputField>("EmailInput");
+                if (registerPasswordInput == null)
+                    registerPasswordInput = AutoBindHelper.FindComponentByName<TMP_InputField>("PasswordInput");
+                if (registerButton == null)
+                    registerButton = AutoBindHelper.FindComponentByName<Button>("RegisterButton");
+                if (registerErrorText == null)
+                    registerErrorText = AutoBindHelper.FindComponentByName<TextMeshProUGUI>("RegisterErrorText");
+                if (goToLoginButton == null)
+                    goToLoginButton = AutoBindHelper.FindComponentByName<Button>("BackToLoginButton");
+                return;
+            }
+
+            if (loginEmailInput == null)
+                loginEmailInput = AutoBindHelper.FindComponentByName<TMP_InputField>("EmailInput");
+            if (loginPasswordInput == null)
+                loginPasswordInput = AutoBindHelper.FindComponentByName<TMP_InputField>("PasswordInput");
+            if (loginButton == null)
+                loginButton = AutoBindHelper.FindComponentByName<Button>("LoginButton");
+            if (loginErrorText == null)
+                loginErrorText = AutoBindHelper.FindComponentByName<TextMeshProUGUI>("LoginErrorText");
+            if (goToRegisterButton == null)
+                goToRegisterButton = AutoBindHelper.FindComponentByName<Button>("CreateAccountButton");
+            if (forgotPasswordButton == null)
+                forgotPasswordButton = AutoBindHelper.FindComponentByName<Button>("ForgotPasswordButton");
+        }
+
+        private void EnsureLoginRecoveryButtons()
+        {
+            if (loginEmailInput == null || forgotPasswordButton != null)
+                return;
+
+            Transform card = loginEmailInput.transform.parent;
+            if (card == null)
+                return;
+
+            if (forgotPasswordButton == null)
+            {
+                GameObject go = CreateRecoveryTextButton("ForgotPasswordButton", card, "Forgot password?");
+                forgotPasswordButton = go.GetComponent<Button>();
+                PositionRecoveryButton(go.GetComponent<RectTransform>(), 0.20f, 0.80f, 0.37f);
+            }
+        }
+
+        private static GameObject CreateRecoveryTextButton(string name, Transform parent, string label)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Button));
+            go.transform.SetParent(parent, false);
+
+            var textGO = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+            textGO.transform.SetParent(go.transform, false);
+
+            var tmp = textGO.GetComponent<TextMeshProUGUI>();
+            tmp.text = label;
+            tmp.fontSize = 16;
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.color = new Color32(28, 83, 146, 255);
+            tmp.enableWordWrapping = false;
+
+            var rect = go.GetComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(280, 28);
+
+            var textRect = textGO.GetComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = Vector2.zero;
+            textRect.offsetMax = Vector2.zero;
+
+            return go;
+        }
+
+        private static void PositionRecoveryButton(RectTransform rect, float anchorMinX, float anchorMaxX, float anchorY)
+        {
+            rect.anchorMin = new Vector2(anchorMinX, anchorY);
+            rect.anchorMax = new Vector2(anchorMaxX, anchorY);
+            rect.sizeDelta = new Vector2(0, 28);
+            rect.anchoredPosition = Vector2.zero;
         }
 
         private bool IsValidEmail(string email)
@@ -92,6 +194,8 @@ namespace PhobiaReliefTherapy.Managers
 
             string email = loginEmailInput.text.Trim();
             string pass = loginPasswordInput.text.Trim();
+
+            loginErrorText.color = new Color32(229, 62, 62, 255);
 
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(pass))
             {
@@ -220,6 +324,130 @@ namespace PhobiaReliefTherapy.Managers
 
             if (registerButton != null)
                 registerButton.interactable = true;
+        }
+
+        public void OnForgotPasswordClicked()
+        {
+            if (loginEmailInput == null || loginErrorText == null)
+                return;
+
+            string email = loginEmailInput.text.Trim();
+
+            if (string.IsNullOrEmpty(email))
+            {
+                loginErrorText.text = "Enter your email above, then tap Forgot password.";
+                return;
+            }
+
+            if (!IsValidEmail(email))
+            {
+                loginErrorText.text = "Enter a valid email address.";
+                return;
+            }
+
+            if (forgotPasswordButton != null)
+                forgotPasswordButton.interactable = false;
+            if (forgotUsernameButton != null)
+                forgotUsernameButton.interactable = false;
+
+            loginErrorText.text = "Sending reset link...";
+            StartCoroutine(ForgotPasswordCoroutine(email));
+        }
+
+        public void OnForgotUsernameClicked()
+        {
+            if (loginEmailInput == null || loginErrorText == null)
+                return;
+
+            string email = loginEmailInput.text.Trim();
+
+            if (string.IsNullOrEmpty(email))
+            {
+                loginErrorText.text = "Enter your email above, then tap Forgot username.";
+                return;
+            }
+
+            if (!IsValidEmail(email))
+            {
+                loginErrorText.text = "Enter a valid email address.";
+                return;
+            }
+
+            if (forgotPasswordButton != null)
+                forgotPasswordButton.interactable = false;
+            if (forgotUsernameButton != null)
+                forgotUsernameButton.interactable = false;
+
+            loginErrorText.text = "Looking up account...";
+            StartCoroutine(ForgotUsernameCoroutine(email));
+        }
+
+        private IEnumerator ForgotPasswordCoroutine(string email)
+        {
+            bool complete = false;
+            bool success = false;
+            string error = "Could not send password reset email. Try again later.";
+
+            yield return DatabaseManager.Instance.RecoverPassword(email, (ok, err) =>
+            {
+                success = ok;
+                if (!ok && !string.IsNullOrEmpty(err))
+                    error = err;
+                complete = true;
+            });
+
+            while (!complete)
+                yield return null;
+
+            if (success)
+            {
+                loginErrorText.text = "If an account exists for that email, a password reset link has been sent.";
+                loginErrorText.color = new Color32(28, 83, 146, 255);
+            }
+            else
+            {
+                loginErrorText.text = error;
+                loginErrorText.color = new Color32(229, 62, 62, 255);
+            }
+
+            if (forgotPasswordButton != null)
+                forgotPasswordButton.interactable = true;
+            if (forgotUsernameButton != null)
+                forgotUsernameButton.interactable = true;
+        }
+
+        private IEnumerator ForgotUsernameCoroutine(string email)
+        {
+            bool complete = false;
+            string username = null;
+            string error = "Could not look up account. Try again later.";
+
+            yield return DatabaseManager.Instance.LookupUsernameByEmail(email, (foundUsername, err) =>
+            {
+                username = foundUsername;
+                if (!string.IsNullOrEmpty(err))
+                    error = err;
+                complete = true;
+            });
+
+            while (!complete)
+                yield return null;
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                loginErrorText.text = $"Your account name is: {username}";
+                loginErrorText.color = new Color32(28, 83, 146, 255);
+            }
+            else
+            {
+                loginErrorText.text = error;
+                loginErrorText.color = new Color32(229, 62, 62, 255);
+            }
+
+            if (forgotPasswordButton != null)
+                forgotPasswordButton.interactable = true;
+            if (forgotUsernameButton != null)
+                forgotUsernameButton.interactable = true;
         }
 
         private void NavigateToScene(string sceneName)

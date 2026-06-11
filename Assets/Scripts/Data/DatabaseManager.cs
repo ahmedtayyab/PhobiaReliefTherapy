@@ -53,7 +53,7 @@ namespace PhobiaReliefTherapy.Data
         // Supabase configuration
         private const string SUPABASE_URL = "https://vzdtagvmpuhyahewooly.supabase.co";
         private const string SUPABASE_ANON_KEY = "sb_publishable_QSBY1oj2CZoXAekpLt5Xcg_72xPbbi4";
-        private const string SUPABASE_AUTH_REDIRECT_URL = "https://vzdtagvmpuhyahewooly.supabase.co"; // Use a public URL for email confirmation redirects.
+        private const string SUPABASE_AUTH_REDIRECT_URL = "https://vzdtagvmpuhyahewooly.supabase.co"; // Must be a reachable web page configured in Supabase Auth; localhost will fail unless you are serving a local callback page.
 
         private void Awake()
         {
@@ -121,6 +121,83 @@ namespace PhobiaReliefTherapy.Data
                         errorText = request.error;
                     Debug.LogError($"RegisterUser failed: {errorText}; response: {responseBody}; code: {request.responseCode}");
                     callback(false, errorText);
+                }
+            }
+        }
+
+        public IEnumerator RecoverPassword(string email, System.Action<bool, string> callback)
+        {
+            string url = $"{SUPABASE_URL}/auth/v1/recover";
+
+            var recoverData = new RecoverRequest
+            {
+                email = email,
+                redirect_to = SUPABASE_AUTH_REDIRECT_URL
+            };
+            string jsonData = JsonUtility.ToJson(recoverData);
+
+            using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+            {
+                request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(jsonData));
+                request.downloadHandler = new DownloadHandlerBuffer();
+
+                request.SetRequestHeader("apikey", SUPABASE_ANON_KEY);
+                request.SetRequestHeader("Authorization", $"Bearer {SUPABASE_ANON_KEY}");
+                request.SetRequestHeader("Accept", "application/json");
+                request.SetRequestHeader("Content-Type", "application/json");
+
+                yield return request.SendWebRequest();
+
+                string responseBody = request.downloadHandler.text;
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                    callback(true, null);
+                }
+                else
+                {
+                    string errorText = !string.IsNullOrEmpty(responseBody) ? ParseSupabaseError(responseBody) : request.error;
+                    if (string.IsNullOrEmpty(errorText))
+                        errorText = request.error;
+                    Debug.LogError($"RecoverPassword failed: {errorText}; response: {responseBody}; code: {request.responseCode}");
+                    callback(false, errorText);
+                }
+            }
+        }
+
+        public IEnumerator LookupUsernameByEmail(string email, System.Action<string, string> callback)
+        {
+            string encodedEmail = UnityWebRequest.EscapeURL(email);
+            string url = $"{SUPABASE_URL}/rest/v1/users?email=eq.{encodedEmail}&select=username";
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.SetRequestHeader("apikey", SUPABASE_ANON_KEY);
+                request.SetRequestHeader("Authorization", $"Bearer {SUPABASE_ANON_KEY}");
+                request.SetRequestHeader("Accept", "application/json");
+
+                yield return request.SendWebRequest();
+
+                string responseBody = request.downloadHandler.text;
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                    string body = WrapJsonArray(responseBody, "users");
+                    var users = JsonUtility.FromJson<UserEmailLookupArray>(body);
+                    if (users?.users != null && users.users.Length > 0 && !string.IsNullOrEmpty(users.users[0].username))
+                    {
+                        callback(users.users[0].username, null);
+                    }
+                    else
+                    {
+                        callback(null, "No account found for that email address.");
+                    }
+                }
+                else
+                {
+                    string errorText = !string.IsNullOrEmpty(responseBody) ? ParseSupabaseError(responseBody) : request.error;
+                    if (string.IsNullOrEmpty(errorText))
+                        errorText = request.error;
+                    Debug.LogError($"LookupUsernameByEmail failed: {errorText}; response: {responseBody}; code: {request.responseCode}");
+                    callback(null, errorText);
                 }
             }
         }
@@ -344,6 +421,13 @@ namespace PhobiaReliefTherapy.Data
         }
 
         [System.Serializable]
+        private class RecoverRequest
+        {
+            public string email;
+            public string redirect_to;
+        }
+
+        [System.Serializable]
         private class AuthResponse
         {
             public string access_token;
@@ -389,6 +473,18 @@ namespace PhobiaReliefTherapy.Data
         private class UserArray
         {
             public User[] users;
+        }
+
+        [System.Serializable]
+        private class UserEmailLookup
+        {
+            public string username;
+        }
+
+        [System.Serializable]
+        private class UserEmailLookupArray
+        {
+            public UserEmailLookup[] users;
         }
 
         [System.Serializable]

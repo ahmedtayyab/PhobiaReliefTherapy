@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d0e12">
+  <title>Phobia Relief Therapy | Reset Password</title>
+  <meta name="description" content="Reset your Phobia Relief Therapy account password.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <style>
+    :root {
+      --bg: #0d0e12;
+      --bg-deep: #0b0c0f;
+      --card: rgba(31, 34, 42, 0.92);
+      --card-border: rgba(68, 74, 90, 0.78);
+      --card-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
+      --text: #f5f7fb;
+      --text-soft: #dce1eb;
+      --muted: #98a2b3;
+      --accent: #ff5722;
+      --accent-2: #ff7043;
+      --accent-3: #e64a19;
+      --success: #38a169;
+      --error: #e53e3e;
+      --field: #13151a;
+      --field-border: #2c303b;
+      --focus: rgba(255, 112, 67, 0.28);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at 20% 15%, rgba(255, 87, 34, 0.18), transparent 26%),
+        radial-gradient(circle at 80% 20%, rgba(255, 112, 67, 0.12), transparent 22%),
+        radial-gradient(circle at 50% 85%, rgba(255, 87, 34, 0.1), transparent 28%),
+        linear-gradient(180deg, var(--bg), var(--bg-deep));
+      color: var(--text);
+      font-family: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .shell {
+      position: relative;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 32px 20px;
+      isolation: isolate;
+    }
+
+    .shell::before,
+    .shell::after {
+      content: "";
+      position: absolute;
+      inset: auto;
+      border-radius: 999px;
+      filter: blur(40px);
+      opacity: 0.55;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .shell::before {
+      width: 280px;
+      height: 280px;
+      top: 7%;
+      right: 7%;
+      background: rgba(255, 112, 67, 0.14);
+    }
+
+    .shell::after {
+      width: 360px;
+      height: 360px;
+      bottom: -8%;
+      left: -5%;
+      background: rgba(255, 87, 34, 0.08);
+    }
+
+    .container {
+      width: min(1080px, 100%);
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .hero,
+    .panel {
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--card-shadow);
+      background: linear-gradient(180deg, rgba(37, 41, 51, 0.88), rgba(23, 25, 32, 0.96));
+      backdrop-filter: blur(18px);
+    }
+
+    .hero {
+      padding: 36px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 620px;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(135deg, rgba(255, 87, 34, 0.18), transparent 38%, transparent 68%, rgba(255, 112, 67, 0.12));
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 112, 67, 0.22);
+      background: rgba(255, 87, 34, 0.08);
+      color: var(--accent-2);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.76rem;
+      font-weight: 800;
+      width: fit-content;
+      position: relative;
+      z-index: 1;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent-2);
+      box-shadow: 0 0 0 6px rgba(255, 112, 67, 0.14);
+    }
+
+    h1,
+    h2,
+    .title {
+      font-family: "Space Grotesk", "Manrope", sans-serif;
+      letter-spacing: -0.04em;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.3rem, 4vw, 4.4rem);
+      line-height: 0.98;
+      margin-top: 22px;
+      position: relative;
+      z-index: 1;
+      max-width: 10ch;
+    }
+
+    .hero p {
+      color: var(--text-soft);
+      font-size: 1.02rem;
+      line-height: 1.7;
+      max-width: 56ch;
+      margin: 18px 0 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .panel {
+      padding: 28px;
+      display: grid;
+      align-content: center;
+      gap: 18px;
+    }
+
+    .panel h2 {
+      font-size: clamp(1.5rem, 2vw, 2rem);
+      margin-bottom: 8px;
+    }
+
+    .status {
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      background: rgba(13, 14, 18, 0.32);
+      color: var(--text-soft);
+      min-height: 56px;
+      line-height: 1.5;
+    }
+
+    .status[data-state="info"] { border-color: rgba(255, 112, 67, 0.2); }
+    .status[data-state="success"] { border-color: rgba(56, 161, 105, 0.34); color: #d5f4e3; }
+    .status[data-state="error"] { border-color: rgba(229, 62, 62, 0.35); color: #ffd4d4; }
+
+    form {
+      display: grid;
+      gap: 14px;
+      margin-top: 4px;
+    }
+
+    label {
+      display: grid;
+      gap: 8px;
+      font-size: 0.94rem;
+      font-weight: 700;
+      color: var(--text-soft);
+    }
+
+    input {
+      width: 100%;
+      padding: 15px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--field-border);
+      background: linear-gradient(180deg, #181a21, #0e1014);
+      color: var(--text);
+      font: inherit;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+    }
+
+    input::placeholder {
+      color: #6f7786;
+    }
+
+    input:focus {
+      border-color: rgba(255, 112, 67, 0.55);
+      box-shadow: 0 0 0 4px var(--focus);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    button,
+    .link-button {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      border-radius: 14px;
+      font: inherit;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      transition: transform 0.15s ease, filter 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+      min-height: 52px;
+      padding: 0 18px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    button:hover,
+    .link-button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+    }
+
+    button:active,
+    .link-button:active {
+      transform: translateY(0);
+    }
+
+    .primary {
+      color: white;
+      background: linear-gradient(180deg, var(--accent), var(--accent-3));
+      box-shadow: 0 16px 34px rgba(255, 87, 34, 0.22);
+    }
+
+    .secondary {
+      color: var(--text);
+      background: linear-gradient(180deg, #2f333e, #1f222b);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .secondary:disabled,
+    .primary:disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+      box-shadow: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .success-state {
+      display: grid;
+      gap: 16px;
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(56, 161, 105, 0.08);
+      border: 1px solid rgba(56, 161, 105, 0.22);
+    }
+
+    .success-state p {
+      margin: 0;
+      color: var(--text-soft);
+      line-height: 1.65;
+    }
+
+    @media (max-width: 960px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .shell {
+        padding: 16px;
+      }
+
+      .hero,
+      .panel {
+        padding: 20px;
+        border-radius: 22px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      button,
+      .link-button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="container" aria-label="Reset password page">
+      <article class="hero">
+        <div>
+          <div class="eyebrow"><span class="dot"></span> Password reset</div>
+          <h1>Reset your Phobia Relief Therapy password.</h1>
+          <p>Choose a new password and return to the app.</p>
+        </div>
+      </article>
+
+      <aside class="panel">
+        <h2>Set a new password</h2>
+
+        <div id="status" class="status" data-state="info">Loading recovery session...</div>
+
+        <form id="reset-form" class="hidden" novalidate>
+          <label for="password">
+            New password
+            <input id="password" name="password" type="password" minlength="8" autocomplete="new-password" placeholder="At least 8 characters" required>
+          </label>
+
+          <label for="confirm-password">
+            Confirm password
+            <input id="confirm-password" name="confirm-password" type="password" minlength="8" autocomplete="new-password" placeholder="Repeat the new password" required>
+          </label>
+
+          <div class="actions">
+            <button id="save-button" class="primary" type="submit">Update password</button>
+            <button id="retry-button" class="secondary" type="button">Retry session</button>
+          </div>
+        </form>
+
+        <div id="success-state" class="success-state hidden">
+          <p>Your password has been updated.</p>
+          <p class="tiny">Return to the Phobia Relief Therapy app and sign in with your new password.</p>
+        </div>
+
+        <p class="footer-note">Supabase should redirect here after deployment.</p>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://vzdtagvmpuhyahewooly.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_QSBY1oj2CZoXAekpLt5Xcg_72xPbbi4";
+
+    const statusEl = document.getElementById("status");
+    const formEl = document.getElementById("reset-form");
+    const successEl = document.getElementById("success-state");
+    const saveButton = document.getElementById("save-button");
+    const retryButton = document.getElementById("retry-button");
+    const passwordEl = document.getElementById("password");
+    const confirmPasswordEl = document.getElementById("confirm-password");
+
+    let supabaseClient;
+    let sessionReady = false;
+
+    function setStatus(message, state = "info") {
+      statusEl.textContent = message;
+      statusEl.dataset.state = state;
+    }
+
+    function showForm(show) {
+      formEl.classList.toggle("hidden", !show);
+    }
+
+    function showSuccess(show) {
+      successEl.classList.toggle("hidden", !show);
+    }
+
+    function clearUrlArtifacts() {
+      const cleanUrl = new URL(window.location.href);
+      cleanUrl.searchParams.delete("code");
+      cleanUrl.searchParams.delete("token_hash");
+      cleanUrl.searchParams.delete("type");
+      cleanUrl.searchParams.delete("error_code");
+      cleanUrl.searchParams.delete("error_description");
+      window.history.replaceState({}, document.title, cleanUrl.pathname + cleanUrl.hash);
+    }
+
+    function readHashParams() {
+      return new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    }
+
+    function updateButtonState(isBusy) {
+      saveButton.disabled = isBusy;
+      retryButton.disabled = isBusy;
+      retryButton.textContent = isBusy ? "Checking..." : "Retry session";
+      saveButton.textContent = isBusy ? "Updating..." : "Update password";
+    }
+
+    function getClient() {
+      if (!window.supabase || !window.supabase.createClient) {
+        throw new Error("Supabase client library failed to load.");
+      }
+      return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: false,
+        },
+      });
+    }
+
+    async function establishRecoverySession() {
+      if (!supabaseClient) {
+        supabaseClient = getClient();
+      }
+
+      const url = new URL(window.location.href);
+      const search = url.searchParams;
+      const hash = readHashParams();
+      const errorCode = search.get("error_code") || hash.get("error_code");
+      const errorDescription = search.get("error_description") || hash.get("error_description");
+
+      if (errorCode || errorDescription) {
+        throw new Error(decodeURIComponent(errorDescription || errorCode));
+      }
+
+      if (search.get("code")) {
+        const code = search.get("code");
+        const result = await supabaseClient.auth.exchangeCodeForSession(code);
+        if (result.error) throw result.error;
+        clearUrlArtifacts();
+      } else if (search.get("token_hash") && search.get("type") === "recovery") {
+        const result = await supabaseClient.auth.verifyOtp({
+          type: "recovery",
+          token_hash: search.get("token_hash"),
+        });
+        if (result.error) throw result.error;
+        clearUrlArtifacts();
+      } else if (hash.get("access_token") && hash.get("refresh_token")) {
+        const result = await supabaseClient.auth.setSession({
+          access_token: hash.get("access_token"),
+          refresh_token: hash.get("refresh_token"),
+        });
+        if (result.error) throw result.error;
+        window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+      }
+
+      const sessionResult = await supabaseClient.auth.getSession();
+      if (!sessionResult.data.session) {
+        throw new Error("No recovery session was found in the link.");
+      }
+
+      sessionReady = true;
+    }
+
+    async function initializePage() {
+      setStatus("Loading recovery session...", "info");
+      showForm(false);
+      showSuccess(false);
+      updateButtonState(true);
+
+      try {
+        await establishRecoverySession();
+        setStatus("Recovery session ready. Enter your new password below.", "info");
+        showForm(true);
+      } catch (error) {
+        const message = error && error.message ? error.message : "Could not open the recovery link.";
+        setStatus(message, "error");
+        showForm(false);
+      } finally {
+        updateButtonState(false);
+      }
+    }
+
+    formEl.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      if (!sessionReady) {
+        setStatus("Open the reset email again so the recovery session can be established.", "error");
+        return;
+      }
+
+      const password = passwordEl.value.trim();
+      const confirmPassword = confirmPasswordEl.value.trim();
+
+      if (password.length < 8) {
+        setStatus("Password must be at least 8 characters long.", "error");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        setStatus("Passwords do not match.", "error");
+        return;
+      }
+
+      try {
+        updateButtonState(true);
+        setStatus("Updating password...", "info");
+
+        const result = await supabaseClient.auth.updateUser({ password });
+        if (result.error) throw result.error;
+
+        showForm(false);
+        showSuccess(true);
+        setStatus("Password updated successfully.", "success");
+      } catch (error) {
+        const message = error && error.message ? error.message : "Could not update the password.";
+        setStatus(message, "error");
+      } finally {
+        updateButtonState(false);
+        saveButton.textContent = "Update password";
+        retryButton.textContent = "Retry session";
+      }
+    });
+
+    retryButton.addEventListener("click", initializePage);
+
+    window.addEventListener("load", initializePage);
+  </script>
+</body>
+</html>

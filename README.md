@@ -197,6 +197,10 @@ Authentication and user data are stored in [Supabase](https://supabase.com):
 
 > **For contributors:** Supabase URL and anon key are configured in `Assets/Scripts/Data/DatabaseManager.cs`. For production deployments, move credentials to environment-based configuration rather than hardcoding them.
 
+> **Password reset note:** the reset email link must point to a real hosted callback page. If Supabase Auth is configured with `localhost` or another unreachable redirect URL, the email will open a browser page that cannot connect. Update the Supabase dashboard `Site URL` and `Additional Redirect URLs` to a live HTTPS page before testing password recovery.
+
+> **Reset page:** a simple hosted callback page lives at `web/password-reset/index.html`. Point Supabase recovery redirects to that URL after you deploy it.
+
 ---
 
 ## VR / XR Setup

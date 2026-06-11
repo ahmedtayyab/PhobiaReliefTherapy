@@ -106,11 +106,19 @@ public static class AuthSceneBuilder
         GameObject title = CreateText("LoginTitle", card.transform, "Login", 42, TextAlignmentOptions.Center, Color.white);
         GameObject emailField = CreateInputField("EmailInput", card.transform, "Enter Email");
         GameObject passwordField = CreateInputField("PasswordInput", card.transform, "Enter Password", true);
+        GameObject forgotPasswordButton = CreateTextButton("ForgotPasswordButton", card.transform, "Forgot password?");
         GameObject loginButton = CreateButton("LoginButton", card.transform, "Login");
         GameObject createAccountButton = CreateTextButton("CreateAccountButton", card.transform, "Create new account");
         GameObject errorText = CreateText("LoginErrorText", card.transform, "", 18, TextAlignmentOptions.Center, new Color32(229, 62, 62, 255));
 
-        ArrangeLoginLayout(title.GetComponent<RectTransform>(), emailField.GetComponent<RectTransform>(), passwordField.GetComponent<RectTransform>(), loginButton.GetComponent<RectTransform>(), createAccountButton.GetComponent<RectTransform>(), errorText.GetComponent<RectTransform>());
+        ArrangeLoginLayout(
+            title.GetComponent<RectTransform>(),
+            emailField.GetComponent<RectTransform>(),
+            passwordField.GetComponent<RectTransform>(),
+            forgotPasswordButton.GetComponent<RectTransform>(),
+            loginButton.GetComponent<RectTransform>(),
+            createAccountButton.GetComponent<RectTransform>(),
+            errorText.GetComponent<RectTransform>());
 
         var managerGO = new GameObject("AuthManagerObject", typeof(AuthManager));
         managerGO.transform.SetParent(card.transform, false);
@@ -120,6 +128,7 @@ public static class AuthSceneBuilder
         auth.loginButton = loginButton.GetComponent<Button>();
         auth.loginErrorText = errorText.GetComponent<TextMeshProUGUI>();
         auth.goToRegisterButton = createAccountButton.GetComponent<Button>();
+        auth.forgotPasswordButton = forgotPasswordButton.GetComponent<Button>();
 
         SaveScene(scene, scenePath);
     }
@@ -317,7 +326,7 @@ public static class AuthSceneBuilder
 
 
 
-    private static void ArrangeLoginLayout(RectTransform title, RectTransform email, RectTransform password, RectTransform loginButton, RectTransform createAccountButton, RectTransform errorText)
+    private static void ArrangeLoginLayout(RectTransform title, RectTransform email, RectTransform password, RectTransform forgotPasswordButton, RectTransform loginButton, RectTransform createAccountButton, RectTransform errorText)
     {
         title.anchorMin = new Vector2(0.08f, 0.80f);
         title.anchorMax = new Vector2(0.92f, 0.90f);
@@ -333,6 +342,11 @@ public static class AuthSceneBuilder
         password.anchorMax = new Vector2(0.80f, 0.47f);
         password.sizeDelta = new Vector2(0, 48);
         password.anchoredPosition = Vector2.zero;
+
+        forgotPasswordButton.anchorMin = new Vector2(0.20f, 0.37f);
+        forgotPasswordButton.anchorMax = new Vector2(0.80f, 0.37f);
+        forgotPasswordButton.sizeDelta = new Vector2(0, 28);
+        forgotPasswordButton.anchoredPosition = Vector2.zero;
 
         loginButton.anchorMin = new Vector2(0.5f, 0.28f);
         loginButton.anchorMax = new Vector2(0.5f, 0.28f);
