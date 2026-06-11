@@ -3,10 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="refresh" content="0; url=./registration-success/">
   <title>Phobia Relief Therapy</title>
   <script>
-    window.location.replace('./registration-success/');
+    (function () {
+      const url = new URL(window.location.href);
+      const search = url.searchParams;
+      const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+      const isRecovery = search.get('type') === 'recovery' || search.has('token_hash') || hash.get('type') === 'recovery' || hash.has('access_token') || hash.has('refresh_token');
+      const target = isRecovery ? './password-reset/' : './registration-success/';
+      window.location.replace(target + window.location.search + window.location.hash);
+    })();
   </script>
   <style>
     body {
@@ -27,6 +33,6 @@
   </style>
 </head>
 <body>
-  <p>If you are not redirected automatically, open <a href="./registration-success/">registration success</a>.</p>
+  <p>If you are not redirected automatically, open <a href="./registration-success/">registration success</a> or <a href="./password-reset/">password reset</a>.</p>
 </body>
 </html>
