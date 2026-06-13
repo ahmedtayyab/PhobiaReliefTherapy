@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 using System.Text.RegularExpressions;
 using PhobiaReliefTherapy.Data;
@@ -7,6 +8,7 @@ using PhobiaReliefTherapy.Managers;
 using System.Collections;
 using UnityEngine.SceneManagement;
 using PhobiaReliefTherapy;
+using UnityEngine.XR;
 
 namespace PhobiaReliefTherapy.Managers
 {
@@ -39,6 +41,7 @@ namespace PhobiaReliefTherapy.Managers
 
         private void Start()
         {
+            VRUIInputBridge.EnsureInstanceExists();
             AutoBindMissingFields();
             EnsureLoginRecoveryButtons();
 
@@ -228,30 +231,35 @@ namespace PhobiaReliefTherapy.Managers
 
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(pass))
             {
+                registerErrorText.color = new Color32(229, 62, 62, 255); // Red
                 registerErrorText.text = "All fields are required!";
                 return;
             }
 
             if (!IsValidUsername(name))
             {
+                registerErrorText.color = new Color32(229, 62, 62, 255); // Red
                 registerErrorText.text = "Name must be 3-30 characters.";
                 return;
             }
 
             if (!IsValidEmail(email))
             {
+                registerErrorText.color = new Color32(229, 62, 62, 255); // Red
                 registerErrorText.text = "Enter a valid email address.";
                 return;
             }
 
             if (!IsValidPassword(pass))
             {
+                registerErrorText.color = new Color32(229, 62, 62, 255); // Red
                 registerErrorText.text = "Password must be at least 8 characters and include both letters and numbers.";
                 return;
             }
 
             registerButton.interactable = false;
-            registerErrorText.text = "Loading, confirm email";
+            registerErrorText.color = new Color32(28, 83, 146, 255); // Neutral blue
+            registerErrorText.text = "Loading, confirm email...";
             StartCoroutine(RegisterCoroutine(name, email, pass));
         }
 
@@ -314,11 +322,13 @@ namespace PhobiaReliefTherapy.Managers
 
             if (registerSuccess)
             {
-                registerErrorText.text = "Registered successfully";
+                registerErrorText.color = new Color32(72, 187, 120, 255); // Green for success
+                registerErrorText.text = "Registered successfully! Check your email to confirm your account.";
                 // Do not auto-login until the user has confirmed their email.
             }
             else
             {
+                registerErrorText.color = new Color32(229, 62, 62, 255); // Red for error
                 registerErrorText.text = registerError;
             }
 
@@ -456,6 +466,231 @@ namespace PhobiaReliefTherapy.Managers
                 SceneLoader.Instance.LoadScene(sceneName);
             else
                 SceneManager.LoadScene(sceneName);
+        }
+    }
+
+    /// <summary>
+    /// Lightweight VR-friendly UI bridge that lets headset gaze and controller trigger input click existing Unity UI.
+    /// This avoids the need for a full XR Interaction Toolkit rig while still making login/register screens usable in VR.
+    /// </summary>
+    public class VRUIInputBridge : MonoBehaviour
+    {
+        private static VRUIInputBridge instance;
+
+        private readonly System.Collections.Generic.List<RaycastResult> raycastResults = new System.Collections.Generic.List<RaycastResult>();
+        private PointerEventData pointerEventData;
+        private EventSystem eventSystem;
+        private GameObject currentHoveredObject;
+        private GameObject pressedObject;
+        private bool wasPressedLastFrame;
+
+        public static void EnsureInstanceExists()
+        {
+            if (instance != null)
+                return;
+
+            GameObject existing = Object.FindObjectOfType<VRUIInputBridge>()?.gameObject;
+            if (existing != null)
+            {
+                instance = existing.GetComponent<VRUIInputBridge>();
+                return;
+            }
+
+            GameObject go = new GameObject("VRUIInputBridge");
+            instance = go.AddComponent<VRUIInputBridge>();
+            Object.DontDestroyOnLoad(go);
+        }
+
+        private void Awake()
+        {
+            if (instance == null)
+            {
+                instance = this;
+                Object.DontDestroyOnLoad(gameObject);
+            }
+            else if (instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            EnsureEventSystemExists();
+        }
+
+        private void OnDestroy()
+        {
+            if (instance == this)
+            {
+                SceneManager.sceneLoaded -= OnSceneLoaded;
+                instance = null;
+            }
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+        {
+            EnsureEventSystemExists();
+            currentHoveredObject = null;
+            pressedObject = null;
+            wasPressedLastFrame = false;
+        }
+
+        private void EnsureEventSystemExists()
+        {
+            if (UnityEngine.XR.XRSettings.isDeviceActive || 
+                (UnityEngine.XR.Management.XRGeneralSettings.Instance != null && 
+                 UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager != null && 
+                 UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager.activeLoader != null))
+            {
+                return;
+            }
+
+            eventSystem = EventSystem.current != null ? EventSystem.current : Object.FindObjectOfType<EventSystem>();
+            if (eventSystem == null)
+            {
+                GameObject eventSystemGO = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+                eventSystem = eventSystemGO.GetComponent<EventSystem>();
+                Object.DontDestroyOnLoad(eventSystemGO);
+            }
+            else if (eventSystem.GetComponent<StandaloneInputModule>() == null)
+            {
+                eventSystem.gameObject.AddComponent<StandaloneInputModule>();
+            }
+
+            if (pointerEventData == null && eventSystem != null)
+            {
+                pointerEventData = new PointerEventData(eventSystem);
+            }
+        }
+
+        private void Update()
+        {
+            // If native VR rig is active, disable this legacy gaze bridge to avoid input module conflicts and auto-deselection of fields
+            if (UnityEngine.XR.XRSettings.isDeviceActive || 
+                (UnityEngine.XR.Management.XRGeneralSettings.Instance != null && 
+                 UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager != null && 
+                 UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager.activeLoader != null))
+            {
+                if (eventSystem != null)
+                {
+                    var standalone = eventSystem.GetComponent<StandaloneInputModule>();
+                    if (standalone != null)
+                    {
+                        Destroy(standalone);
+                    }
+                }
+                gameObject.SetActive(false);
+                return;
+            }
+
+            if (eventSystem == null)
+            {
+                EnsureEventSystemExists();
+                if (eventSystem == null)
+                    return;
+            }
+
+            if (pointerEventData == null)
+            {
+                pointerEventData = new PointerEventData(eventSystem);
+            }
+
+            pointerEventData.Reset();
+            pointerEventData.position = GetPointerPosition();
+            pointerEventData.button = PointerEventData.InputButton.Left;
+
+            raycastResults.Clear();
+            eventSystem.RaycastAll(pointerEventData, raycastResults);
+
+            GameObject hoveredObject = raycastResults.Count > 0 ? raycastResults[0].gameObject : null;
+            UpdateHoverState(hoveredObject);
+
+            bool triggerPressed = IsTriggerPressed();
+            if (triggerPressed && !wasPressedLastFrame)
+            {
+                HandlePointerDown(hoveredObject);
+            }
+            else if (!triggerPressed && wasPressedLastFrame)
+            {
+                HandlePointerUp(hoveredObject);
+            }
+
+            wasPressedLastFrame = triggerPressed;
+        }
+
+        private Vector2 GetPointerPosition()
+        {
+            if (Application.isEditor)
+                return new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+
+            return new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+        }
+
+        private bool IsTriggerPressed()
+        {
+            if (Application.isEditor)
+                return Input.GetMouseButton(0);
+
+            return IsXRButtonPressed(XRNode.RightHand) || IsXRButtonPressed(XRNode.LeftHand);
+        }
+
+        private bool IsXRButtonPressed(XRNode node)
+        {
+            InputDevice device = InputDevices.GetDeviceAtXRNode(node);
+            if (!device.isValid)
+                return false;
+
+            if (device.TryGetFeatureValue(CommonUsages.triggerButton, out bool triggerPressed) && triggerPressed)
+                return true;
+
+            if (device.TryGetFeatureValue(CommonUsages.primaryButton, out bool primaryPressed) && primaryPressed)
+                return true;
+
+            return false;
+        }
+
+        private void UpdateHoverState(GameObject hoveredObject)
+        {
+            if (hoveredObject == currentHoveredObject)
+                return;
+
+            if (currentHoveredObject != null)
+            {
+                ExecuteEvents.ExecuteHierarchy(currentHoveredObject, pointerEventData, ExecuteEvents.pointerExitHandler);
+            }
+
+            currentHoveredObject = hoveredObject;
+
+            if (currentHoveredObject != null)
+            {
+                ExecuteEvents.ExecuteHierarchy(currentHoveredObject, pointerEventData, ExecuteEvents.pointerEnterHandler);
+            }
+        }
+
+        private void HandlePointerDown(GameObject hoveredObject)
+        {
+            pressedObject = hoveredObject;
+            if (pressedObject == null)
+                return;
+
+            ExecuteEvents.ExecuteHierarchy(pressedObject, pointerEventData, ExecuteEvents.pointerDownHandler);
+            eventSystem.SetSelectedGameObject(pressedObject);
+        }
+
+        private void HandlePointerUp(GameObject hoveredObject)
+        {
+            if (pressedObject == null)
+                return;
+
+            ExecuteEvents.ExecuteHierarchy(pressedObject, pointerEventData, ExecuteEvents.pointerUpHandler);
+
+            if (hoveredObject == pressedObject)
+            {
+                ExecuteEvents.ExecuteHierarchy(pressedObject, pointerEventData, ExecuteEvents.pointerClickHandler);
+                ExecuteEvents.ExecuteHierarchy(pressedObject, pointerEventData, ExecuteEvents.submitHandler);
+            }
+
+            pressedObject = null;
         }
     }
 }

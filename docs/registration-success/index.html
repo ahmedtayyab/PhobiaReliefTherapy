@@ -201,5 +201,28 @@
       <div class="note">Supabase signup redirects should point to this page.</div>
     </section>
   </main>
+  <script>
+    // Automatically redirect to password-reset page if recovery parameters are detected
+    const url = new URL(window.location.href);
+    const hash = window.location.hash;
+    const search = url.search;
+
+    const isRecovery = url.searchParams.get("type") === "recovery" ||
+                       url.searchParams.get("token_hash") ||
+                       url.searchParams.get("code") ||
+                       hash.includes("type=recovery") ||
+                       (hash.includes("access_token=") && hash.includes("refresh_token="));
+
+    if (isRecovery) {
+      // Forward the user automatically to the password-reset page with all query/hash tokens
+      window.location.replace("../password-reset/" + search + hash);
+    } else {
+      // Fallback: update the link dynamically to pass down any parameters when manually clicked
+      const resetLink = document.querySelector('a[href="../password-reset/"]');
+      if (resetLink) {
+        resetLink.href = "../password-reset/" + search + hash;
+      }
+    }
+  </script>
 </body>
 </html>

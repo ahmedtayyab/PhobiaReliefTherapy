@@ -20,6 +20,8 @@ namespace PhobiaReliefTherapy.Therapy
 
         private void Start()
         {
+            VRUIInputBridge.EnsureInstanceExists();
+            VRLocomotionBridge.EnsureInstanceExists();
             AutoBindMissingFields();
             InitializeSafeRoomImage();
 

@@ -56,6 +56,8 @@ namespace PhobiaReliefTherapy.Therapy
 
         private void Start()
         {
+            VRUIInputBridge.EnsureInstanceExists();
+            VRLocomotionBridge.EnsureInstanceExists();
             AutoBindMissingFields();
 
             if (continueButton != null)
@@ -80,9 +82,12 @@ namespace PhobiaReliefTherapy.Therapy
         {
             if (isMeasuring)
             {
-                // Auto-detect VR state to hide 2D fallback and reveal true 3D skybox
-                bool isVRActive = UnityEngine.XR.XRSettings.isDeviceActive;
-                if (isVRActive)
+#if UNITY_ANDROID && !UNITY_EDITOR
+                // On Quest: always hide flat 2D background, let the skybox + HMD rotation do the work
+                if (customBackgroundGO != null && customBackgroundGO.activeSelf)
+                    customBackgroundGO.SetActive(false);
+#else
+                if (IsVRActive())
                 {
                     if (customBackgroundGO != null && customBackgroundGO.activeSelf)
                         customBackgroundGO.SetActive(false);
@@ -92,6 +97,7 @@ namespace PhobiaReliefTherapy.Therapy
                     // If not in VR, allow Editor simulation to preview 3D environment look
                     SimulateEditor3DLook();
                 }
+#endif
             }
         }
 
@@ -313,6 +319,12 @@ namespace PhobiaReliefTherapy.Therapy
                 bgRect.anchorMax = Vector2.one;
                 bgRect.offsetMin = Vector2.zero;
                 bgRect.offsetMax = Vector2.zero;
+
+                // Immediately deactivate the 2D background if VR is active to reveal the skybox instantly
+                if (IsVRActive())
+                {
+                    customBackgroundGO.SetActive(false);
+                }
             }
 
             // Disable the original Panel Image component to reveal our backgrounds
@@ -322,7 +334,7 @@ namespace PhobiaReliefTherapy.Therapy
                 if (panelImage != null) panelImage.enabled = false;
             }
 
-            // Move the timer to a corner (Top-Right corner of Canvas Panel)
+            // Move the timer to a corner (Top-Right corner of Canvas Panel, or center-right if VR is active)
             if (timerText != null)
             {
                 originalTimerParent = timerText.transform.parent;
@@ -332,17 +344,28 @@ namespace PhobiaReliefTherapy.Therapy
                 timerText.transform.SetParent(panelTransform != null ? panelTransform : canvas.transform, true);
 
                 RectTransform rect = timerText.rectTransform;
-                rect.anchorMin = new Vector2(1, 1);
-                rect.anchorMax = new Vector2(1, 1);
-                rect.pivot = new Vector2(1, 1);
-                rect.anchoredPosition = new Vector2(-50f, -50f); // Top-right offset
-                timerText.alignment = TextAlignmentOptions.TopRight;
+                if (IsVRActive())
+                {
+                    rect.anchorMin = new Vector2(0.75f, 0.85f);
+                    rect.anchorMax = new Vector2(0.75f, 0.85f);
+                    rect.pivot = new Vector2(0.5f, 0.5f);
+                    rect.anchoredPosition = Vector2.zero;
+                    timerText.alignment = TextAlignmentOptions.Center;
+                }
+                else
+                {
+                    rect.anchorMin = new Vector2(1, 1);
+                    rect.anchorMax = new Vector2(1, 1);
+                    rect.pivot = new Vector2(1, 1);
+                    rect.anchoredPosition = new Vector2(-50f, -50f); // Top-right offset
+                    timerText.alignment = TextAlignmentOptions.TopRight;
+                }
                 timerText.fontSize = 36f;
                 timerText.fontStyle = FontStyles.Bold;
                 timerText.color = Color.white;
             }
 
-            // Move instructionText to a corner (Bottom-Left corner of Canvas Panel)
+            // Move instructionText to a corner (Bottom-Left corner of Canvas Panel, or center-bottom if VR is active)
             if (instructionText != null)
             {
                 originalInstructionParent = instructionText.transform.parent;
@@ -357,13 +380,24 @@ namespace PhobiaReliefTherapy.Therapy
                 instructionText.transform.SetParent(panelTransform != null ? panelTransform : canvas.transform, true);
 
                 RectTransform rect = instructionText.rectTransform;
-                rect.anchorMin = new Vector2(0, 0); // Bottom-Left anchor
-                rect.anchorMax = new Vector2(0, 0);
-                rect.pivot = new Vector2(0, 0);
-                rect.anchoredPosition = new Vector2(50f, 50f); // Bottom-left offset
-                rect.sizeDelta = new Vector2(700f, 150f); // Set clear bounds for wrap layout
-
-                instructionText.alignment = TextAlignmentOptions.BottomLeft;
+                if (IsVRActive())
+                {
+                    rect.anchorMin = new Vector2(0.5f, 0.2f);
+                    rect.anchorMax = new Vector2(0.5f, 0.2f);
+                    rect.pivot = new Vector2(0.5f, 0.5f);
+                    rect.anchoredPosition = Vector2.zero;
+                    rect.sizeDelta = new Vector2(700f, 150f);
+                    instructionText.alignment = TextAlignmentOptions.Center;
+                }
+                else
+                {
+                    rect.anchorMin = new Vector2(0, 0); // Bottom-Left anchor
+                    rect.anchorMax = new Vector2(0, 0);
+                    rect.pivot = new Vector2(0, 0);
+                    rect.anchoredPosition = new Vector2(50f, 50f); // Bottom-left offset
+                    rect.sizeDelta = new Vector2(700f, 150f); // Set clear bounds for wrap layout
+                    instructionText.alignment = TextAlignmentOptions.BottomLeft;
+                }
                 instructionText.fontSize = 24f;
                 instructionText.fontStyle = FontStyles.Normal;
                 instructionText.color = new Color(0.95f, 0.95f, 0.95f, 0.95f); // Super crisp readable white
@@ -541,6 +575,25 @@ namespace PhobiaReliefTherapy.Therapy
                     SceneLoader.Instance.LoadScene("SafeRoomScene");
                 });
             }
+        }
+
+        private bool IsVRActive()
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            return true; // Always force VR mode on Oculus Quest standalone builds
+#else
+            if (UnityEngine.XR.XRSettings.isDeviceActive)
+                return true;
+
+            if (UnityEngine.XR.Management.XRGeneralSettings.Instance != null &&
+                UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager != null &&
+                UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager.activeLoader != null)
+            {
+                return true;
+            }
+
+            return false;
+#endif
         }
     }
 }
