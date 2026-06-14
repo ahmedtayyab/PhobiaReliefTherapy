@@ -239,6 +239,16 @@ namespace PhobiaReliefTherapy.Theme
                 canvas.gameObject.AddComponent<TrackedDeviceGraphicRaycaster>();
                 Debug.Log($"[UIThemeAutoApply] Added TrackedDeviceGraphicRaycaster to Canvas: {canvas.name}");
             }
+
+            // Add VRMenuDragger component so the user can grab and drag the menu
+            if (canvas.renderMode == RenderMode.WorldSpace)
+            {
+                if (canvas.GetComponent<VRMenuDragger>() == null)
+                {
+                    canvas.gameObject.AddComponent<VRMenuDragger>();
+                    Debug.Log($"[UIThemeAutoApply] Added VRMenuDragger to WorldSpace Canvas: {canvas.name}");
+                }
+            }
         }
 
         private void AttachKeyboardTriggers()
