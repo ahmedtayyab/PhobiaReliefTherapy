@@ -56,16 +56,29 @@ namespace PhobiaReliefTherapy.VR
             mainCamera.transform.localRotation = Quaternion.identity;
             origin.Camera = mainCamera;
 
-            // Add TrackedPoseDriver to the main camera to enable headset tracking (head rotation and translation)
-            var trackedPoseDriver = mainCamera.gameObject.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>();
+            // Add TrackedPoseDriver (new Input System) to the main camera to enable headset tracking (head rotation and translation)
+            var legacyTrackedPoseDriver = mainCamera.gameObject.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>();
+            if (legacyTrackedPoseDriver != null)
+            {
+                Object.DestroyImmediate(legacyTrackedPoseDriver);
+            }
+
+            var trackedPoseDriver = mainCamera.gameObject.GetComponent<UnityEngine.InputSystem.XR.TrackedPoseDriver>();
             if (trackedPoseDriver == null)
             {
-                trackedPoseDriver = mainCamera.gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>();
+                trackedPoseDriver = mainCamera.gameObject.AddComponent<UnityEngine.InputSystem.XR.TrackedPoseDriver>();
             }
-            trackedPoseDriver.SetPoseSource(
-                UnityEngine.SpatialTracking.TrackedPoseDriver.DeviceType.GenericXRDevice,
-                UnityEngine.SpatialTracking.TrackedPoseDriver.TrackedPose.Center
-            );
+
+            trackedPoseDriver.trackingType = UnityEngine.InputSystem.XR.TrackedPoseDriver.TrackingType.RotationAndPosition;
+            
+            var positionAction = new UnityEngine.InputSystem.InputAction("Position", binding: "<XRHMD>/centerEyePosition");
+            var rotationAction = new UnityEngine.InputSystem.InputAction("Rotation", binding: "<XRHMD>/centerEyeRotation");
+            
+            positionAction.Enable();
+            rotationAction.Enable();
+            
+            trackedPoseDriver.positionInput = new UnityEngine.InputSystem.InputActionProperty(positionAction);
+            trackedPoseDriver.rotationInput = new UnityEngine.InputSystem.InputActionProperty(rotationAction);
             
             // Set default Camera Y Offset for non-tracked/Device-based fallback environments
             origin.CameraYOffset = initialCameraHeight;
