@@ -25,7 +25,7 @@ namespace PhobiaReliefTherapy.Therapy
         public Image progressBarFill;
         public Button continueButton;
 
-        public float measurementDuration = 10f; // seconds
+        public float measurementDuration = 20f; // seconds
 
         [Header("Skybox Setup")]
         public Material baselineSkyboxMaterial;

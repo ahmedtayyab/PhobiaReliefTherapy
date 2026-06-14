@@ -184,7 +184,7 @@ docs/password-reset/index.html         (Loads Supabase JS client and resets pass
            │
            ▼
 +----------------------+
-|    BaselineScene     | --> 10-second calibration & simulated BPM tracking
+|    BaselineScene     | --> 20-second calibration & simulated BPM tracking
 +----------------------+
            │
            ▼
