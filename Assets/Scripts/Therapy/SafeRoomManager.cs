@@ -29,7 +29,7 @@ namespace PhobiaReliefTherapy.Therapy
             SensorManager.EnsureInstanceExists();
 
             if (welcomeText != null)
-                welcomeText.text = $"Welcome, {UserData.Username}.";
+                welcomeText.text = $"Welcome";
 
             if (infoText != null)
                 infoText.text = $"Selected phobia: {UserData.SelectedPhobia}\nBaseline HR: {UserData.BaselineHeartRate} BPM\nDifficulty: {UserData.SelectedDifficulty}";

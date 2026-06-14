@@ -7,10 +7,10 @@ using TMPro;
 using PhobiaReliefTherapy.Therapy;
 using PhobiaReliefTherapy.Theme;
 
-public static class DarknessSceneBuilder
+public static class CrowdSceneBuilder
 {
-    [MenuItem("Tools/Build Darkness Scene")]
-    public static void BuildDarknessScene()
+    [MenuItem("Tools/Build Crowd Scene")]
+    public static void BuildCrowdScene()
     {
         if (EditorApplication.isPlaying)
         {
@@ -18,7 +18,7 @@ public static class DarknessSceneBuilder
             return;
         }
 
-        string scenePath = "Assets/Scenes/DarknessScene.unity";
+        string scenePath = "Assets/Scenes/CrowdScene.unity";
         var scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
 
         // Find or create Main Camera
@@ -57,13 +57,13 @@ public static class DarknessSceneBuilder
             new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
         }
 
-        // Find or create DarknessManager
-        DarknessManager manager = Object.FindObjectOfType<DarknessManager>();
+        // Find or create CrowdManager
+        CrowdManager manager = Object.FindObjectOfType<CrowdManager>();
         GameObject managerGO;
         if (manager == null)
         {
-            managerGO = new GameObject("DarknessManager", typeof(DarknessManager));
-            manager = managerGO.GetComponent<DarknessManager>();
+            managerGO = new GameObject("CrowdManager", typeof(CrowdManager));
+            manager = managerGO.GetComponent<CrowdManager>();
         }
         else
         {
@@ -139,8 +139,8 @@ public static class DarknessSceneBuilder
         ThemeableUI btnTextTheme = btnTextGO.AddComponent<ThemeableUI>();
         btnTextTheme.elementType = UIElementType.ButtonText;
 
-        // Create and save DarknessSkybox.mat in Editor to force-include shader in the build
-        string matPath = "Assets/Materials/DarknessSkybox.mat";
+        // Create and save CrowdSkybox.mat in Editor to force-include shader in the build
+        string matPath = "Assets/Materials/CrowdSkybox.mat";
         Material skyboxMat = AssetDatabase.LoadAssetAtPath<Material>(matPath);
         if (skyboxMat == null)
         {
@@ -155,16 +155,20 @@ public static class DarknessSceneBuilder
 
         if (skyboxMat != null)
         {
-            Texture2D darknessTexture = Resources.Load<Texture2D>("darkness_image");
-            if (darknessTexture != null)
+            Texture2D crowdTexture = Resources.Load<Texture2D>("crowd_image");
+            if (crowdTexture == null) crowdTexture = Resources.Load<Texture2D>("crowd_image.jpg");
+            if (crowdTexture == null) crowdTexture = Resources.Load<Texture2D>("crowd_image.jpg.jpeg");
+            if (crowdTexture == null) crowdTexture = Resources.Load<Texture2D>("crowd");
+
+            if (crowdTexture != null)
             {
-                skyboxMat.SetTexture("_MainTex", darknessTexture);
+                skyboxMat.SetTexture("_MainTex", crowdTexture);
                 skyboxMat.SetFloat("_Mapping", 1.0f);    // Latitude Longitude
                 skyboxMat.SetFloat("_ImageType", 0.0f);  // 360 Degrees
                 skyboxMat.SetFloat("_Exposure", 1.0f);
                 EditorUtility.SetDirty(skyboxMat);
             }
-            manager.darknessSkyboxMaterial = skyboxMat;
+            manager.crowdSkyboxMaterial = skyboxMat;
         }
 
         // Assign script field references
@@ -180,6 +184,6 @@ public static class DarknessSceneBuilder
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
 
-        Debug.Log("Successfully built DarknessScene hierarchy and saved scene.");
+        Debug.Log("Successfully built CrowdScene hierarchy and saved scene.");
     }
 }

@@ -45,9 +45,9 @@ The application models exposure categories using internal lookup keys and maps t
 
 | Phobia | Key | Scene Name | Description |
 | :--- | :--- | :--- | :--- |
-| **Fear of Heights (Acrophobia)** | `Height` | `HeightScene` | Immersive height-exposure scene (Environment placeholders included). |
+| **Fear of Heights (Acrophobia)** | `Height` | `HeightScene` | Controlled height-exposure environment featuring panoramic height skyboxes and 2D fallback background support. |
 | **Fear of Darkness (Nyctophobia)** | `Darkness` | `DarknessScene` | Controlled darkness-exposure environment featuring progressive illumination stages and panoramic dark skyboxes. |
-| **Fear of Crowds (Enochlophobia)** | `Crowd` | `CrowdScene` | High-density crowd exposure scene (Environment placeholders included). |
+| **Fear of Crowds (Enochlophobia)** | `Crowd` | `CrowdScene` | Controlled crowd-exposure environment featuring high-density crowd panoramic skyboxes and 2D fallback background support. |
 
 ---
 

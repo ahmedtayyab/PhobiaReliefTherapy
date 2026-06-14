@@ -7,10 +7,10 @@ using TMPro;
 using PhobiaReliefTherapy.Therapy;
 using PhobiaReliefTherapy.Theme;
 
-public static class DarknessSceneBuilder
+public static class HeightSceneBuilder
 {
-    [MenuItem("Tools/Build Darkness Scene")]
-    public static void BuildDarknessScene()
+    [MenuItem("Tools/Build Height Scene")]
+    public static void BuildHeightScene()
     {
         if (EditorApplication.isPlaying)
         {
@@ -18,7 +18,7 @@ public static class DarknessSceneBuilder
             return;
         }
 
-        string scenePath = "Assets/Scenes/DarknessScene.unity";
+        string scenePath = "Assets/Scenes/HeightScene.unity";
         var scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
 
         // Find or create Main Camera
@@ -57,13 +57,13 @@ public static class DarknessSceneBuilder
             new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
         }
 
-        // Find or create DarknessManager
-        DarknessManager manager = Object.FindObjectOfType<DarknessManager>();
+        // Find or create HeightManager
+        HeightManager manager = Object.FindObjectOfType<HeightManager>();
         GameObject managerGO;
         if (manager == null)
         {
-            managerGO = new GameObject("DarknessManager", typeof(DarknessManager));
-            manager = managerGO.GetComponent<DarknessManager>();
+            managerGO = new GameObject("HeightManager", typeof(HeightManager));
+            manager = managerGO.GetComponent<HeightManager>();
         }
         else
         {
@@ -139,8 +139,8 @@ public static class DarknessSceneBuilder
         ThemeableUI btnTextTheme = btnTextGO.AddComponent<ThemeableUI>();
         btnTextTheme.elementType = UIElementType.ButtonText;
 
-        // Create and save DarknessSkybox.mat in Editor to force-include shader in the build
-        string matPath = "Assets/Materials/DarknessSkybox.mat";
+        // Create and save HeightSkybox.mat in Editor to force-include shader in the build
+        string matPath = "Assets/Materials/HeightSkybox.mat";
         Material skyboxMat = AssetDatabase.LoadAssetAtPath<Material>(matPath);
         if (skyboxMat == null)
         {
@@ -155,16 +155,18 @@ public static class DarknessSceneBuilder
 
         if (skyboxMat != null)
         {
-            Texture2D darknessTexture = Resources.Load<Texture2D>("darkness_image");
-            if (darknessTexture != null)
+            Texture2D heightTexture = Resources.Load<Texture2D>("height_image");
+            if (heightTexture == null) heightTexture = Resources.Load<Texture2D>("height");
+
+            if (heightTexture != null)
             {
-                skyboxMat.SetTexture("_MainTex", darknessTexture);
+                skyboxMat.SetTexture("_MainTex", heightTexture);
                 skyboxMat.SetFloat("_Mapping", 1.0f);    // Latitude Longitude
                 skyboxMat.SetFloat("_ImageType", 0.0f);  // 360 Degrees
                 skyboxMat.SetFloat("_Exposure", 1.0f);
                 EditorUtility.SetDirty(skyboxMat);
             }
-            manager.darknessSkyboxMaterial = skyboxMat;
+            manager.heightSkyboxMaterial = skyboxMat;
         }
 
         // Assign script field references
@@ -180,6 +182,6 @@ public static class DarknessSceneBuilder
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
 
-        Debug.Log("Successfully built DarknessScene hierarchy and saved scene.");
+        Debug.Log("Successfully built HeightScene hierarchy and saved scene.");
     }
 }
