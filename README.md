@@ -259,7 +259,8 @@ The codebase features customized productivity extensions accessible from the top
 | **Tools** > **Build Auth Scenes** | Automatically regenerates the UI layout structures for the login, welcome, and signup scenes. |
 | **Tools** > **Phobia Relief** > **Create Style Guide & Prefabs** | Exports default UI templates, layouts, input containers, and button configurations to `Assets/Prefabs/UI/`. |
 | **Tools** > **Phobia Relief** > **Apply / Build UI** | Traverses build scenes and updates canvases with standard UI themes and font templates. |
-| **Tools** > **Apply Global Theme** | Forces application of the `MedicalTheme` properties to the current active scene hierarchy. |
+| **Tools** > **Build Feedback Scene** | Rebuilds post-session feedback UI (`FeedbackScene`). |
+| **Tools** > **Build Admin Scene** | Rebuilds administrator metrics dashboard (`AdminScene`). |
 
 ---
 
@@ -287,9 +288,18 @@ docs/                    # GitHub Pages hosted folder containing signup and rese
 
 ---
 
-## Roadmap (Phase 2+)
+## Roadmap (Phase 2 — `phase-2` branch)
 
-* [ ] **Immersive 3D Exposure**: Replace Skybox overlays in `HeightScene` and `CrowdScene` with detailed 3D models and crowds.
-* [ ] **Polar H10 Integration**: Connect Bluetooth Low Energy APIs to read real-time heart rate via `SensorManager.cs`.
-* [ ] **AI-driven Exposure Staging**: Activate the difficulty loader in dashboard menus to adjust triggers dynamically.
-* [ ] **Backend Logging**: Call `DatabaseManager.SaveTherapySession()` at the end of sessions to log statistics (BPM variations, exposure duration) back to Supabase.
+Phase 1 behaviour (20s baseline, 30s exposure stages, skybox panoramas) is preserved. Phase 2 adds SRS-aligned session monitoring without changing VR/UI interaction patterns.
+
+**Implemented on `phase-2`:**
+* Difficulty selection (Beginner / Intermediate / Advanced) with staged exposure counts
+* Panic detection scoring, emergency stop, and safe-room routing
+* Post-session feedback scene with local JSON cache + Supabase sync
+* Dashboard session history and admin login dashboard
+* Mock sensor stress simulation and head-movement tracking (Polar H10 BLE pending hardware)
+
+**Still planned:**
+* [ ] **Immersive 3D Exposure**: Replace skybox overlays in `HeightScene` and `CrowdScene` with detailed 3D environments.
+* [ ] **Polar H10 Integration**: Connect BLE APIs in `SensorManager.cs` when hardware is available.
+* [ ] **Companion web dashboard**: Full browser-based progress view (static stub in `docs/session-history/`).

@@ -287,9 +287,10 @@ namespace PhobiaReliefTherapy.Managers
             {
                 Data.UserData.UserId = loggedInUser.Id;
                 Data.UserData.Username = loggedInUser.Username;
+                Data.UserData.IsAdmin = IsAdminAccount(email, loggedInUser.Username);
                 Debug.Log($"User logged in: {loggedInUser.Username}");
                 loginErrorText.text = "Login successful!";
-                NavigateToScene("DashboardScene");
+                NavigateToScene(Data.UserData.IsAdmin ? "AdminScene" : "DashboardScene");
             }
             else
             {
@@ -458,6 +459,20 @@ namespace PhobiaReliefTherapy.Managers
                 forgotPasswordButton.interactable = true;
             if (forgotUsernameButton != null)
                 forgotUsernameButton.interactable = true;
+        }
+
+        private bool IsAdminAccount(string email, string username)
+        {
+            if (string.IsNullOrEmpty(email) && string.IsNullOrEmpty(username))
+                return false;
+
+            if (!string.IsNullOrEmpty(username) && username.Trim().Equals("admin", System.StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!string.IsNullOrEmpty(email) && email.Trim().Equals("admin@phobia.local", System.StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            return false;
         }
 
         private void NavigateToScene(string sceneName)

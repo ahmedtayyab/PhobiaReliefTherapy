@@ -472,6 +472,11 @@ namespace PhobiaReliefTherapy.Therapy
             isMeasuring = false;
             UserData.BaselineHeartRate = heartRate;
 
+            HeadMovementTracker.EnsureInstanceExists();
+            ExposureSessionMonitor.EnsureInstanceExists();
+            if (ExposureSessionMonitor.Instance != null)
+                ExposureSessionMonitor.Instance.CaptureBaselineHeadMovement();
+
             // Snap camera back to original rotation and clear flags
             if (Camera.main != null)
             {

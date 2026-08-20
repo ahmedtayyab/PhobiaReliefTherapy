@@ -4,6 +4,7 @@ using TMPro;
 using System.Collections;
 using PhobiaReliefTherapy.Managers;
 using PhobiaReliefTherapy.Theme;
+using PhobiaReliefTherapy.Data;
 using PhobiaReliefTherapy;
 
 namespace PhobiaReliefTherapy.Therapy
@@ -32,6 +33,9 @@ namespace PhobiaReliefTherapy.Therapy
         private float pitch = 0f;
         private bool isTimerRunning = false;
 
+        private bool sessionEnded = false;
+        private Transform panelTransform;
+
         private void Start()
         {
             Debug.Log("HeightManager component started.");
@@ -48,12 +52,45 @@ namespace PhobiaReliefTherapy.Therapy
             {
                 returnButton.onClick.RemoveAllListeners();
                 returnButton.onClick.AddListener(() => {
-                    Debug.Log("Return button clicked. Transitioning to DashboardScene.");
-                    SceneLoader.Instance.LoadScene("DashboardScene");
+                    if (sessionEnded) return;
+                    sessionEnded = true;
+                    Debug.Log("Return button clicked. Ending session.");
+                    TherapySessionHelper.CompleteExposureSession(true);
                 });
             }
 
+            WireEmergencyStop();
             StartExposureTherapy();
+        }
+
+        private void WireEmergencyStop()
+        {
+            if (panelTransform == null)
+            {
+                var canvas = Object.FindObjectOfType<Canvas>();
+                if (canvas != null)
+                {
+                    var panel = canvas.transform.Find("Panel");
+                    if (panel != null)
+                        panelTransform = panel;
+                }
+            }
+
+            var emergencyButton = TherapySessionHelper.CreateEmergencyStopButton(panelTransform);
+            TherapySessionHelper.WireEmergencyStop(emergencyButton, () =>
+            {
+                if (sessionEnded) return;
+                sessionEnded = true;
+                SceneLoader.Instance.LoadScene("SafeRoomScene");
+            });
+        }
+
+        private void OnSafetyTriggered(PanicDetectionService.PanicEvaluation evaluation)
+        {
+            if (sessionEnded) return;
+            sessionEnded = true;
+            Debug.Log($"Safety triggered: {evaluation.Classification} — {evaluation.AiRecommendation}");
+            SceneLoader.Instance.LoadScene("SafeRoomScene");
         }
 
         private void Update()
@@ -206,11 +243,12 @@ namespace PhobiaReliefTherapy.Therapy
 
             // Disable original Panel Image component if it exists
             GameObject panelGO = null;
-            var panelTransform = canvas.transform.Find("Panel");
-            if (panelTransform != null)
+            var panelTransformLocal = canvas.transform.Find("Panel");
+            if (panelTransformLocal != null)
             {
-                panelGO = panelTransform.gameObject;
-                var panelImage = panelTransform.GetComponent<Image>();
+                panelGO = panelTransformLocal.gameObject;
+                panelTransform = panelTransformLocal;
+                var panelImage = panelTransformLocal.GetComponent<Image>();
                 if (panelImage != null)
                 {
                     panelImage.enabled = false;
@@ -222,6 +260,7 @@ namespace PhobiaReliefTherapy.Therapy
                 // Create Panel container if not exists
                 panelGO = new GameObject("Panel", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
                 panelGO.transform.SetParent(canvas.transform, false);
+                panelTransform = panelGO.transform;
                 RectTransform panelRect = panelGO.GetComponent<RectTransform>();
                 panelRect.anchorMin = Vector2.zero;
                 panelRect.anchorMax = Vector2.one;
@@ -261,6 +300,7 @@ namespace PhobiaReliefTherapy.Therapy
                 RenderSettings.skybox = skyboxMat;
                 DynamicGI.UpdateEnvironment();
                 hasAppliedSkybox = true;
+                TherapySessionHelper.ApplyDifficultyToSkyboxMaterial(skyboxMat);
                 Debug.Log("Applied 3D Panoramic Skybox successfully.");
             }
             else
@@ -399,32 +439,47 @@ namespace PhobiaReliefTherapy.Therapy
                 Debug.Log("Initialized camera clear flags to Skybox.");
             }
 
+            UserData.ResetSessionState();
+            TherapySessionHelper.BeginExposureSession(OnSafetyTriggered);
             StartCoroutine(ExposureTimerRoutine());
         }
 
         private IEnumerator ExposureTimerRoutine()
         {
             isTimerRunning = true;
-            float remaining = exposureDuration;
-            Debug.Log("Starting 30-second exposure countdown.");
+            int stageCount = TherapySessionHelper.GetStageCountForDifficulty();
 
-            while (remaining > 0)
+            for (int stage = 1; stage <= stageCount; stage++)
             {
-                if (timerText != null)
+                UserData.CurrentStage = stage;
+                TherapySessionHelper.ApplyDifficultyToSkyboxMaterial(RenderSettings.skybox);
+
+                float remaining = exposureDuration;
+                Debug.Log($"Starting exposure stage {stage}/{stageCount}.");
+
+                while (remaining > 0)
                 {
-                    timerText.text = Mathf.CeilToInt(remaining).ToString() + "s";
+                    if (sessionEnded)
+                        yield break;
+
+                    if (timerText != null)
+                        timerText.text = $"S{stage} " + Mathf.CeilToInt(remaining).ToString() + "s";
+
+                    yield return new WaitForSeconds(1f);
+                    remaining -= 1f;
                 }
-                yield return new WaitForSeconds(1f);
-                remaining -= 1f;
             }
 
             if (timerText != null)
-            {
                 timerText.text = "Session Complete!";
-            }
-            Debug.Log("Exposure timer complete.");
 
             isTimerRunning = false;
+
+            if (!sessionEnded)
+            {
+                sessionEnded = true;
+                TherapySessionHelper.CompleteExposureSession(false);
+            }
         }
 
         private void OnDestroy()

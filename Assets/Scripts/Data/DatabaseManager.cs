@@ -331,7 +331,7 @@ namespace PhobiaReliefTherapy.Data
         }
 
         // Therapy Session Management
-        public IEnumerator SaveTherapySession(string userId, string phobia, string difficulty, int stage, int baselineHR, int finalHR, float exposureTime, string feedback)
+        public IEnumerator SaveTherapySession(string userId, string phobia, string difficulty, int stage, int baselineHR, int finalHR, float exposureTime, string feedback, System.Action<bool> callback = null)
         {
             string url = $"{SUPABASE_URL}/rest/v1/therapy_sessions";
 
@@ -364,11 +364,39 @@ namespace PhobiaReliefTherapy.Data
                 if (request.result == UnityWebRequest.Result.Success)
                 {
                     Debug.Log("Therapy session saved");
+                    callback?.Invoke(true);
                 }
                 else
                 {
                     Debug.LogError($"Failed to save session: {request.error}");
+                    callback?.Invoke(false);
                 }
+            }
+        }
+
+        public IEnumerator SyncPendingLocalSessions()
+        {
+            var pending = LocalSessionStore.GetUnsyncedSessions();
+            foreach (var local in pending)
+            {
+                bool done = false;
+                bool success = false;
+                yield return SaveTherapySession(
+                    local.UserId,
+                    local.Phobia,
+                    local.Difficulty,
+                    local.Stage,
+                    local.BaselineHeartRate,
+                    local.FinalHeartRate,
+                    local.ExposureTime,
+                    local.Feedback,
+                    (ok) => { success = ok; done = true; });
+
+                while (!done)
+                    yield return null;
+
+                if (success)
+                    LocalSessionStore.MarkSynced(local);
             }
         }
 

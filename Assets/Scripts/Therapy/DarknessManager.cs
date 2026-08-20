@@ -4,6 +4,7 @@ using TMPro;
 using System.Collections;
 using PhobiaReliefTherapy.Managers;
 using PhobiaReliefTherapy.Theme;
+using PhobiaReliefTherapy.Data;
 using PhobiaReliefTherapy;
 
 namespace PhobiaReliefTherapy.Therapy
@@ -12,6 +13,7 @@ namespace PhobiaReliefTherapy.Therapy
     {
         [Header("UI Elements")]
         public TextMeshProUGUI timerText;
+        public TextMeshProUGUI stageText;
         public Button returnButton;
 
         [Header("Skybox Setup")]
@@ -31,6 +33,8 @@ namespace PhobiaReliefTherapy.Therapy
         private float yaw = 0f;
         private float pitch = 0f;
         private bool isTimerRunning = false;
+        private bool sessionEnded = false;
+        private Transform panelTransform;
 
         private void Start()
         {
@@ -48,12 +52,43 @@ namespace PhobiaReliefTherapy.Therapy
             {
                 returnButton.onClick.RemoveAllListeners();
                 returnButton.onClick.AddListener(() => {
-                    Debug.Log("Return button clicked. Transitioning to DashboardScene.");
-                    SceneLoader.Instance.LoadScene("DashboardScene");
+                    if (sessionEnded) return;
+                    sessionEnded = true;
+                    TherapySessionHelper.CompleteExposureSession(true);
                 });
             }
 
+            WireEmergencyStop();
             StartExposureTherapy();
+        }
+
+        private void WireEmergencyStop()
+        {
+            if (panelTransform == null)
+            {
+                var canvas = Object.FindObjectOfType<Canvas>();
+                if (canvas != null)
+                {
+                    var panel = canvas.transform.Find("Panel");
+                    if (panel != null)
+                        panelTransform = panel;
+                }
+            }
+
+            var emergencyButton = TherapySessionHelper.CreateEmergencyStopButton(panelTransform);
+            TherapySessionHelper.WireEmergencyStop(emergencyButton, () =>
+            {
+                if (sessionEnded) return;
+                sessionEnded = true;
+                SceneLoader.Instance.LoadScene("SafeRoomScene");
+            });
+        }
+
+        private void OnSafetyTriggered(PanicDetectionService.PanicEvaluation evaluation)
+        {
+            if (sessionEnded) return;
+            sessionEnded = true;
+            SceneLoader.Instance.LoadScene("SafeRoomScene");
         }
 
         private void Update()
@@ -112,6 +147,8 @@ namespace PhobiaReliefTherapy.Therapy
         {
             if (timerText == null)
                 timerText = AutoBindField<TextMeshProUGUI>("TimerText");
+            if (stageText == null)
+                stageText = AutoBindField<TextMeshProUGUI>("StageText");
             if (returnButton == null)
                 returnButton = AutoBindField<Button>("ReturnButton");
         }
@@ -122,31 +159,85 @@ namespace PhobiaReliefTherapy.Therapy
             return result != null ? result : AutoBindHelper.FindComponentByName<T>(objectName);
         }
 
-        private Texture2D LoadDarknessTexture()
+        private Texture2D LoadDarknessTextureForStage(int stage)
         {
-            Debug.Log("Loading darkness texture...");
+            string baseName = "darkness_image";
+            if (stage == 2) baseName = "darkness_image2";
+            if (stage == 3) baseName = "darkness_image3";
+
+            Debug.Log($"Loading darkness texture for stage {stage} (resource: {baseName})...");
+            
             // Try loading from Resources
-            Texture2D tex = Resources.Load<Texture2D>("darkness_image");
-            if (tex != null) { Debug.Log("Loaded 'darkness_image' from Resources."); return tex; }
+            Texture2D tex = Resources.Load<Texture2D>(baseName);
+            if (tex != null) { Debug.Log($"Loaded '{baseName}' from Resources."); return tex; }
 
-            Sprite sprite = Resources.Load<Sprite>("darkness_image");
-            if (sprite != null && sprite.texture != null) { Debug.Log("Loaded 'darkness_image' sprite from Resources."); return sprite.texture; }
+            Sprite sprite = Resources.Load<Sprite>(baseName);
+            if (sprite != null && sprite.texture != null) { Debug.Log($"Loaded '{baseName}' sprite from Resources."); return sprite.texture; }
 
-            tex = Resources.Load<Texture2D>("darkness");
-            if (tex != null) { Debug.Log("Loaded 'darkness' from Resources."); return tex; }
+            // If stage 1, check original fallbacks
+            if (stage == 1)
+            {
+                tex = Resources.Load<Texture2D>("darkness");
+                if (tex != null) { Debug.Log("Loaded 'darkness' from Resources."); return tex; }
 
-            sprite = Resources.Load<Sprite>("darkness");
-            if (sprite != null && sprite.texture != null) { Debug.Log("Loaded 'darkness' sprite from Resources."); return sprite.texture; }
+                sprite = Resources.Load<Sprite>("darkness");
+                if (sprite != null && sprite.texture != null) { Debug.Log("Loaded 'darkness' sprite from Resources."); return sprite.texture; }
 
-            // Fallbacks to relative paths
-            tex = LoadTextureFromFileSystem("../images/darkness.JPG.jpeg");
-            if (tex != null) { Debug.Log("Loaded 'darkness.JPG.jpeg' from images fallback."); return tex; }
+                // Fallbacks to relative paths
+                tex = LoadTextureFromFileSystem("../images/darkness.JPG.jpeg");
+                if (tex != null) { Debug.Log("Loaded 'darkness.JPG.jpeg' from images fallback."); return tex; }
 
-            tex = LoadTextureFromFileSystem("Resources/darkness_image.jpeg");
-            if (tex != null) { Debug.Log("Loaded 'Resources/darkness_image.jpeg' from fallback."); return tex; }
+                tex = LoadTextureFromFileSystem("Resources/darkness_image.jpeg");
+                if (tex != null) { Debug.Log("Loaded 'Resources/darkness_image.jpeg' from fallback."); return tex; }
+            }
+            else
+            {
+                // General fallbacks for stage 2 and 3
+                string suffix = stage == 2 ? "2" : "3";
+                tex = LoadTextureFromFileSystem($"../images/darkness_image{suffix}.jpeg");
+                if (tex != null) return tex;
+                tex = LoadTextureFromFileSystem($"../images/darkness_image{suffix}.JPG.jpeg");
+                if (tex != null) return tex;
+                tex = LoadTextureFromFileSystem($"Resources/darkness_image{suffix}.jpeg");
+                if (tex != null) return tex;
+            }
 
-            Debug.LogError("Failed to load darkness texture from any source!");
+            Debug.LogError($"Failed to load darkness texture for stage {stage}!");
             return null;
+        }
+
+        private void ApplyStageTexture(int stage)
+        {
+            Texture2D tex = LoadDarknessTextureForStage(stage);
+            if (tex != null)
+            {
+                darknessTexture = tex;
+
+                // Update 3D Skybox material texture
+                if (RenderSettings.skybox != null)
+                {
+                    RenderSettings.skybox.SetTexture("_MainTex", darknessTexture);
+                    DynamicGI.UpdateEnvironment();
+                    Debug.Log($"Applied Stage {stage} 3D Skybox texture.");
+                }
+
+                // Update 2D Fallback background sprite
+                if (customBackgroundGO != null)
+                {
+                    Image bgImgComponent = customBackgroundGO.GetComponent<Image>();
+                    if (bgImgComponent != null)
+                    {
+                        if (darknessSprite != null)
+                        {
+                            Destroy(darknessSprite);
+                        }
+                        darknessSprite = Sprite.Create(darknessTexture, new Rect(0, 0, darknessTexture.width, darknessTexture.height), new Vector2(0.5f, 0.5f));
+                        bgImgComponent.sprite = darknessSprite;
+                        bgImgComponent.color = Color.white;
+                        Debug.Log($"Applied Stage {stage} 2D Fallback background sprite.");
+                    }
+                }
+            }
         }
 
         private Texture2D LoadTextureFromFileSystem(string relativePath)
@@ -233,7 +324,7 @@ namespace PhobiaReliefTherapy.Therapy
                 img.raycastTarget = false;
             }
 
-            darknessTexture = LoadDarknessTexture();
+            darknessTexture = LoadDarknessTextureForStage(1);
 
             // 1. 3D Panoramic Skybox setup
             Material skyboxMat = darknessSkyboxMaterial;
@@ -301,7 +392,7 @@ namespace PhobiaReliefTherapy.Therapy
             }
 
             // 3. Runtime fallback UI creation if fields are not bound (i.e. empty scene fallback)
-            if (timerText == null || returnButton == null)
+            if (timerText == null || stageText == null || returnButton == null)
             {
                 Debug.Log("Scene elements missing at runtime. Spawning minimal corner UI dynamically.");
 
@@ -314,7 +405,7 @@ namespace PhobiaReliefTherapy.Therapy
                     timerRect.anchorMin = new Vector2(1f, 1f);
                     timerRect.anchorMax = new Vector2(1f, 1f);
                     timerRect.pivot = new Vector2(1f, 1f);
-                    timerRect.anchoredPosition = new Vector2(-50f, -50f);
+                    timerRect.anchoredPosition = new Vector2(-50f, -150f);
                     timerRect.sizeDelta = new Vector2(300f, 80f);
 
                     timerText = timerGO.GetComponent<TextMeshProUGUI>();
@@ -324,6 +415,27 @@ namespace PhobiaReliefTherapy.Therapy
                     ThemeableUI timerTheme = timerGO.AddComponent<ThemeableUI>();
                     timerTheme.elementType = UIElementType.HeadingText;
                     timerTheme.ApplyTheme();
+                }
+
+                if (stageText == null)
+                {
+                    GameObject stageGO = new GameObject("StageText", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+                    stageGO.transform.SetParent(panelGO.transform, false);
+
+                    RectTransform stageRect = stageGO.GetComponent<RectTransform>();
+                    stageRect.anchorMin = new Vector2(0.5f, 1f);
+                    stageRect.anchorMax = new Vector2(0.5f, 1f);
+                    stageRect.pivot = new Vector2(0.5f, 1f);
+                    stageRect.anchoredPosition = new Vector2(0f, -150f);
+                    stageRect.sizeDelta = new Vector2(400f, 80f);
+
+                    stageText = stageGO.GetComponent<TextMeshProUGUI>();
+                    stageText.text = "Stage 1";
+                    stageText.alignment = TextAlignmentOptions.Center;
+
+                    ThemeableUI stageTheme = stageGO.AddComponent<ThemeableUI>();
+                    stageTheme.elementType = UIElementType.HeadingText;
+                    stageTheme.ApplyTheme();
                 }
 
                 if (returnButton == null)
@@ -368,11 +480,21 @@ namespace PhobiaReliefTherapy.Therapy
                 if (timerText != null)
                 {
                     RectTransform rect = timerText.rectTransform;
-                    rect.anchorMin = new Vector2(0.75f, 0.85f);
-                    rect.anchorMax = new Vector2(0.75f, 0.85f);
+                    rect.anchorMin = new Vector2(0.75f, 0.70f);
+                    rect.anchorMax = new Vector2(0.75f, 0.70f);
                     rect.pivot = new Vector2(0.5f, 0.5f);
                     rect.anchoredPosition = Vector2.zero;
                     timerText.alignment = TextAlignmentOptions.Center;
+                }
+
+                if (stageText != null)
+                {
+                    RectTransform rect = stageText.rectTransform;
+                    rect.anchorMin = new Vector2(0.5f, 0.70f);
+                    rect.anchorMax = new Vector2(0.5f, 0.70f);
+                    rect.pivot = new Vector2(0.5f, 0.5f);
+                    rect.anchoredPosition = Vector2.zero;
+                    stageText.alignment = TextAlignmentOptions.Center;
                 }
 
                 if (returnButton != null)
@@ -399,32 +521,56 @@ namespace PhobiaReliefTherapy.Therapy
                 Debug.Log("Initialized camera clear flags to Skybox.");
             }
 
+            UserData.ResetSessionState();
+            TherapySessionHelper.BeginExposureSession(OnSafetyTriggered);
             StartCoroutine(ExposureTimerRoutine());
         }
 
         private IEnumerator ExposureTimerRoutine()
         {
             isTimerRunning = true;
-            float remaining = exposureDuration;
-            Debug.Log("Starting 30-second exposure countdown.");
+            int stageCount = Mathf.Min(3, TherapySessionHelper.GetStageCountForDifficulty());
 
-            while (remaining > 0)
+            for (int stage = 1; stage <= stageCount; stage++)
             {
-                if (timerText != null)
+                if (sessionEnded)
+                    yield break;
+
+                UserData.CurrentStage = stage;
+
+                if (stageText != null)
+                    stageText.text = $"Stage {stage}";
+
+                ApplyStageTexture(stage);
+                TherapySessionHelper.ApplyDifficultyToSkyboxMaterial(RenderSettings.skybox);
+
+                float remaining = exposureDuration;
+
+                while (remaining > 0)
                 {
-                    timerText.text = Mathf.CeilToInt(remaining).ToString() + "s";
+                    if (sessionEnded)
+                        yield break;
+
+                    if (timerText != null)
+                        timerText.text = Mathf.CeilToInt(remaining).ToString() + "s";
+
+                    yield return new WaitForSeconds(1f);
+                    remaining -= 1f;
                 }
-                yield return new WaitForSeconds(1f);
-                remaining -= 1f;
             }
 
             if (timerText != null)
-            {
                 timerText.text = "Session Complete!";
-            }
-            Debug.Log("Exposure timer complete.");
+            if (stageText != null)
+                stageText.text = "Completed";
 
             isTimerRunning = false;
+
+            if (!sessionEnded)
+            {
+                sessionEnded = true;
+                TherapySessionHelper.CompleteExposureSession(false);
+            }
         }
 
         private void OnDestroy()

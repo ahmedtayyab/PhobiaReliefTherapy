@@ -5,8 +5,7 @@ using UnityEngine;
 namespace PhobiaReliefTherapy.Managers
 {
     /// <summary>
-    /// Abstracts sensor input so the app can be tested without Polar H10 or other hardware.
-    /// Replace or extend this class later with real Bluetooth/Polar H10 code.
+    /// Abstracts sensor input. Mock fallback per SRS UC-08 / FYP Q9 when Polar H10 is unavailable.
     /// </summary>
     public class SensorManager : MonoBehaviour
     {
@@ -17,6 +16,9 @@ namespace PhobiaReliefTherapy.Managers
         public int CurrentHeartRate { get; private set; } = 0;
 
         private Coroutine baselineRoutine;
+        private Coroutine exposureRoutine;
+        private int mockBaselineHeartRate = 75;
+        private float exposureStressFactor = 1f;
 
         private void Awake()
         {
@@ -54,36 +56,67 @@ namespace PhobiaReliefTherapy.Managers
         private IEnumerator BaselineRoutine(float durationSeconds, Action<int> onComplete)
         {
             float timer = Mathf.Max(1f, durationSeconds);
-            int simulatedRate = UnityEngine.Random.Range(70, 91);
+            mockBaselineHeartRate = UnityEngine.Random.Range(70, 91);
 
             while (timer > 0)
             {
-                CurrentHeartRate = simulatedRate;
+                CurrentHeartRate = mockBaselineHeartRate + UnityEngine.Random.Range(-2, 3);
                 yield return new WaitForSeconds(1f);
                 timer -= 1f;
             }
 
-            CurrentHeartRate = simulatedRate;
+            CurrentHeartRate = mockBaselineHeartRate;
             onComplete?.Invoke(CurrentHeartRate);
             baselineRoutine = null;
         }
 
         public void StartSessionMonitoring()
         {
+            StartExposureMonitoring();
+        }
+
+        public void StartExposureMonitoring()
+        {
+            if (exposureRoutine != null)
+            {
+                StopCoroutine(exposureRoutine);
+                exposureRoutine = null;
+            }
+
             if (UseMockSensor)
             {
-                Debug.Log("SensorManager: Starting mock sensor session monitoring.");
-                CurrentHeartRate = UnityEngine.Random.Range(70, 95);
+                Debug.Log("SensorManager: Starting mock exposure monitoring.");
+                exposureStressFactor = 1f;
+                exposureRoutine = StartCoroutine(ExposureMockRoutine());
             }
             else
             {
                 Debug.Log("SensorManager: Starting real sensor session monitoring.");
-                // TODO: start real sensor updates here.
+                // TODO: Polar H10 BLE read loop (SRS §3.2.4).
+            }
+        }
+
+        private IEnumerator ExposureMockRoutine()
+        {
+            int baseRate = mockBaselineHeartRate > 0 ? mockBaselineHeartRate : UnityEngine.Random.Range(70, 90);
+
+            while (true)
+            {
+                exposureStressFactor = Mathf.Min(exposureStressFactor + 0.02f, 1.25f);
+                int stressedRate = Mathf.RoundToInt(baseRate * exposureStressFactor);
+                CurrentHeartRate = stressedRate + UnityEngine.Random.Range(-2, 3);
+                yield return new WaitForSeconds(1f);
             }
         }
 
         public void StopSessionMonitoring()
         {
+            if (exposureRoutine != null)
+            {
+                StopCoroutine(exposureRoutine);
+                exposureRoutine = null;
+            }
+
             Debug.Log("SensorManager: Stopping sensor session monitoring.");
         }
 

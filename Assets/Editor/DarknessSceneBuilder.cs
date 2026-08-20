@@ -97,7 +97,7 @@ public static class DarknessSceneBuilder
         timerRect.anchorMin = new Vector2(1f, 1f);
         timerRect.anchorMax = new Vector2(1f, 1f);
         timerRect.pivot = new Vector2(1f, 1f);
-        timerRect.anchoredPosition = new Vector2(-50f, -50f);
+        timerRect.anchoredPosition = new Vector2(-50f, -150f);
         timerRect.sizeDelta = new Vector2(300f, 80f);
 
         TextMeshProUGUI timerText = timerGO.GetComponent<TextMeshProUGUI>();
@@ -106,6 +106,24 @@ public static class DarknessSceneBuilder
         
         ThemeableUI timerTheme = timerGO.AddComponent<ThemeableUI>();
         timerTheme.elementType = UIElementType.HeadingText;
+
+        // Create StageText in Top-Center
+        GameObject stageGO = new GameObject("StageText", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+        stageGO.transform.SetParent(panelGO.transform, false);
+        
+        RectTransform stageRect = stageGO.GetComponent<RectTransform>();
+        stageRect.anchorMin = new Vector2(0.5f, 1f);
+        stageRect.anchorMax = new Vector2(0.5f, 1f);
+        stageRect.pivot = new Vector2(0.5f, 1f);
+        stageRect.anchoredPosition = new Vector2(0f, -150f);
+        stageRect.sizeDelta = new Vector2(400f, 80f);
+
+        TextMeshProUGUI stageText = stageGO.GetComponent<TextMeshProUGUI>();
+        stageText.text = "Stage 1";
+        stageText.alignment = TextAlignmentOptions.Center;
+        
+        ThemeableUI stageTheme = stageGO.AddComponent<ThemeableUI>();
+        stageTheme.elementType = UIElementType.HeadingText;
 
         // 2. Create ReturnButton in Top-Left Corner
         GameObject buttonGO = new GameObject("ReturnButton", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
@@ -169,10 +187,12 @@ public static class DarknessSceneBuilder
 
         // Assign script field references
         manager.timerText = timerText;
+        manager.stageText = stageText;
         manager.returnButton = returnButton;
 
         // Apply theme styling in Edit Mode
         timerTheme.ApplyTheme();
+        stageTheme.ApplyTheme();
         btnTheme.ApplyTheme();
         btnTextTheme.ApplyTheme();
 

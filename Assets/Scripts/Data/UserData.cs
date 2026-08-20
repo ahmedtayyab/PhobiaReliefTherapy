@@ -19,5 +19,14 @@ namespace PhobiaReliefTherapy.Data
 
         // For session tracking
         public static int CurrentStage { get; set; } = 1;
+
+        public static bool IsAdmin { get; set; } = false;
+        public static bool SessionWasAborted { get; set; } = false;
+
+        public static void ResetSessionState()
+        {
+            SessionWasAborted = false;
+            SessionMetrics.Reset();
+        }
     }
 }

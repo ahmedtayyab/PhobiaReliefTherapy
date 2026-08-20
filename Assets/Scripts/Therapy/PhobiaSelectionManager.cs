@@ -76,12 +76,8 @@ namespace PhobiaReliefTherapy.Therapy
             UserData.SelectedPhobia = phobiaType;
             UpdateSelectedPhobiaText();
             
-            // Phase 1 Bypass: AI model/calculations in Phase 2 will determine the level.
-            // For now, set default baseline values and jump directly to the Baseline Scene.
-            UserData.SelectedDifficulty = "Low";
-            UserData.CurrentStage = 1;
-
-            SceneLoader.Instance.LoadScene("BaselineScene");
+            // Phase 2: show difficulty selection (SRS §3.2.2, §3.2.7).
+            ShowLevelSelection();
         }
 
         private void ShowLevelSelection()
@@ -108,9 +104,9 @@ namespace PhobiaReliefTherapy.Therapy
                 layout.childForceExpandHeight = parentLayout.childForceExpandHeight;
             }
 
-            CreateLevelButton("Level 1: Low", () => ConfirmLevel("Low", 1));
-            CreateLevelButton("Level 2: Medium", () => ConfirmLevel("Medium", 2));
-            CreateLevelButton("Level 3: High", () => ConfirmLevel("High", 3));
+            CreateLevelButton("Level 1: Beginner (Low)", () => ConfirmLevel("Low", 1));
+            CreateLevelButton("Level 2: Intermediate (Medium)", () => ConfirmLevel("Medium", 2));
+            CreateLevelButton("Level 3: Advanced (High)", () => ConfirmLevel("High", 3));
             CreateLevelButton("Back to Phobias", CancelLevelSelection, true);
         }
 
