@@ -51,6 +51,8 @@ namespace PhobiaReliefTherapy.Data
 
         public static void Reset()
         {
+            float savedBaselineHeadMovement = BaselineHeadMovementScore;
+
             SessionActive = false;
             SessionAborted = false;
             SessionStartTime = 0f;
@@ -62,7 +64,7 @@ namespace PhobiaReliefTherapy.Data
             HeartRateSampleCount = 0;
             HeartRateSampleSum = 0;
 
-            BaselineHeadMovementScore = 0f;
+            BaselineHeadMovementScore = savedBaselineHeadMovement;
             PeakHeadMovementScore = 0f;
             AverageHeadMovementScore = 0f;
             HeadMovementSampleSum = 0f;

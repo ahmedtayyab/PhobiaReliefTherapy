@@ -18,6 +18,17 @@ namespace PhobiaReliefTherapy.Therapy
             ExposureSessionMonitor.Instance.StartMonitoring(onSafetyTriggered);
         }
 
+        public static void AbortToSafeRoom(bool aborted)
+        {
+            ExposureSessionMonitor.EnsureInstanceExists();
+            if (ExposureSessionMonitor.Instance != null)
+                ExposureSessionMonitor.Instance.StopMonitoring(aborted);
+
+            UserData.SessionWasAborted = aborted;
+            TryPersistSession();
+            SceneLoader.Instance.LoadScene("SafeRoomScene");
+        }
+
         public static void CompleteExposureSession(bool aborted)
         {
             ExposureSessionMonitor.EnsureInstanceExists();
@@ -25,20 +36,31 @@ namespace PhobiaReliefTherapy.Therapy
                 ExposureSessionMonitor.Instance.StopMonitoring(aborted);
 
             UserData.SessionWasAborted = aborted;
+            TryPersistSession();
             SceneLoader.Instance.LoadScene("FeedbackScene");
+        }
+
+        private static void TryPersistSession()
+        {
+            try
+            {
+                LocalSessionStore.PersistFromCurrentMetrics();
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError("Session persist failed: " + ex.Message);
+            }
+        }
+
+        public static int GetAssignedExposureStage()
+        {
+            return Mathf.Clamp(UserData.CurrentStage, 1, 3);
         }
 
         public static int GetStageCountForDifficulty()
         {
-            switch (UserData.SelectedDifficulty)
-            {
-                case "Medium":
-                    return 2;
-                case "High":
-                    return 3;
-                default:
-                    return 1;
-            }
+            // One AI-selected stage per session (not a manual multi-level run).
+            return 1;
         }
 
         public static float GetSkyboxExposureForDifficulty()
@@ -65,6 +87,13 @@ namespace PhobiaReliefTherapy.Therapy
         public static Button CreateEmergencyStopButton(Transform panelParent)
         {
             if (panelParent == null)
+            {
+                var canvas = Object.FindObjectOfType<Canvas>();
+                if (canvas != null)
+                    panelParent = canvas.transform;
+            }
+
+            if (panelParent == null)
                 return null;
 
             var existing = panelParent.Find("EmergencyStopButton");
@@ -81,6 +110,9 @@ namespace PhobiaReliefTherapy.Therapy
             rect.sizeDelta = new Vector2(260f, 52f);
             rect.anchoredPosition = Vector2.zero;
 
+            var ignoreLayout = buttonGO.AddComponent<UnityEngine.UI.LayoutElement>();
+            ignoreLayout.ignoreLayout = true;
+
             var theme = buttonGO.AddComponent<ThemeableUI>();
             theme.elementType = UIElementType.SecondaryButton;
 
@@ -93,7 +125,7 @@ namespace PhobiaReliefTherapy.Therapy
             textRect.offsetMax = Vector2.zero;
 
             var tmp = textGO.GetComponent<TextMeshProUGUI>();
-            tmp.text = "Emergency Stop";
+            tmp.text = "Emergency  ·  A / X";
             tmp.alignment = TextAlignmentOptions.Center;
 
             var textTheme = textGO.AddComponent<ThemeableUI>();

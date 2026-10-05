@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using PhobiaReliefTherapy.Managers;
+using PhobiaReliefTherapy.UI;
 using PhobiaReliefTherapy.VR;
 using UnityEngine.XR.Interaction.Toolkit.UI;
 
@@ -42,6 +43,7 @@ namespace PhobiaReliefTherapy.Theme
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+            VRMenuDragger.ReleaseAllGrabs();
             ApplyThemeToScene(scene);
             StartCoroutine(ConfigureCanvasesRoutine());
         }
@@ -58,22 +60,7 @@ namespace PhobiaReliefTherapy.Theme
 
         private bool IsVRActive()
         {
-#if UNITY_ANDROID && !UNITY_EDITOR
-            return true; // Always force VR mode on Oculus Quest standalone builds
-#else
-            // Fallback for Editor VR play mode or PC VR builds
-            if (UnityEngine.XR.XRSettings.isDeviceActive)
-                return true;
-
-            if (UnityEngine.XR.Management.XRGeneralSettings.Instance != null &&
-                UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager != null &&
-                UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager.activeLoader != null)
-            {
-                return true;
-            }
-
-            return false;
-#endif
+            return VrAvailability.IsHeadsetPresent();
         }
 
         private System.Collections.IEnumerator ConfigureCanvasesRoutine()
@@ -141,114 +128,36 @@ namespace PhobiaReliefTherapy.Theme
 
         private void ConfigureCanvasesForVR(Camera mainCamera)
         {
-            // ── Skybox/therapy scenes ──────────────────────────────────────────────────
-            // These scenes render a 360° equirectangular panorama as a Unity skybox.
-            // We must NOT convert their canvases to floating WorldSpace panels — that
-            // covers the panorama entirely.  Instead we:
-            //   1. Build the XR rig (so head tracking works).
-            //   2. Switch the canvas to ScreenSpaceCamera mode so the skybox renders
-            //      behind the canvas and is fully visible through any transparent areas.
-            //   3. Force the camera clearFlags = Skybox.
-            //   4. Add TrackedDeviceGraphicRaycaster so the Return button is still clickable.
             if (IsSkyboxScene())
-            {
-                VRRigBuilder.BuildVRRig(mainCamera, null);
-
-                // Ensure the camera renders the skybox (not a flat colour)
                 mainCamera.clearFlags = CameraClearFlags.Skybox;
 
-                foreach (var canvas in FindObjectsOfType<Canvas>(true))
-                {
-                    if (canvas.transform.parent != null &&
-                        canvas.transform.parent.GetComponent<SceneLoader>() != null)
-                        continue;
-
-                    // Switch to ScreenSpaceCamera so the skybox shows through
-                    if (canvas.renderMode != RenderMode.ScreenSpaceCamera)
-                    {
-                        canvas.renderMode   = RenderMode.ScreenSpaceCamera;
-                        canvas.worldCamera  = mainCamera;
-                        canvas.planeDistance = 1.5f;   // 1.5 metres in front — comfortable viewing distance
-                    }
-
-                    // Keep XR raycaster so the Return button still works
-                    if (canvas.GetComponent<TrackedDeviceGraphicRaycaster>() == null)
-                        canvas.gameObject.AddComponent<TrackedDeviceGraphicRaycaster>();
-                }
-                return;
-            }
-            // Destroy legacy VRGazePointer to avoid conflicts and incorrect laser visual lines
             foreach (var gazePointer in FindObjectsOfType<VRGazePointer>(true))
-            {
                 Destroy(gazePointer);
-                Debug.Log("[UIThemeAutoApply] Destroyed legacy VRGazePointer to prevent laser offset and interaction conflicts.");
-            }
 
             Canvas mainCanvas = null;
-
             foreach (var canvas in FindObjectsOfType<Canvas>(true))
             {
-                // Don't modify the SceneLoader transition canvas which is nested under SceneLoader
-                if (canvas.transform.parent != null && canvas.transform.parent.GetComponent<SceneLoader>() != null)
+                if (IsProtectedCanvas(canvas))
                     continue;
 
-                ConfigureCanvasForXR(canvas, mainCamera);
-
+                VrWorldMenu.AttachAndPlace(canvas, mainCamera, recenterIfLoose: true);
                 if (canvas.renderMode == RenderMode.WorldSpace)
-                {
                     mainCanvas = canvas;
-                }
             }
 
-            // Build the native XR Origin / Controller Rig
             VRRigBuilder.BuildVRRig(mainCamera, mainCanvas);
-
-            // Find all input fields in the active scene and attach VRKeyboardTrigger
             AttachKeyboardTriggers();
         }
 
-        private void ConfigureCanvasForXR(Canvas canvas, Camera mainCamera)
+        private static bool IsProtectedCanvas(Canvas canvas)
         {
-            if (canvas == null) return;
-
-            // If the canvas is screen space overlay, convert it to world space for VR visibility and targeting
-            if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
-            {
-                canvas.renderMode = RenderMode.WorldSpace;
-                canvas.worldCamera = mainCamera;
-                
-                // Position the canvas 1.5 meters in front of the camera, facing it
-                canvas.transform.position = mainCamera.transform.position + mainCamera.transform.forward * 1.5f;
-                canvas.transform.rotation = Quaternion.LookRotation(mainCamera.transform.forward, Vector3.up);
-                
-                // Scale the canvas down so 1920 pixels equals 1.92 meters wide in VR space
-                canvas.transform.localScale = new Vector3(0.001f, 0.001f, 0.001f);
-                
-                Debug.Log($"[UIThemeAutoApply] Converted Canvas '{canvas.name}' to WorldSpace for VR compatibility.");
-            }
-
-            // Replace standard GraphicRaycaster with TrackedDeviceGraphicRaycaster for VR pointer interaction
-            var oldRaycaster = canvas.GetComponent<GraphicRaycaster>();
-            if (oldRaycaster != null)
-            {
-                Destroy(oldRaycaster);
-            }
-
-            if (canvas.GetComponent<TrackedDeviceGraphicRaycaster>() == null)
-            {
-                canvas.gameObject.AddComponent<TrackedDeviceGraphicRaycaster>();
-                Debug.Log($"[UIThemeAutoApply] Added TrackedDeviceGraphicRaycaster to Canvas: {canvas.name}");
-            }
-
-            // Add VRMenuDragger component so the user can grab and drag the menu
-            if (canvas.renderMode == RenderMode.WorldSpace)
-            {
-                if (canvas.GetComponent<VRMenuDragger>() == null)
-                {
-                    canvas.gameObject.AddComponent<VRMenuDragger>();
-                    Debug.Log($"[UIThemeAutoApply] Added VRMenuDragger to WorldSpace Canvas: {canvas.name}");
-                }
-            }
+            if (canvas == null)
+                return true;
+            if (canvas.transform.parent != null && canvas.transform.parent.GetComponent<SceneLoader>() != null)
+                return true;
+            if (canvas.name == "VitalsOverlayCanvas" || canvas.name == "TransitionCanvas")
+                return true;
+            return canvas.GetComponentInParent<SessionVitalsOverlay>() != null;
         }
 
         private void AttachKeyboardTriggers()
@@ -311,6 +220,8 @@ namespace PhobiaReliefTherapy.Theme
 
                 themeable.elementType = ResolveTextElementType(text);
                 themeable.ApplyTheme();
+                if (themeable.elementType == UIElementType.ButtonText)
+                    ClinicalUIFactory.AlignButtonLabel(text);
             }
         }
 

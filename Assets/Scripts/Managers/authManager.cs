@@ -5,6 +5,8 @@ using TMPro;
 using System.Text.RegularExpressions;
 using PhobiaReliefTherapy.Data;
 using PhobiaReliefTherapy.Managers;
+using PhobiaReliefTherapy.Theme;
+using PhobiaReliefTherapy.UI;
 using System.Collections;
 using UnityEngine.SceneManagement;
 using PhobiaReliefTherapy;
@@ -47,26 +49,199 @@ namespace PhobiaReliefTherapy.Managers
 
             // Setup listeners
             if (loginButton != null)
-                loginButton.onClick.AddListener(() => OnLoginClicked());
+            {
+                loginButton.onClick.RemoveAllListeners();
+                loginButton.onClick.AddListener(OnLoginClicked);
+            }
             
             if (registerButton != null)
-                registerButton.onClick.AddListener(() => OnRegisterClicked());
+            {
+                registerButton.onClick.RemoveAllListeners();
+                registerButton.onClick.AddListener(OnRegisterClicked);
+            }
 
             if (goToRegisterButton != null)
+            {
+                EnsureClickableButton(goToRegisterButton);
+                goToRegisterButton.onClick.RemoveAllListeners();
                 goToRegisterButton.onClick.AddListener(() => NavigateToScene("RegisterScene"));
+            }
 
             if (goToLoginButton != null)
+            {
+                EnsureClickableButton(goToLoginButton);
+                goToLoginButton.onClick.RemoveAllListeners();
                 goToLoginButton.onClick.AddListener(() => NavigateToScene("LoginScene"));
+            }
 
             if (forgotPasswordButton != null)
-                forgotPasswordButton.onClick.AddListener(() => OnForgotPasswordClicked());
+            {
+                forgotPasswordButton.onClick.RemoveAllListeners();
+                forgotPasswordButton.onClick.AddListener(OnForgotPasswordClicked);
+            }
 
             if (forgotUsernameButton != null)
-                forgotUsernameButton.onClick.AddListener(() => OnForgotUsernameClicked());
+            {
+                forgotUsernameButton.onClick.RemoveAllListeners();
+                forgotUsernameButton.onClick.AddListener(OnForgotUsernameClicked);
+            }
 
             // Clear errors
             if (loginErrorText != null) loginErrorText.text = "";
             if (registerErrorText != null) registerErrorText.text = "";
+
+            LocalAccountStore.EnsureSeedAccounts();
+            PrefillDemoCredentials();
+            RemoveDemoHint();
+            UnblockUiOverlays();
+            EnsureClickableButton(loginButton, false);
+            EnsureClickableButton(registerButton, false);
+            EnsureClickableButton(goToRegisterButton, true);
+            EnsureClickableButton(goToLoginButton, true);
+            EnsureClickableButton(forgotPasswordButton, true);
+            RestoreEditorCanvas();
+            StartCoroutine(RestoreEditorCanvasDelayed());
+            StartCoroutine(ShowCloudStatusOnLogin());
+        }
+
+        private void Update()
+        {
+            if (loginButton == null || !loginButton.gameObject.activeInHierarchy)
+                return;
+
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+                OnLoginClicked();
+        }
+
+        private static void UnblockUiOverlays()
+        {
+            var groups = Object.FindObjectsOfType<CanvasGroup>();
+            foreach (var group in groups)
+            {
+                if (group == null)
+                    continue;
+
+                if (group.gameObject.name == "FadeImage" || group.gameObject.name == "TransitionCanvas")
+                {
+                    group.alpha = 0f;
+                    group.blocksRaycasts = false;
+                    var img = group.GetComponent<Image>();
+                    if (img != null)
+                        img.raycastTarget = false;
+                }
+            }
+        }
+
+        private IEnumerator RestoreEditorCanvasDelayed()
+        {
+            yield return null;
+            RestoreEditorCanvas();
+            yield return new WaitForSeconds(0.5f);
+            RestoreEditorCanvas();
+        }
+
+        private void RestoreEditorCanvas()
+        {
+            if (VrAvailability.IsHeadsetPresent())
+                return;
+
+            if (Object.FindObjectOfType<EventSystem>() == null)
+                new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+            else
+            {
+                var es = EventSystem.current != null ? EventSystem.current : Object.FindObjectOfType<EventSystem>();
+                if (es != null && es.GetComponent<StandaloneInputModule>() == null)
+                    es.gameObject.AddComponent<StandaloneInputModule>();
+            }
+
+            foreach (var canvas in Object.FindObjectsOfType<Canvas>())
+            {
+                if (canvas == null)
+                    continue;
+                if (canvas.transform.parent != null && canvas.transform.parent.GetComponent<SceneLoader>() != null)
+                    continue;
+
+                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                canvas.worldCamera = null;
+                canvas.transform.localScale = Vector3.one;
+
+                if (canvas.GetComponent<GraphicRaycaster>() == null)
+                    canvas.gameObject.AddComponent<GraphicRaycaster>();
+
+                var vrRaycaster = canvas.GetComponent<UnityEngine.XR.Interaction.Toolkit.UI.TrackedDeviceGraphicRaycaster>();
+                if (vrRaycaster != null)
+                    Object.Destroy(vrRaycaster);
+
+                var dragger = canvas.GetComponent<PhobiaReliefTherapy.VR.VRMenuDragger>();
+                if (dragger != null)
+                    dragger.enabled = false;
+            }
+
+            EnsureClickableButton(loginButton, false);
+            EnsureClickableButton(registerButton, false);
+            EnsureClickableButton(goToRegisterButton, true);
+            EnsureClickableButton(goToLoginButton, true);
+            EnsureClickableButton(forgotPasswordButton, true);
+            EnsureClickableButton(forgotUsernameButton, true);
+        }
+
+        private static void EnsureClickableButton(Button button, bool secondary)
+        {
+            if (button == null)
+                return;
+
+            button.interactable = true;
+            button.transform.SetAsLastSibling();
+
+            if (button.GetComponent<Image>() == null)
+                button.gameObject.AddComponent<Image>();
+
+            var themeable = button.GetComponent<ThemeableUI>();
+            if (themeable == null)
+                themeable = button.gameObject.AddComponent<ThemeableUI>();
+            themeable.elementType = secondary ? UIElementType.SecondaryButton : UIElementType.PrimaryButton;
+            themeable.ApplyTheme();
+
+            var image = button.GetComponent<Image>();
+            image.raycastTarget = true;
+            button.targetGraphic = image;
+
+            var tmp = button.GetComponentInChildren<TextMeshProUGUI>();
+            if (tmp == null)
+                return;
+
+            tmp.raycastTarget = false;
+            var textTheme = tmp.GetComponent<ThemeableUI>();
+            if (textTheme == null)
+                textTheme = tmp.gameObject.AddComponent<ThemeableUI>();
+            textTheme.elementType = UIElementType.ButtonText;
+            textTheme.ApplyTheme();
+            ClinicalUIFactory.AlignButtonLabel(tmp);
+        }
+
+        private void PrefillDemoCredentials()
+        {
+            if (loginEmailInput == null || loginPasswordInput == null)
+                return;
+            if (!string.IsNullOrEmpty(loginEmailInput.text))
+                return;
+
+            loginEmailInput.text = "admin@phobia.local";
+            loginPasswordInput.text = "admin123";
+        }
+
+        private void RemoveDemoHint()
+        {
+            var hint = GameObject.Find("DemoHint");
+            if (hint != null)
+                Destroy(hint);
+
+            if (loginEmailInput != null && loginEmailInput.transform.parent != null)
+            {
+                var nested = loginEmailInput.transform.parent.Find("DemoHint");
+                if (nested != null)
+                    Destroy(nested.gameObject);
+            }
         }
 
         private void AutoBindMissingFields()
@@ -101,6 +276,8 @@ namespace PhobiaReliefTherapy.Managers
                 loginErrorText = AutoBindHelper.FindComponentByName<TextMeshProUGUI>("LoginErrorText");
             if (goToRegisterButton == null)
                 goToRegisterButton = AutoBindHelper.FindComponentByName<Button>("CreateAccountButton");
+            if (goToRegisterButton == null)
+                goToRegisterButton = AutoBindHelper.FindComponentByName<Button>("CreateAccButton");
             if (forgotPasswordButton == null)
                 forgotPasswordButton = AutoBindHelper.FindComponentByName<Button>("ForgotPasswordButton");
         }
@@ -124,8 +301,11 @@ namespace PhobiaReliefTherapy.Managers
 
         private static GameObject CreateRecoveryTextButton(string name, Transform parent, string label)
         {
-            var go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Button));
+            var go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
             go.transform.SetParent(parent, false);
+            var image = go.GetComponent<Image>();
+            image.color = new Color(1f, 1f, 1f, 0.02f);
+            image.raycastTarget = true;
 
             var textGO = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
             textGO.transform.SetParent(go.transform, false);
@@ -259,12 +439,28 @@ namespace PhobiaReliefTherapy.Managers
 
             registerButton.interactable = false;
             registerErrorText.color = new Color32(28, 83, 146, 255); // Neutral blue
-            registerErrorText.text = "Loading, confirm email...";
+            registerErrorText.text = "Creating account on Supabase...";
             StartCoroutine(RegisterCoroutine(name, email, pass));
+        }
+
+        private IEnumerator ShowCloudStatusOnLogin()
+        {
+            yield return DatabaseManager.Instance.ProbeCloudHealth();
+            if (loginErrorText == null || !string.IsNullOrEmpty(loginErrorText.text))
+                yield break;
+
+            loginErrorText.color = DatabaseManager.TablesReady
+                ? new Color32(72, 187, 120, 255)
+                : new Color32(28, 83, 146, 255);
+            loginErrorText.text = DatabaseManager.StatusLabel;
         }
 
         private IEnumerator LoginCoroutine(string email, string password)
         {
+            LocalAccountStore.EnsureSeedAccounts();
+            loginErrorText.color = new Color32(28, 83, 146, 255);
+            loginErrorText.text = "Connecting to Supabase...";
+
             bool loginComplete = false;
             User loggedInUser = null;
             string loginError = "Invalid email or password!";
@@ -277,40 +473,80 @@ namespace PhobiaReliefTherapy.Managers
                 loginComplete = true;
             });
 
-            // Wait for callback
             while (!loginComplete)
-            {
                 yield return null;
-            }
 
             if (loggedInUser != null)
             {
-                Data.UserData.UserId = loggedInUser.Id;
-                Data.UserData.Username = loggedInUser.Username;
-                Data.UserData.IsAdmin = IsAdminAccount(email, loggedInUser.Username);
-                Debug.Log($"User logged in: {loggedInUser.Username}");
-                loginErrorText.text = "Login successful!";
+                if (string.Equals(loggedInUser.AccountStatus, LocalAccountStore.SuspendedStatus, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    loginErrorText.color = new Color32(229, 62, 62, 255);
+                    loginErrorText.text = "This account is suspended. Contact an administrator.";
+                    if (loginButton != null)
+                        loginButton.interactable = true;
+                    yield break;
+                }
+
+                ApplyLoggedInUser(loggedInUser, email, true);
+                loginErrorText.color = new Color32(72, 187, 120, 255);
+                loginErrorText.text = "Login successful (Supabase)";
                 NavigateToScene(Data.UserData.IsAdmin ? "AdminScene" : "DashboardScene");
-            }
-            else
-            {
-                loginErrorText.text = loginError;
+                if (loginButton != null)
+                    loginButton.interactable = true;
+                yield break;
             }
 
+            var local = LocalAccountStore.TryLogin(email, password, out string localError);
+            if (local != null)
+            {
+                ApplyLoggedInUser(new User
+                {
+                    Id = local.Id,
+                    Username = local.Username,
+                    Email = local.Email,
+                    IsAdmin = local.IsAdmin,
+                    AccountStatus = local.AccountStatus
+                }, email, false);
+                loginErrorText.color = new Color32(72, 187, 120, 255);
+                loginErrorText.text = string.IsNullOrEmpty(loginError)
+                    ? "Login successful (local)"
+                    : $"Login successful (local fallback)\n{DatabaseManager.StatusLabel}";
+                NavigateToScene(Data.UserData.IsAdmin ? "AdminScene" : "DashboardScene");
+                if (loginButton != null)
+                    loginButton.interactable = true;
+                yield break;
+            }
+
+            loginErrorText.color = new Color32(229, 62, 62, 255);
+            loginErrorText.text = FirstAuthError(loginError, localError);
             if (loginButton != null)
                 loginButton.interactable = true;
+        }
+
+        private static string FirstAuthError(string cloudError, string localError)
+        {
+            if (!string.IsNullOrEmpty(cloudError) &&
+                cloudError.IndexOf("invalid", System.StringComparison.OrdinalIgnoreCase) < 0 &&
+                cloudError.IndexOf("Invalid", System.StringComparison.OrdinalIgnoreCase) < 0)
+                return cloudError;
+            if (!string.IsNullOrEmpty(localError))
+                return localError;
+            return string.IsNullOrEmpty(cloudError) ? "Invalid email or password." : cloudError;
         }
 
         private IEnumerator RegisterCoroutine(string name, string email, string password)
         {
             bool registerComplete = false;
             bool registerSuccess = false;
+            string cloudUserId = null;
             string registerError = "Registration failed! Email may already be in use.";
 
             yield return DatabaseManager.Instance.RegisterUser(name, password, email, (success, error) =>
             {
                 registerSuccess = success;
-                if (!success && !string.IsNullOrEmpty(error))
+                if (success)
+                    cloudUserId = error;
+                else if (!string.IsNullOrEmpty(error))
                     registerError = error;
                 registerComplete = true;
             });
@@ -323,14 +559,38 @@ namespace PhobiaReliefTherapy.Managers
 
             if (registerSuccess)
             {
-                registerErrorText.color = new Color32(72, 187, 120, 255); // Green for success
-                registerErrorText.text = "Registered successfully! Check your email to confirm your account.";
-                // Do not auto-login until the user has confirmed their email.
+                LocalAccountStore.Register(name, email, password, false, out _);
+                if (!string.IsNullOrEmpty(cloudUserId) && DatabaseManager.IsUuid(cloudUserId))
+                    LocalAccountStore.UpsertFromCloud(cloudUserId, name, email, false);
+                LocalNotificationStore.Add("", "Account created", "Cloud account created.");
+                registerErrorText.color = new Color32(72, 187, 120, 255);
+                registerErrorText.text = DatabaseManager.LastRegisterNeedsEmailVerification
+                    ? "Account created on Supabase. Verify your email, then log in."
+                    : "Registered on Supabase. You can log in now.";
+            }
+            else if (!string.IsNullOrEmpty(registerError) &&
+                     registerError.IndexOf("already", System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                registerErrorText.color = new Color32(229, 62, 62, 255);
+                registerErrorText.text = registerError;
             }
             else
             {
-                registerErrorText.color = new Color32(229, 62, 62, 255); // Red for error
-                registerErrorText.text = registerError;
+                string localError;
+                var local = LocalAccountStore.Register(name, email, password, false, out localError);
+                if (local != null && !DatabaseManager.CloudReachable)
+                {
+                    LocalNotificationStore.Add(local.Id, "Account created", "Local account ready. You can log in on this device.");
+                    registerErrorText.color = new Color32(72, 187, 120, 255);
+                    registerErrorText.text = "Saved locally. Cloud was offline — you can still log in on this device.";
+                }
+                else
+                {
+                    registerErrorText.color = new Color32(229, 62, 62, 255);
+                    registerErrorText.text = string.IsNullOrEmpty(registerError)
+                        ? (string.IsNullOrEmpty(localError) ? "Registration failed." : localError)
+                        : registerError;
+                }
             }
 
             if (registerButton != null)
@@ -444,6 +704,13 @@ namespace PhobiaReliefTherapy.Managers
             while (!complete)
                 yield return null;
 
+            if (string.IsNullOrEmpty(username))
+            {
+                var local = LocalAccountStore.FindByEmail(email);
+                if (local != null)
+                    username = local.Username;
+            }
+
             if (!string.IsNullOrEmpty(username))
             {
                 loginErrorText.text = $"Your account name is: {username}";
@@ -459,6 +726,21 @@ namespace PhobiaReliefTherapy.Managers
                 forgotPasswordButton.interactable = true;
             if (forgotUsernameButton != null)
                 forgotUsernameButton.interactable = true;
+        }
+
+        private void ApplyLoggedInUser(User loggedInUser, string email, bool viaCloud)
+        {
+            Data.UserData.UserId = loggedInUser.Id;
+            Data.UserData.Username = string.IsNullOrEmpty(loggedInUser.Username) ? email : loggedInUser.Username;
+            Data.UserData.Email = string.IsNullOrEmpty(loggedInUser.Email) ? email : loggedInUser.Email;
+            Data.UserData.IsAdmin = loggedInUser.IsAdmin
+                || IsAdminAccount(email, loggedInUser.Username)
+                || (LocalAccountStore.FindByEmail(email)?.IsAdmin ?? false);
+            Data.UserData.AuthenticatedViaCloud = viaCloud;
+            LocalAccountStore.UpsertFromCloud(loggedInUser.Id, Data.UserData.Username, Data.UserData.Email, Data.UserData.IsAdmin);
+            LocalNotificationStore.Add(loggedInUser.Id, "Signed in",
+                viaCloud ? "Signed in through Supabase." : "Signed in on this device (local fallback).");
+            Debug.Log($"User logged in: {Data.UserData.Username} admin={Data.UserData.IsAdmin} cloud={viaCloud}");
         }
 
         private bool IsAdminAccount(string email, string username)
@@ -552,13 +834,8 @@ namespace PhobiaReliefTherapy.Managers
 
         private void EnsureEventSystemExists()
         {
-            if (UnityEngine.XR.XRSettings.isDeviceActive || 
-                (UnityEngine.XR.Management.XRGeneralSettings.Instance != null && 
-                 UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager != null && 
-                 UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager.activeLoader != null))
-            {
+            if (IsHeadsetTakingOverUi())
                 return;
-            }
 
             eventSystem = EventSystem.current != null ? EventSystem.current : Object.FindObjectOfType<EventSystem>();
             if (eventSystem == null)
@@ -578,25 +855,21 @@ namespace PhobiaReliefTherapy.Managers
             }
         }
 
+        private static bool IsHeadsetTakingOverUi()
+        {
+            if (Application.isEditor)
+                return false;
+
+            return UnityEngine.XR.XRSettings.isDeviceActive;
+        }
+
         private void Update()
         {
-            // If native VR rig is active, disable this legacy gaze bridge to avoid input module conflicts and auto-deselection of fields
-            if (UnityEngine.XR.XRSettings.isDeviceActive || 
-                (UnityEngine.XR.Management.XRGeneralSettings.Instance != null && 
-                 UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager != null && 
-                 UnityEngine.XR.Management.XRGeneralSettings.Instance.Manager.activeLoader != null))
-            {
-                if (eventSystem != null)
-                {
-                    var standalone = eventSystem.GetComponent<StandaloneInputModule>();
-                    if (standalone != null)
-                    {
-                        Destroy(standalone);
-                    }
-                }
-                gameObject.SetActive(false);
+            if (Application.isEditor)
                 return;
-            }
+
+            if (IsHeadsetTakingOverUi())
+                return;
 
             if (eventSystem == null)
             {

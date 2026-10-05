@@ -1,149 +1,247 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
+using UnityEngine.XR.Interaction.Toolkit;
 
 namespace PhobiaReliefTherapy.VR
 {
     /// <summary>
-    /// Attach to any world-space Canvas to allow users to grab it with the Grip button
-    /// on their VR controller and move/rotate it using the thumbstick.
+    /// Grip-grabs only the canvas the laser actually hits. Nearest collider wins so
+    /// graphs and menus never move together.
     /// </summary>
     [RequireComponent(typeof(Canvas))]
     public class VRMenuDragger : MonoBehaviour
     {
-        private BoxCollider canvasCollider;
-        private bool isDragging = false;
-        private XRNode draggingHand = XRNode.RightHand;
-        private float dragDistance = 1.5f;
-        private float accumulatedYawOffset = 0f;
+        public bool UserPlaced { get; private set; }
+        public bool IsVitalsHud;
 
-        private readonly List<InputDevice> _deviceBuf = new List<InputDevice>();
-        private Transform _cachedOrigin;
+        public static event System.Action<VRMenuDragger> GrabStarted;
+
+        private static int claimFrame = -1;
+        private static float bestHitDistance = float.MaxValue;
+        private static VRMenuDragger bestCandidate;
+        private static VRMenuDragger activeDrag;
+
+        private BoxCollider canvasCollider;
+        private bool isDragging;
+        private XRNode draggingHand = XRNode.RightHand;
+        private float dragDistance = 1.45f;
+
+        private void OnEnable()
+        {
+            RefreshCollider();
+        }
 
         private void Start()
         {
-            // Auto-configure box collider on the world-space canvas so we can raycast it
-            RectTransform rect = GetComponent<RectTransform>();
-            canvasCollider = GetComponent<BoxCollider>();
-            if (canvasCollider == null)
-            {
-                canvasCollider = gameObject.AddComponent<BoxCollider>();
-            }
+            RefreshCollider();
+        }
 
-            // Adjust collider bounds to match canvas RectTransform size
-            canvasCollider.size = new Vector3(rect.rect.width, rect.rect.height, 0.05f);
-            canvasCollider.center = new Vector3(rect.rect.x + rect.rect.width / 2f, rect.rect.y + rect.rect.height / 2f, 0f);
+        private void OnDisable()
+        {
+            if (activeDrag == this)
+                StopDrag();
+        }
+
+        private void OnDestroy()
+        {
+            if (activeDrag == this)
+                activeDrag = null;
+            if (bestCandidate == this)
+                bestCandidate = null;
+        }
+
+        public static void ReleaseAllGrabs()
+        {
+            if (activeDrag != null)
+                activeDrag.StopDrag();
+            activeDrag = null;
+            bestCandidate = null;
+            bestHitDistance = float.MaxValue;
+            claimFrame = -1;
+        }
+
+        public void ReleaseGrab()
+        {
+            if (activeDrag == this || isDragging)
+                StopDrag();
         }
 
         private void Update()
         {
-            HandleDrag();
-        }
+            if (activeDrag != null &&
+                (!activeDrag.isActiveAndEnabled || !activeDrag.gameObject.activeInHierarchy))
+            {
+                activeDrag = null;
+            }
 
-        private void HandleDrag()
-        {
             if (isDragging)
             {
-                // Continue dragging with the selected hand
-                InputDevices.GetDevicesAtXRNode(draggingHand, _deviceBuf);
-                if (_deviceBuf.Count == 0)
+                if (activeDrag != this || !IsGripDown(draggingHand) || !TryGetAim(draggingHand, out Ray aim, out Vector2 stick))
                 {
-                    isDragging = false;
+                    StopDrag();
                     return;
                 }
 
-                var device = _deviceBuf[0];
-                device.TryGetFeatureValue(CommonUsages.gripButton, out bool gripPressed);
+                dragDistance = Mathf.Clamp(dragDistance + stick.y * Time.deltaTime * 1.1f, 0.45f, 3.2f);
+                float scale = transform.localScale.x;
+                scale = Mathf.Clamp(scale * (1f + stick.x * Time.deltaTime * 0.9f), 0.00032f, 0.0015f);
+                transform.localScale = Vector3.one * scale;
 
-                if (!gripPressed)
-                {
-                    // User released the grip, stop dragging
-                    isDragging = false;
-                    return;
-                }
-
-                // Dragging in progress: calculate position and rotation
-                device.TryGetFeatureValue(CommonUsages.devicePosition, out Vector3 ctrlPos);
-                device.TryGetFeatureValue(CommonUsages.deviceRotation, out Quaternion ctrlRot);
-                device.TryGetFeatureValue(CommonUsages.primary2DAxis, out Vector2 stick);
-
-                Transform origin = FindXROrigin();
-                if (origin != null)
-                {
-                    ctrlPos = origin.TransformPoint(ctrlPos);
-                    ctrlRot = origin.rotation * ctrlRot;
-                }
-
-                // Thumbstick Y changes distance (range: 0.5m to 3.0m)
-                dragDistance = Mathf.Clamp(dragDistance + stick.y * Time.deltaTime * 0.8f, 0.5f, 3.0f);
-
-                // Thumbstick X adds permanent yaw offset (rotating the menu)
-                accumulatedYawOffset += stick.x * Time.deltaTime * 60f;
-
-                // Move menu target in front of controller
-                Vector3 targetPosition = ctrlPos + ctrlRot * Vector3.forward * dragDistance;
-
-                // Rotate menu to face player's camera
+                Vector3 targetPosition = aim.origin + aim.direction * dragDistance;
                 Camera cam = Camera.main;
-                Vector3 lookDir = cam != null ? (targetPosition - cam.transform.position).normalized : ctrlRot * Vector3.forward;
-                Quaternion faceRotation = Quaternion.LookRotation(lookDir, Vector3.up);
-                faceRotation = Quaternion.Euler(faceRotation.eulerAngles.x, faceRotation.eulerAngles.y + accumulatedYawOffset, 0f);
+                Vector3 lookDir = cam != null
+                    ? (targetPosition - cam.transform.position).normalized
+                    : aim.direction;
 
-                // Apply smooth translation and rotation
-                transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * 12f);
-                transform.rotation = Quaternion.Slerp(transform.rotation, faceRotation, Time.deltaTime * 12f);
+                transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * 14f);
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(lookDir, Vector3.up), Time.deltaTime * 14f);
+                RememberPose();
+                return;
             }
-            else
+
+            if (activeDrag != null)
+                return;
+
+            ResetClaimIfNewFrame();
+
+            foreach (XRNode hand in new[] { XRNode.RightHand, XRNode.LeftHand })
             {
-                // Check both hands to initiate dragging
-                foreach (XRNode hand in new[] { XRNode.LeftHand, XRNode.RightHand })
+                if (!IsGripDown(hand) || !TryGetAim(hand, out Ray aim, out _))
+                    continue;
+
+                RefreshCollider();
+                if (canvasCollider != null && canvasCollider.Raycast(aim, out RaycastHit hit, 8f) && hit.distance < bestHitDistance)
                 {
-                    InputDevices.GetDevicesAtXRNode(hand, _deviceBuf);
-                    if (_deviceBuf.Count == 0) continue;
-
-                    var device = _deviceBuf[0];
-                    device.TryGetFeatureValue(CommonUsages.gripButton, out bool gripPressed);
-
-                    if (!gripPressed) continue;
-
-                    // Controller tracking position and rotation
-                    device.TryGetFeatureValue(CommonUsages.devicePosition, out Vector3 ctrlPos);
-                    device.TryGetFeatureValue(CommonUsages.deviceRotation, out Quaternion ctrlRot);
-
-                    Transform origin = FindXROrigin();
-                    if (origin != null)
-                    {
-                        ctrlPos = origin.TransformPoint(ctrlPos);
-                        ctrlRot = origin.rotation * ctrlRot;
-                    }
-
-                    // Cast a ray from the controller forward direction to see if it points at this menu
-                    Ray ray = new Ray(ctrlPos, ctrlRot * Vector3.forward);
-                    if (canvasCollider.Raycast(ray, out RaycastHit hit, 10f))
-                    {
-                        // Ray hit this menu! Start dragging
-                        isDragging = true;
-                        draggingHand = hand;
-                        dragDistance = hit.distance;
-                        
-                        // Set initial yaw angle relative to camera view
-                        Camera cam = Camera.main;
-                        Vector3 lookDir = cam != null ? (transform.position - cam.transform.position).normalized : ctrlRot * Vector3.forward;
-                        Quaternion faceRotation = Quaternion.LookRotation(lookDir, Vector3.up);
-                        accumulatedYawOffset = transform.rotation.eulerAngles.y - faceRotation.eulerAngles.y;
-
-                        break; // Hand locked
-                    }
+                    bestHitDistance = hit.distance;
+                    bestCandidate = this;
+                    draggingHand = hand;
                 }
             }
         }
 
-        private Transform FindXROrigin()
+        private void LateUpdate()
         {
-            if (_cachedOrigin != null) return _cachedOrigin;
-            var originObj = GameObject.Find("XR Origin");
-            if (originObj != null) _cachedOrigin = originObj.transform;
-            return _cachedOrigin;
+            if (activeDrag != null || bestCandidate != this)
+                return;
+
+            BeginDrag(draggingHand, bestHitDistance);
+        }
+
+        public void RefreshCollider()
+        {
+            RectTransform rect = GetComponent<RectTransform>();
+            canvasCollider = GetComponent<BoxCollider>();
+            if (canvasCollider == null)
+                canvasCollider = gameObject.AddComponent<BoxCollider>();
+
+            float width = Mathf.Max(120f, rect.rect.width);
+            float height = Mathf.Max(120f, rect.rect.height);
+            canvasCollider.size = new Vector3(width, height, 0.08f);
+            canvasCollider.center = new Vector3(
+                rect.rect.x + rect.rect.width * 0.5f,
+                rect.rect.y + rect.rect.height * 0.5f,
+                0f);
+            canvasCollider.isTrigger = true;
+        }
+
+        private void BeginDrag(XRNode hand, float distance)
+        {
+            PrepareForWorldDrag();
+            isDragging = true;
+            UserPlaced = true;
+            activeDrag = this;
+            draggingHand = hand;
+            dragDistance = Mathf.Clamp(distance, 0.45f, 3.2f);
+            GrabStarted?.Invoke(this);
+        }
+
+        private void StopDrag()
+        {
+            RememberPose();
+            isDragging = false;
+            if (activeDrag == this)
+                activeDrag = null;
+        }
+
+        private void RememberPose()
+        {
+            if (IsVitalsHud)
+                VrMenuPose.CaptureHud(transform);
+            else
+                VrMenuPose.CaptureScreen(transform);
+        }
+
+        private void PrepareForWorldDrag()
+        {
+            var canvas = GetComponent<Canvas>();
+            Camera cam = VrWorldMenu.FindVrCamera();
+            if (canvas == null || cam == null)
+                return;
+
+            if (canvas.renderMode != RenderMode.WorldSpace)
+                VrWorldMenu.AttachAndPlace(canvas, cam, recenterIfLoose: false);
+
+            RefreshCollider();
+        }
+
+        private static void ResetClaimIfNewFrame()
+        {
+            if (claimFrame == Time.frameCount)
+                return;
+
+            claimFrame = Time.frameCount;
+            bestHitDistance = float.MaxValue;
+            bestCandidate = null;
+        }
+
+        private static bool TryGetAim(XRNode hand, out Ray aim, out Vector2 stick)
+        {
+            aim = default;
+            stick = Vector2.zero;
+
+            foreach (var interactor in Object.FindObjectsOfType<XRRayInteractor>())
+            {
+                if (interactor == null)
+                    continue;
+                var controller = interactor.GetComponent<XRController>();
+                if (controller == null || controller.controllerNode != hand)
+                    continue;
+                if (interactor.rayOriginTransform == null)
+                    continue;
+
+                aim = new Ray(interactor.rayOriginTransform.position, interactor.rayOriginTransform.forward);
+                InputDevice device = InputDevices.GetDeviceAtXRNode(hand);
+                if (device.isValid)
+                    device.TryGetFeatureValue(CommonUsages.primary2DAxis, out stick);
+                return true;
+            }
+
+            InputDevice fallback = InputDevices.GetDeviceAtXRNode(hand);
+            if (!fallback.isValid)
+                return false;
+
+            fallback.TryGetFeatureValue(CommonUsages.devicePosition, out Vector3 pos);
+            fallback.TryGetFeatureValue(CommonUsages.deviceRotation, out Quaternion rot);
+            fallback.TryGetFeatureValue(CommonUsages.primary2DAxis, out stick);
+            Camera cam = Camera.main;
+            if (cam != null)
+            {
+                pos = cam.transform.position + cam.transform.rotation * pos;
+                rot = cam.transform.rotation * rot;
+            }
+
+            aim = new Ray(pos, rot * Vector3.forward);
+            return true;
+        }
+
+        private static bool IsGripDown(XRNode hand)
+        {
+            InputDevice device = InputDevices.GetDeviceAtXRNode(hand);
+            if (!device.isValid)
+                return false;
+            if (device.TryGetFeatureValue(CommonUsages.gripButton, out bool gripButton) && gripButton)
+                return true;
+            return device.TryGetFeatureValue(CommonUsages.grip, out float grip) && grip >= 0.65f;
         }
     }
 }

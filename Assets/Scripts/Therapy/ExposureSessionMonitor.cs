@@ -11,11 +11,16 @@ namespace PhobiaReliefTherapy.Therapy
     public class ExposureSessionMonitor : MonoBehaviour
     {
         public static ExposureSessionMonitor Instance { get; private set; }
+        public static event System.Action<PanicDetectionService.PanicEvaluation> EvaluationReady;
 
         private Coroutine monitorRoutine;
         private float consecutiveStressSeconds;
         private float elapsedSeconds;
+        private float monitoringStartedAt;
+        private bool safetyTriggered;
         private System.Action<PanicDetectionService.PanicEvaluation> onSafetyTriggered;
+
+        private const float SafetyGraceSeconds = 20f;
 
         private void Awake()
         {
@@ -34,7 +39,12 @@ namespace PhobiaReliefTherapy.Therapy
         {
             StopMonitoring(false);
             onSafetyTriggered = safetyCallback;
+            safetyTriggered = false;
+            monitoringStartedAt = Time.time;
+
+            float savedBaselineHeadMovement = SessionMetrics.BaselineHeadMovementScore;
             SessionMetrics.Reset();
+            SessionMetrics.BaselineHeadMovementScore = savedBaselineHeadMovement;
             SessionMetrics.SessionActive = true;
             SessionMetrics.SessionStartTime = Time.time;
             elapsedSeconds = 0f;
@@ -42,6 +52,8 @@ namespace PhobiaReliefTherapy.Therapy
 
             SensorManager.EnsureInstanceExists();
             HeadMovementTracker.EnsureInstanceExists();
+            AdaptiveExposureController.EnsureInstanceExists();
+            AdaptiveExposureController.Instance.BeginSessionOverlay();
             SensorManager.Instance.StartExposureMonitoring();
 
             monitorRoutine = StartCoroutine(MonitorLoop());
@@ -57,16 +69,23 @@ namespace PhobiaReliefTherapy.Therapy
 
             SessionMetrics.SessionAborted = aborted;
             SessionMetrics.FinalizeDuration(elapsedSeconds);
-            SensorManager.Instance.StopSessionMonitoring();
+            if (SensorManager.Instance != null)
+                SensorManager.Instance.StopSessionMonitoring();
+            if (AdaptiveExposureController.Instance != null)
+                AdaptiveExposureController.Instance.EndSessionOverlay();
         }
 
         public void CaptureBaselineHeadMovement()
         {
             HeadMovementTracker.EnsureInstanceExists();
-            if (HeadMovementTracker.Instance != null)
+            if (SessionMetrics.HeadMovementSampleCount > 0)
             {
-                SessionMetrics.BaselineHeadMovementScore = HeadMovementTracker.Instance.CombinedMovementScore;
+                SessionMetrics.BaselineHeadMovementScore = SessionMetrics.AverageHeadMovementScore;
+                return;
             }
+
+            if (HeadMovementTracker.Instance != null)
+                SessionMetrics.BaselineHeadMovementScore = HeadMovementTracker.Instance.AgitationScore;
         }
 
         private IEnumerator MonitorLoop()
@@ -88,27 +107,36 @@ namespace PhobiaReliefTherapy.Therapy
             float movementScore = 0f;
             if (HeadMovementTracker.Instance != null)
             {
-                movementScore = HeadMovementTracker.Instance.CombinedMovementScore;
+                movementScore = HeadMovementTracker.Instance.AgitationScore;
                 SessionMetrics.RecordHeadMovementSample(movementScore);
             }
 
             float deltaHr = heartRate - UserData.BaselineHeartRate;
-            if (deltaHr > 10f || movementScore > SessionMetrics.BaselineHeadMovementScore * 1.5f)
+            float movementFloor = Mathf.Max(15f, SessionMetrics.BaselineHeadMovementScore);
+            if (deltaHr > 16f || movementScore > movementFloor * 2.4f)
                 consecutiveStressSeconds += 1f;
             else
                 consecutiveStressSeconds = 0f;
 
             var evaluation = PanicDetectionService.Evaluate(heartRate, movementScore, consecutiveStressSeconds);
+            EvaluationReady?.Invoke(evaluation);
 
             if (evaluation.PanicScore >= 10f)
             {
                 SessionMetrics.RecordPanicEvent(PanicDetectionService.ToRecord(evaluation));
             }
 
-            if (evaluation.TriggerSafetyMechanism)
+            if (evaluation.TriggerSafetyMechanism &&
+                !safetyTriggered &&
+                Time.time - monitoringStartedAt >= SafetyGraceSeconds)
             {
+                safetyTriggered = true;
                 SessionMetrics.SafetyTriggerCount++;
-                onSafetyTriggered?.Invoke(evaluation);
+                SessionMetrics.SessionActive = false;
+                if (AdaptiveExposureController.Instance != null)
+                    AdaptiveExposureController.Instance.HandleSeverePanic(evaluation);
+                else
+                    onSafetyTriggered?.Invoke(evaluation);
             }
         }
 

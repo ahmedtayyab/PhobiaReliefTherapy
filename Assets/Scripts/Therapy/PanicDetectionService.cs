@@ -9,8 +9,9 @@ namespace PhobiaReliefTherapy.Therapy
     /// </summary>
     public static class PanicDetectionService
     {
-        public const float DeltaHrHighPriorityThreshold = 25f;
-        public const float DeltaHrImmediateEvaluateThreshold = 28f;
+        public const float DeltaHrHighPriorityThreshold = 32f;
+        public const float DeltaHrImmediateEvaluateThreshold = 36f;
+        public const float SafeRoomScoreThreshold = 22f;
 
         public struct PanicEvaluation
         {
@@ -32,9 +33,14 @@ namespace PhobiaReliefTherapy.Therapy
             float tsScore = ComputeTimeSpentScore(consecutiveStressSeconds, deltaHr);
 
             float panicScore = (deltaHr * 0.5f) + (hmScore * 0.3f) + (tsScore * 0.2f);
+            if (panicScore < 0f)
+                panicScore = 0f;
 
             if (deltaHr > DeltaHrImmediateEvaluateThreshold)
-                panicScore = Math.Max(panicScore, 18f);
+                panicScore = Math.Max(panicScore, SafeRoomScoreThreshold);
+
+            if (deltaHr > DeltaHrHighPriorityThreshold && panicScore < 10f)
+                panicScore = Math.Max(panicScore, 10f);
 
             var evaluation = new PanicEvaluation
             {
@@ -58,7 +64,7 @@ namespace PhobiaReliefTherapy.Therapy
             {
                 evaluation.Classification = "Severe Panic";
                 evaluation.AiRecommendation = "Stop / Safe Room";
-                evaluation.TriggerSafetyMechanism = true;
+                evaluation.TriggerSafetyMechanism = panicScore >= SafeRoomScoreThreshold && deltaHr >= 20f;
             }
 
             return evaluation;
@@ -66,9 +72,12 @@ namespace PhobiaReliefTherapy.Therapy
 
         private static float ComputeHeadMovementScore(float currentMovement)
         {
-            float baseline = Math.Max(0.01f, SessionMetrics.BaselineHeadMovementScore);
-            float deviation = Math.Abs(currentMovement - baseline) / baseline;
-            return Math.Min(100f, deviation * 100f);
+            float baseline = Math.Max(15f, SessionMetrics.BaselineHeadMovementScore);
+            float excess = currentMovement - baseline;
+            if (excess <= 0f)
+                return 0f;
+
+            return Math.Min(100f, excess / baseline * 45f);
         }
 
         private static float ComputeTimeSpentScore(float consecutiveStressSeconds, float deltaHr)

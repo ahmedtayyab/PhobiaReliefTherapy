@@ -113,7 +113,11 @@ namespace PhobiaReliefTherapy.Theme
                     ApplyTextStyle(theme.errorRed, theme.bodyFontSize, FontStyles.Bold, theme);
                     break;
                 case UIElementType.ButtonText:
-                    ApplyTextStyle(Color.white, theme.buttonFontSize, FontStyles.Bold, theme);
+                    ApplyTextStyle(Color.white, theme.buttonFontSize, FontStyles.Normal, theme);
+                    var buttonLabel = GetComponent<TextMeshProUGUI>();
+                    if (buttonLabel != null && buttonLabel.fontSize < 14f)
+                        buttonLabel.fontSize = theme.buttonFontSize;
+                    ClinicalUIFactory.AlignButtonLabel(buttonLabel);
                     break;
                 case UIElementType.PlaceholderText:
                     ApplyTextStyle(theme.textLight, theme.bodyFontSize, FontStyles.Normal, theme);

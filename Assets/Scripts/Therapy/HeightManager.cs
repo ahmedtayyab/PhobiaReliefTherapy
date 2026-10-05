@@ -60,7 +60,13 @@ namespace PhobiaReliefTherapy.Therapy
             }
 
             WireEmergencyStop();
+            AdaptiveExposureController.StageChanged += OnAdaptiveStage;
             StartExposureTherapy();
+        }
+
+        private void OnAdaptiveStage(int stage)
+        {
+            TherapySessionHelper.ApplyDifficultyToSkyboxMaterial(RenderSettings.skybox);
         }
 
         private void WireEmergencyStop()
@@ -81,7 +87,7 @@ namespace PhobiaReliefTherapy.Therapy
             {
                 if (sessionEnded) return;
                 sessionEnded = true;
-                SceneLoader.Instance.LoadScene("SafeRoomScene");
+                TherapySessionHelper.AbortToSafeRoom(true);
             });
         }
 
@@ -90,7 +96,7 @@ namespace PhobiaReliefTherapy.Therapy
             if (sessionEnded) return;
             sessionEnded = true;
             Debug.Log($"Safety triggered: {evaluation.Classification} — {evaluation.AiRecommendation}");
-            SceneLoader.Instance.LoadScene("SafeRoomScene");
+            TherapySessionHelper.AbortToSafeRoom(true);
         }
 
         private void Update()
@@ -439,7 +445,6 @@ namespace PhobiaReliefTherapy.Therapy
                 Debug.Log("Initialized camera clear flags to Skybox.");
             }
 
-            UserData.ResetSessionState();
             TherapySessionHelper.BeginExposureSession(OnSafetyTriggered);
             StartCoroutine(ExposureTimerRoutine());
         }
@@ -447,27 +452,27 @@ namespace PhobiaReliefTherapy.Therapy
         private IEnumerator ExposureTimerRoutine()
         {
             isTimerRunning = true;
-            int stageCount = TherapySessionHelper.GetStageCountForDifficulty();
+            int stage = TherapySessionHelper.GetAssignedExposureStage();
+            UserData.CurrentStage = stage;
+            TherapySessionHelper.ApplyDifficultyToSkyboxMaterial(RenderSettings.skybox);
 
-            for (int stage = 1; stage <= stageCount; stage++)
+            float remaining = SessionTiming.ExposureSeconds;
+            Debug.Log($"Starting AI-assigned exposure stage {stage}.");
+
+            while (remaining > 0)
             {
-                UserData.CurrentStage = stage;
-                TherapySessionHelper.ApplyDifficultyToSkyboxMaterial(RenderSettings.skybox);
+                if (sessionEnded || !SessionMetrics.SessionActive)
+                    yield break;
 
-                float remaining = exposureDuration;
-                Debug.Log($"Starting exposure stage {stage}/{stageCount}.");
+                if (SessionTiming.ConsumeSkip())
+                    remaining = 0f;
 
-                while (remaining > 0)
-                {
-                    if (sessionEnded)
-                        yield break;
+                stage = UserData.CurrentStage;
+                if (timerText != null)
+                    timerText.text = $"S{stage} " + Mathf.CeilToInt(remaining).ToString() + "s";
 
-                    if (timerText != null)
-                        timerText.text = $"S{stage} " + Mathf.CeilToInt(remaining).ToString() + "s";
-
-                    yield return new WaitForSeconds(1f);
-                    remaining -= 1f;
-                }
+                yield return new WaitForSeconds(1f);
+                remaining -= 1f;
             }
 
             if (timerText != null)
@@ -484,6 +489,7 @@ namespace PhobiaReliefTherapy.Therapy
 
         private void OnDestroy()
         {
+            AdaptiveExposureController.StageChanged -= OnAdaptiveStage;
             Debug.Log("HeightManager component destroyed. Restoring environment.");
             // Restore camera clear flags and rotation
             if (Camera.main != null)

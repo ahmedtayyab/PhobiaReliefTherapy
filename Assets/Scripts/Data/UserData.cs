@@ -7,6 +7,7 @@ namespace PhobiaReliefTherapy.Data
     {
         public static string UserId { get; set; } = "";
         public static string Username { get; set; } = "Guest";
+        public static string Email { get; set; } = "";
         
         // E.g. "Height", "Darkness", "Crowd"
         public static string SelectedPhobia { get; set; } = "None";
@@ -21,12 +22,17 @@ namespace PhobiaReliefTherapy.Data
         public static int CurrentStage { get; set; } = 1;
 
         public static bool IsAdmin { get; set; } = false;
+        public static bool AuthenticatedViaCloud { get; set; } = false;
+        public static bool AllowManualStageSelection { get; set; } = false;
         public static bool SessionWasAborted { get; set; } = false;
+        public static string AiStageRecommendation { get; set; } = "";
 
         public static void ResetSessionState()
         {
             SessionWasAborted = false;
+            AiStageRecommendation = "";
             SessionMetrics.Reset();
+            LocalSessionStore.ClearOpenSession();
         }
     }
 }

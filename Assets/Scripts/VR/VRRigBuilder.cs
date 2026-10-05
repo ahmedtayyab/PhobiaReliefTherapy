@@ -18,11 +18,15 @@ namespace PhobiaReliefTherapy.VR
         {
             if (mainCamera == null) return;
 
-            // Check if an XR Origin is already present in the scene
-            if (Object.FindObjectOfType<XROrigin>() != null)
+            XROrigin existingOrigin = Object.FindObjectOfType<XROrigin>();
+            if (existingOrigin != null)
             {
-                Debug.Log("[VRRigBuilder] XR Origin already exists in the scene.");
-                return;
+                var interactors = Object.FindObjectsOfType<XRRayInteractor>();
+                bool cameraMissing = existingOrigin.Camera == null;
+                if (!cameraMissing && interactors != null && interactors.Length >= 2)
+                    return;
+
+                Object.Destroy(existingOrigin.gameObject);
             }
 
             Debug.Log("[VRRigBuilder] Dynamically building native XR Interaction Rig...");

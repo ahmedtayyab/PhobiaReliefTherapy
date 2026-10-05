@@ -265,8 +265,12 @@ public static class AuthSceneBuilder
 
     private static GameObject CreateTextButton(string name, Transform parent, string label)
     {
-        var go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Button));
+        var go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
         go.transform.SetParent(parent, false);
+        var theme = go.AddComponent<PhobiaReliefTherapy.Theme.ThemeableUI>();
+        theme.elementType = PhobiaReliefTherapy.Theme.UIElementType.SecondaryButton;
+        theme.ApplyTheme();
+        go.GetComponent<Button>().targetGraphic = go.GetComponent<Image>();
         var text = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
         text.transform.SetParent(go.transform, false);
         var tmp = text.GetComponent<TextMeshProUGUI>();

@@ -1,0 +1,1243 @@
+Software Requirement Specification
+“Your Safe Space to Heal.”
+Supervised By: Maham Saleem
+FYP Team
+Ahmad Tayyab | 22F-8817Shehroz Abbas | 22F-3130 Sehar Saleem |    22F-3820
+Department of Software Engineering FAST – National University of Computer & Emerging Sciences Chiniot-Faisalabad Campus                     
+                                           2026
+Abstract
+Phobia Relief Therapy is a VR based therapeutic system developed to help individuals gradually overcome common phobias such as fear of heights, water, or social situations. These fears can significantly limit daily activities and quality of life. Traditional exposure therapy conducted by psychologists can be expensive, difficult to access, and potentially unsafe when real world exposure is involved. The proposed system addresses this problem by providing a safe and immersive self guided therapy environment using Virtual Reality technology. Users can log in, select a specific phobia to address, and begin a controlled VR exposure session. During the session the system continuously collects physiological and behavioral data through wearable gadgets such as a Polar H10 heart rate sensor and motion tracking from the VR headset to monitor the user's stress levels. This data is analyzed in real time to detect signs of panic. The system can then adapt the exposure intensity or trigger safety mechanisms to ensure psychological safety. After the session the system provides feedback on the user's performance and progress. The system also maintains session records for users and administrators. An administrator panel allows for user management and therapy performance analysis. Phobia Relief Therapy thus creates a unified digital system connecting users with an adaptive and accessible mental health tool while maintaining data security and user privacy. This Software Requirements Specification outlines the system's functional, non functional, and design requirements forming the foundation for its development and evaluation.
+Contents
+1. Introduction8
+2. Vision Document8
+2.1Problem Statement8
+2.2Business Opportunities9
+2.3Objectives9
+2.4Scope9
+2.5Constraints10
+2.6Stakeholder and User Description11
+2.6.1 Market Demographics11
+2.6.2 User Environment11
+2.6.3 Stakeholder Profiles11
+2.6.4 Stakeholder Summary15
+3. System Requirements Specification16
+3.1 System Features16
+3.2 Functional Requirements16
+3.2.1 User Authentication and Registration16
+3.2.2 Phobia and Therapy Session Selection17
+3.2.3 VR Environment Loading and Management17
+3.2.4 Physiological and Behavioral Data Collection17
+3.2.5 Real Time Panic Detection18
+3.2.6 Safety Mechanisms19
+3.2.7 Adaptive Exposure Intensity Control19
+3.2.8 Session Feedback19
+3.2.9 Session History and Progress Tracking19
+3.2.10 User Dashboard20
+3.2.11 Manage User Profile21
+3.2.12 Notifications and Alerts21
+3.2.13 Manage Appointments21
+3.2.14 Administrator Dashboard21
+3.3Non-Functional Requirements21
+3.3.1 User-Friendly Interface21
+3.3.2 Data Security22
+3.3.3 Performance22
+3.3.4 Privacy22
+3.3.5 Compatibility22
+4Design Artifacts23
+4.1 Use Case Diagram23
+4.2 High Level Cases24
+4.2.1 Login24
+4.2.2 Register24
+4.2.3 Select Phobia Type24
+4.2.4 Height Phobia25
+4.2.5 Darkness Phobia26
+4.2.6 Crowd Phobia26
+4.2.7 Baseline Measurement27
+4.2.8 Data Collection27
+4.2.9 Start Exposure27
+4.2.10 Panic Detection29
+4.2.11 Feedback29
+4.2.12 Analyze Performance29
+4.2.13 Manage Accounts30
+4.3Expanded Use Cases30
+4.3.1Use Case 1: Login30
+4.3.2 Use Case 2: Register33
+4.3.2Use Case 3: Select Phobia Type35
+4.3.3Use Case 4: Height Phobia37
+4.3.5 Use Case 5: Darkness Phobia39
+4.3.6Use Case 6: Crowd Phobia41
+4.3.7Use Case 7: Baseline Measurement43
+4.3.8Use Case 8: Data Collection and AI recommendation44
+4.3.9Use Case 9: Start Exposure46
+4.3.10Use Case 10: Panic Detection48
+4.3.11Use Case 11: Feedback51
+4.3.12Use Case 12: Analyze Performance52
+4.3.13Use Case 13: Manage Accounts54
+4.4System Sequence Diagrams56
+4.4.1 Login56
+4.4.2 Register57
+4.4.3 Select Phobia Type58
+4.4.4 Crowd Phobia59
+4.4.5 Darkness Phobia60
+4.4.6 Height Phobia61
+4.4.7 Baseline Measurement62
+4.4.8 Data Collection And AI recommendation63
+4.4.9 Start Exposure64
+4.4.10 Panic Detection65
+4.4.11 Feedback66
+4.4.12 Analyze Performance67
+4.4.13 Manage Accounts67
+4.5Activity Diagram68
+68
+4.6Class Diagram69
+4.7Domain Model70
+4.8Package Diagram71
+4.9Schema72
+4.9.1 User Schema72
+4.9.2 User Profile Schema72
+4.9.3 Phobias Schema73
+4.9.4 VR Environments Schema73
+73
+4.9.5 Therapy Session Schema74
+4.9.6 Physiological Data Schema75
+4.9.7 Panic Events Schema75
+4.9.8 Feedback Schema76
+4.9.9 Headset Tracking Schema77
+4.10Data Flow Diagrams78
+4.10.1Data Flow Diagram: Level 078
+4.10.2 Data Flow Diagram : Level 178
+4.10.3 Data Flow Diagram: Level 279
+5References80
+LIST OF FIGURES: 
+Figure 1: Use Case Diagram for Phobia Relief Therapy22
+Figure 2: SSD for Login PHOBIA RELIEF THERAPY55
+Figure 3 SSD for Register PHOBIA RELIEF THERAPY56
+Figure 4: SSD for Track Report57
+Figure 5 SSD for Crowd Phobia PHOBIA RELIEF THERAPY58
+Figure 6 SSD for Darkness Phobia PHOBIA RELIEF THERAPY59
+Figure 7 SSD for Height Phobia PHOBIA RELIEF THERAPY60
+Figure 8: Baseline Measurement61
+Figure 9 Data Collection and AI Suggestion PHOBIA RELIEF THERAPY62
+Figure 10 SSD for Start Exposure  PHOBIA RELIEF THERAPY63
+Figure 11 SSD for Panic Detection PHOBIA RELIEF THERAPY64
+Figure 12 SSD for Feedback PHOBIA RELIEF THERAPY65
+Figure 13 SSD for Analyze Performance PHOBIA RELIEF THERAPY66
+Figure 14 SSD for Manage Accounts PHOBIA RELIEF THERAPY66
+Figure 15 : Activity Diagram for PHOBIA RELIEF THERAPY67
+Figure 16: Class Diagram for PHOBIA RELIEF THERAPY68
+Figure 17: Domain Model for PHOBIA RELIEF THERAPY69
+Figure 18 : Package Diagram for PHOBIA RELIEF THERAPY70
+Figure 19 User Schema71
+Figure 20 User Profile Schema71
+Figure 21 Phobias Schema72
+Figure 22 VR Environments Schema72
+Figure 23 Therapy Session Schema73
+Figure 24 Physiological Data Schema74
+Figure 25 Panic Event Schema74
+Figure 26 Feedback Schema75
+Figure 27 Headset Tracking Schema76
+Figure 28 DFD Level 0 PHOBIA RELIEF THERAPY77
+Figure 29 DFD Level 2 PHOBIA RELIEF THERAPY77
+Figure 30 DFD Level 3 PHOBIA RELIEF THERAPY78
+List Of Tables
+Table 1: Problem Statement1
+Table 2: Supervisor Team3
+Table 3: Development Team3
+Table 4: End Users4
+Table 5: Administrator4
+Table 6: Stakeholder Summary5
+Table 7: Login5
+Table 8: Register13
+Table 9: Select Phobia Type13
+Table 10: Height Phobia13
+Table 11: Darkness Phobia14
+Table 12: Crowd Phobia14
+Table 13: Baseline Measurement15
+Table 14: Data Collection15
+Table 15: Start Exposure15
+Table 16: Panic Detection16
+Table 17: Feedback16
+Table 18: Analyze Performance16
+Table 19: Manage Accounts17
+Table 20: Login17
+Table 21: Register17
+Table 22: Select Phobia Type18
+Table 23: Height Phobia18
+Table 24: Darkness Phobia19
+Table 25: Crowd Phobia19
+Table 26: Baseline Measurement19
+Table 27: Data Collection and AI suggestion20
+Table 28: Start Exposure22
+Table 29: Panic Detection24
+Table 30: Feedback26
+Table 31: Analyze Performance28
+Table 32: Manage Accounts30
+1. Introduction
+This document presents the Software Requirement Specification (SRS) for the project Phobia Relief Therapy. The system is designed to address challenges in mental healthcare specifically in the treatment of common phobias using exposure therapy. It aims to provide a safe, accessible, and adaptive VR based therapeutic environment coupled with physiological monitoring to enhance the treatment process.
+The SRS defines the problem, objectives, scope, stakeholders, functional and non functional requirements and provides a clear foundation for the development of the proposed solution.
+2. Vision Document
+ Problem Statement
+Table 1: Problem Statement
+Category
+Description
+Problem
+Individuals suffering from phobias such as fear of heights, water, or social situations often avoid confronting their fears, which reinforces the phobia over time.
+Traditional exposure therapy conducted by psychologists is expensive and requires multiple in person sessions.
+Access to qualified mental health professionals is limited, especially in rural or underserved areas, leading to long waiting lists.
+Real world exposure therapy is logistically difficult to arrange, cannot be precisely controlled, and may pose actual physical or psychological risks to the patient.
+Affects
+  .      Individuals with specific phobias who cannot afford or access traditional therapy.
+The mental well being and daily functioning of those with untreated phobias.
+Impact
+  Increased anxiety and reduced quality of life due to unaddressed fears.
+Delayed treatment and worsening of phobia symptoms over time.
+   Reliance on medication as a substitute for effective exposure based therapy.
+Solution
+• A VR Based Phobia Relief Therapy System that provides safe and controlled exposure to fear inducing stimuli.• Users can access therapy from home using a VR headset without needing to visit a clinic.• The system creates immersive virtual environments tailored to specific phobias such as heights, water, or crowd anxiety.• Real time physiological monitoring through heart rate sensors detects stress and panic levels during sessions.• Automatic safety mechanisms such as pausing the session or teleporting the user to a safe room prevent overwhelming distress.• Session feedback and progress tracking provide users with measurable outcomes and motivation for continued use.
+ Business Opportunities
+The Phobia Relief Therapy project offers several practical business opportunities. The software can be sold directly to consumers as a one time purchase or subscription for individuals who already own VR headsets. It can also be licensed to therapy clinics and mental health professionals as a tool to use with patients. Partnerships with VR arcades and wellness centers provide another revenue stream. Academic institutions conducting research on exposure therapy may license the system for studies. The adaptive framework can later be expanded to address related conditions such as social anxiety or public speaking fear, creating additional products from the same technical foundation.
+ Objectives
+The major objectives of Phobia Relief Therapy are:
+To provide a safe and accessible platform for individuals to confront and manage their phobias from home.
+To reduce the cost and logistical barriers associated with traditional exposure therapy.
+To create immersive and realistic VR environments tailored to specific phobias including heights, water, and social situations.
+To utilize real time physiological data to create an adaptive and safe therapeutic experience preventing overwhelming panic.
+To provide users with clear feedback on their progress during and after each session.
+To offer administrators a tool to manage users and monitor system usage.
+ Scope
+A VR based application accessible to users with compatible VR headsets and a companion web interface for account management and progress tracking.
+User features: Secure login, phobia selection, VR exposure sessions, real time physiological monitoring, adaptive intensity control, safety mechanisms, session feedback, session history, and progress tracking.
+Administrator features: System monitoring, user account management, and viewing of anonymized usage analytics.
+The system ensures secure data handling and privacy of user information in compliance with data protection standards.
+ Constraints
+High cost of VR headsets may limit accessibility for some users.
+Accuracy of panic detection depends on the quality of sensor data and the reliability of detection algorithms.
+Users may experience motion sickness or discomfort in VR, requiring clear onboarding and safety guidelines.
+Development time is limited to the academic semester, requiring prioritization of core features.
+ Stakeholder and User Description
+2.6.1 Market Demographics
+Target market: Individuals suffering from specific phobias such as fear of heights, Darknesss, or social situations, who are comfortable with technology and seeking an alternative or supplement to traditional therapy.
+2.6.2 User Environment
+Users will access the system from their homes using a VR headset such as Oculus Quest or HTC Vive and on the unity app.
+2.6.3 Stakeholder Profiles
+2.6.3.1 Supervisor Team
+Table 2: Supervisor Team
+Category
+Description
+Representatives
+Supervisor: Maham Saleem
+Description
+The supervisor oversees the project development, ensuring
+alignment with academic goals and guiding the team through challenges.
+Type
+Technical stakeholder
+Responsibilities
+Provide direction and mentorship to the development team.
+Ensure timely progress and adherence to project milestones.
+Review documents, designs, and code quality.
+Verify that project outcomes meet academic and practical expectations.
+Success Criteria
+Completion of committed features and adherence to FYP
+requirements.
+Involvement
+Requirement reviewer, progress evaluator, and final deliverable validator.
+Comments/Issues
+None
+2.6.3.2 Development Team
+Table 3: Development Team
+Category
+Description
+Representatives
+Ahmad Tayyab (22F-8817), Shehroz Abbas(22F-3130),
+Sehar Saleem (22F-3820)
+Description
+Responsible for designing, developing, and deploying the Phobia Relief Therapy platform.
+Type
+Technical stakeholders
+Responsibilities
+Requirement engineering, design, and coding.
+Research and implementation of VR environments in Unity.
+Integration of physiological sensors and real time data processing.
+Development of the adaptive exposure engine.
+Testing and debugging all system modules.
+Documentation and presentation of project deliverables.
+Success Criteria
+Successful implementation and demonstration of a working Phobia Relief Therapy system.
+Involvement
+Fully involved in project development and documentation.
+Comments/Issues
+None
+2.6.3.3 End Users (Individuals with Phobias)
+Table 4: End Users
+Category
+Description
+Representatives
+Individuals suffering from phobias such as fear of heights, water, or social situations.
+Description
+End users who will use the platform to undergo self guided VR exposure therapy.
+Type
+External stakeholders
+Responsibilities
+1. Register and manage their account.2. Select phobia therapy sessions and participate in VR exposure.3. Wear and ensure proper functioning of physiological sensors during sessions.4. Review session feedback and progress reports.5. Provide feedback on the therapy experience.
+Success Criteria
+Users are able to safely and effectively use the system to reduce their phobia related anxiety.
+Involvement
+Primary users of the platform for mental health and wellness.
+Comments/Issues
+Must have a simple and intuitive VR interface. Clear safety instructions must be provided.
+2.6.3.4 Administrator
+Table 5: Administrator
+Category
+Description
+Representatives
+System Administrator
+Description
+Manages the overall system, ensuring smooth operation, user support, and content management.
+Type
+Internal stakeholder
+Responsibilities
+1. Monitor system health and performance.2. Manage user accounts 3. View usage analytics such as session frequency and duration.4. Manage the library of VR environments and therapy modules.5. Resolve user issues and provide support.
+Success Criteria
+Stable, secure, and functional system operations with a growing user base..
+Involvement
+Backend system monitoring and administrative control.
+Comments/Issues
+Needs a comprehensive admin dashboard with clear data visualization.
+2.6.4 Stakeholder Summary
+Table 6: Stakeholder Summary
+Name
+Description
+Responsibilities
+Supervisor Team
+Guides and monitors the project to ensure academic and technical success.
+• Provide direction to the development team.• Review requirements, design, and progress.• Ensure timely completion of milestones..
+Development Team
+Project creators and developers responsible for building the Phobia Relief Therapy system.
+• Requirement gathering and engineering.• Research and develop VR environments and adaptive engine.• Implement frontend and backend systems.• Integrate and test physiological sensors.• Test and maintain system quality.
+EndUsers 
+Individuals with phobias who will use the system for self guided therapy.
+• Register and manage profile.• Select and participate in VR therapy sessions.• Wear and use physiological sensors correctly.• Review progress and provide feedback.
+Admin
+Manages the overall system, users, and content.
+• Monitor system health.• Manage users and resolve issues.• View system wide analytics.• Manage VR content library.
+3. System Requirements Specification
+3.1 System Features
+The Phobia Relief Therapy system offers a range of essential features to improve mental healthcare accessibility and user experience:
+User Access Panel: Secure registration, login, and role-based dashboards (users and admin).
+Therapy Session Selection: Users can browse and select phobia specific therapy modules such as fear of heights, water, or social situations.
+VR Environment Loading: The system loads immersive 3D environments corresponding to the selected phobia and difficulty level.
+Physiological Monitoring: Real time collection of heart rate data from wearable sensors such as the Polar H10.
+Adaptive Exposure Control: The system adjusts environment intensity based on the user's physiological responses to maintain an optimal therapeutic zone.
+Panic Detection and Safety Mechanisms: Automatic detection of distress triggers safety responses including intensity reduction, session pause, or teleportation to a safe room.
+Admin Panel: Tools for managing user accounts, viewing usage analytics, and managing VR content.
+Session Feedback and Progress Tracking: Session summaries showing duration, heart rate data, panic events, and progress over time.
+3.2 Functional Requirements
+The system must fulfill the following functional requirements:
+3.2.1 User Authentication and Registration
+The system allows users and administrators to register by providing required details such as name, email, and password.
+The system shall verify new users via email verification before account activation.
+The system shall allow registered users to log in using secure credentials.
+The system shall provide role based dashboards after successful login, including User Dashboard and Admin Dashboard.
+The system shall allow users to reset their password via a secure forgot password flow.
+3.2.2 Phobia and Therapy Session Selection
+The system shall allow users to browse available phobia therapy modules such as fear of heights, fear of water, and fear of public speaking.
+The system shall display information about each therapy module including a description and recommended starting level.
+The system shall allow users to select a specific session and difficulty level such as Beginner, Intermediate, or Advanced.
+The system shall confirm the user's readiness and provide pre-session instructions including ensuring the heart rate monitor is connected.
+3.2.3 VR Environment Loading and Management
+The system shall load the correct 3D VR environment corresponding to the user's phobia and difficulty selection.
+The system shall establish a connection with the VR headset and physiological sensors before the session begins.
+The system should provide a virtual Safe Room where users can prepare for and recover from sessions.
+The system shall display a countdown or ready prompt before transporting the user to the main exposure environment.
+3.2.4 Physiological and Behavioral Data Collection
+The system shall collect 8 minutes of baseline data before the first exposure session to establish user's normal heart rate and movement patterns.
+The system shall continuously collect heart rate data from the Polar H10 sensor via Bluetooth throughout the session.
+The system shall continuously collect positional and rotational data from the VR headset to monitor:  Head movement speed ( rotation speed )
+Head movement travel ( distance covered )
+Freezing behaviour ( near-zero velocity ) 
+Jerky/erratic movements
+3.2.5 Real Time Panic Detection
+The system shall calculate ΔHR (Delta Heart Rate) as:ΔHR = Current Heart Rate - Baseline Heart Rate
+The system shall monitor Head Movement (HM) using two metrics:
+-Rotation speed
+- Movement travel
+The system shall track Time Spent (TS) in high-stress states, with panic time < 15 seconds indicating acute stress.
+The system shall calculate a Panic Score using the weighted formula:Panic Score = (ΔHR × 0.5) + (HM × 0.3) + (TS × 0.2)
+The system shall classify panic based on the following thresholds:
+Panic Score
+Classification
+System Action
+0-10
+Calm Stress
+Continuous Exposure at low level
+10-18
+Panic Detected
+Repeat Current Difficulty Level
+18+
+Severe Panic
+Stop Session / Teleport to safe room
+If ΔHR > 28, the system shall immediately evaluate the Panic Score as panic risk is high.
+The system shall log all detected panic events with timestamps, ΔHR, HM, TS, and calculated Panic Score.
+3.2.6 Safety Mechanisms
+Upon detection of a panic state the system shall automatically trigger an appropriate safety mechanism.
+The user shall have a manual Emergency Stop button accessible at all times within the VR environment.
+The system shall log all safety mechanism triggers with timestamps and the associated physiological data.
+3.2.7 Adaptive Exposure Intensity Control
+The system shall continuously monitor user data to determine the appropriate intensity level during the session.
+If the user's stress levels are low and stable ,the system recommends advancing to next level.
+If stress levels rise too quickly the system shall decrease the intensity and put users back to safe environment.
+3.2.8 Session Feedback
+After a session ends whether completed, paused, or aborted the system shall generate a feedback summary
+The summary shall include session duration, maximum heart rate, average heart rate, number of panic events, and number of safety mechanism triggers.
+The system shall store all feedback data in the user's history for long term tracking.
+3.2.9 Session History and Progress Tracking
+The system shall allow users to view a list of all their past therapy sessions.
+Users shall be able to select a past session to view the detailed feedback report generated for that session.
+The system shall display progress over time such as trends in session duration, peak heart rate, or panic event frequency
+3.2.10 User Dashboard
+The system should provide a personalized dashboard for each user after logging in.
+The dashboard shall show quick access to start new session, view progress and profile.
+The dashboard shall display a brief summary of the user’s latest progress or recent session activity.
+3.2.11 Manage User Profile
+The system shall allow users to view and edit their profile information including name, email, and password.
+3.2.12 Notifications and Alerts
+The system shall provide in app notifications for account verification, password resets, and optionally session reminders.
+The system may provide email notifications for the same events based on user preferences.
+3.2.13 Manage Appointments
+Lab staff shall be able to view, confirm, reschedule, or cancel patient appointments.
+The system shall allow phlebotomist assignment for each booking.
+Changes in appointment status shall automatically update the patient’s dashboard.
+3.2.14 Administrator Dashboard
+The system shall provide a dedicated dashboard for the Administrator upon login.
+The dashboard shall display key system metrics such as total registered users, total sessions completed, and average session duration.
+The admin shall be able to view user details, suspend or reactivate accounts, and reset user passwords if necessary.
+Non-Functional Requirements
+The non-functional requirements ensure quality, usability, and       security of system.
+3.3.1 User-Friendly Interface
+The web dashboard must feature a simple and intuitive interface suitable for users with varying levels of technical comfort.
+The VR interface must be simple with clear visual cues and easily accessible safety controls.
+3.3.2 Data Security
+All data must be accessible only by authorized users being the user themselves and the administrator for support purposes.
+3.3.3 Performance
+The VR application must maintain a consistent frame rate of at least 90 frames per second to prevent motion sickness and ensure immersion.
+The system must handle real time data streaming from sensors with latency under 100 milliseconds to enable effective panic detection.
+The web dashboard and session history pages must load within 3 to 5 seconds under normal load conditions.
+3.3.4 Privacy
+The system must ensure confidentiality of user data.
+Anonymized data may be used for aggregate analytics but individual user data must never be exposed to other users.
+Users must provide explicit consent for data collection and be informed about how their data will be used.
+3.3.5 Compatibility
+The  VR application must be compatible with at least one major VR headset platform such as Oculus Quest or HTC Vive.
+The system must integrate with specific supported physiological sensors like polar H10
+Design Artifacts
+4.1 Use Case Diagram
+Figure 1: Use Case Diagram for Phobia Relief Therapy
+4.2 High Level Cases
+4.2.1 Login
+          Table 7: Login
+Use case ID:
+UC-01
+Use case Name:
+Login
+Actor
+User, Admin
+Type:
+Primary.
+Description:
+Registered users and admins log in to access their respective dashboards.
+Extends: 
+Register
+4.2.2 Register
+                                                  Table 8: Register
+Use case ID:
+UC-02
+Use case Name:
+Register
+Actor
+User
+Type:
+Primary.
+Description:
+New users create an account by providing name, email and password
+4.2.3 Select Phobia Type
+Table 9: Select Phobia Type
+Use case ID:
+UC-03
+Use case Name:
+Select Phobia Type
+Actor
+User
+Type:
+Primary.
+Description:
+User browses available phobia therapy modules including Height Phobia, Darkness Phobia, and Crowd Phobia.
+Includes: 
+Baseline Measurement, Start Exposure
+4.2.4 Height Phobia
+Table 10: Height Phobia
+Use case ID:
+UC-04
+Use case Name:
+Height Phobia(Specialization of Select Phobia Type)
+Actor
+User
+Type:
+Primary
+Description:
+User selects the Height Phobia therapy module. The system loads a virtual environment such as a balcony, bridge, or cliff with adjustable heights.
+4.2.5 Darkness Phobia
+Table 11: Darkness Phobia
+Use case ID:
+UC-05
+Use case Name:
+Darkness Phobia
+Actor
+User
+Type:
+Primary (Specialization of Select Phobia Type)
+Description:
+User selects the Darkness Phobia therapy module. The system loads a virtual environment with controlled exposure to darkness.
+4.2.6 Crowd Phobia
+Table 12: Crowd Phobia
+Use case ID:
+UC-06
+Use case Name:
+Crowd Phobia
+Actor
+User
+Type:
+Primary (Specialization of Select Phobia Type)
+Description:
+User selects the Crowd Phobia therapy module. The system loads a virtual environment with gradual exposure to crowds.
+4.2.7 Baseline Measurement
+Table 13: Baseline Measurement
+Use case ID:
+UC-07
+Use case Name:
+Baseline Measurement
+Actor
+System
+Type:
+Secondary ( Included in Select Phobia )
+Description:
+System records 1 minute of baseline heart rate and head movement data to establish normal levels for the user before each 2 minute exposure session begins.
+Includes: 
+ Data collection
+4.2.8 Data Collection
+Table 14: Data collection
+Use case ID:
+UC-08
+Use case Name:
+Data Collection
+Actor
+System
+Type:
+Secondary (Included in Select Phobia)
+Description:
+System collects heart rate data from Polar H10 gadget during the 1 minute baseline period.
+4.2.9 Start Exposure
+Table 15: Start Exposure
+Use case ID:
+UC-09
+Use case Name:
+Start Exposure
+Actor
+ User
+Type:
+Primary
+Description:
+User begins VR exposure session after baseline measurement. System loads environment and starts session.
+Includes: 
+Baseline Measurement, Data Collection
+4.2.10 Panic Detection
+Table 16: Panic Detection
+Use case ID:
+UC-10
+Use case Name:
+Panic Detection
+Actor
+System
+Type:
+Secondary 
+Description:
+System calculates ΔHR, Head Movement score, and Time Spent to generate Panic Score. Uses  (Decision Tree/Random Forest) to classify panic level and recommend action.
+4.2.11 Feedback
+Table 17: Feedback
+Use case ID:
+UC-11
+Use case Name:
+Feedback
+Actor
+User, Admin
+Type:
+Primary.
+Description:
+User can view real-time feedback during session.Admin views anonymized system analytics including total sessions, average duration, and panic event statistics.
+4.2.12 Analyze Performance
+Table 18: Analyze Performance
+Use case ID:
+UC-12
+Use case Name:
+Feedback
+Actor
+Admin
+Type:
+Primary.
+Description:
+Admin views anonymized system analytics including session data, panic scores, and user progress.
+4.2.13 Manage Accounts
+Table 19: Manage Accounts
+Use case ID:
+UC-13
+Use case Name:
+Manage Accounts
+Actor
+Admin
+Type:
+Primary.
+Description:
+Admin can view, suspend, or delete user accounts.
+Expanded Use Cases
+Use Case 1: Login 
+Table 20: Login
+Use case ID:
+UC-01
+Use case Name:
+Login
+Created by:
+Ahmad Tayyab
+Last updated by:
+Ahmad Tayyab
+Date Created:
+03/14/2026
+Revision Date:
+03/14/2026
+Actor:
+User, Admin
+Description:
+Registered users and admins log in to access their respective dashboards.
+Trigger:
+User or admin opens the application and selects Login.
+Pre-condition:
+User/admin has a registered account.
+Post- condition:
+User is redirected to User Dashboard. Admin is redirected to Admin Dashboard
+Normal flow:
+User enters email and password.
+System validates credentials.
+System redirects to appropriate dashboard.
+Alternative flow:
+ 2a. Invalid Credentials.
+  2a.1. System displays "Invalid email or password."
+  2a.2. User re-enters credentials.
+  2a.3. Return to step 1.
+Exceptions:
+Database connection error.  No internet connectivity. 
+Includes:
+N/A.
+Frequency of use:
+High
+Special Requirements:
+Secure password storage. Session management after login.
+4.3.2 Use Case 2: Register
+Table 21: Register
+Use case ID:
+UC-02
+Use case Name:
+Register
+Created by:
+Ahmad Tayyab
+Last updated by:
+Ahmad Tayyab
+Date Created:
+03/14/2026
+Revision Date:
+03/14/2026
+Actor:
+User
+Description:
+New users create an account by providing name, email, and password.
+Trigger:
+User selects Register option from login screen.
+Pre-condition:
+User is not logged in.
+Post- condition:
+New user account is created and user is logged in.
+Normal flow:
+User enters name, email, and password.
+System validates email format.
+System checks if email is unique.
+System creates account.
+System logs user in and redirects to dashboard..
+Alternative flow:
+ 3a. Email already exists
+ 3a.1. System displays "Email already registered."
+ 3a.2. User chooses to login instead.
+ 3a.3. Return to UC-01.
+Exceptions:
+Database error. Network failure
+Includes:
+N/A.
+Frequency of use:
+Medium
+Special Requirements:
+Password must meet security requirements. Email verification optional. 
+Use Case 3: Select Phobia Type
+Table 22: Select Phobia Type
+Use case ID:
+UC-03
+Use case Name:
+Select Phobia Type
+Created by:
+Ahmad Tayyab
+Last updated by:
+Ahmad Tayyab
+Date Created:
+03/14/2026
+Revision Date:
+03/14/2026
+Actor:
+User
+Description:
+User browses and selects a phobia type (Height, Darkness, or Crowd) for therapy.
+Trigger:
+User selects "Start New Session" from dashboard.
+Pre-condition:
+User is logged in.
+Post- condition:
+Phobia type is selected. System displays available difficulty levels.
+Normal flow:
+System displays list of phobia types.
+User selects Height Phobia, Darkness Phobia, or Crowd Phobia.
+System confirms selection.
+System displays difficulty levels for selected phobia.
+Alternative flow:
+ 2a. User cancels selection.
+   2a.1. User returns to dashboard
+Exceptions:
+N/A
+Includes:
+N/A.
+Frequency of use:
+High
+Special Requirements:
+Clear icons or descriptions for each phobia type
+Use Case 4: Height Phobia
+Table 23: Height Phobia
+Use case ID:
+UC-04
+Use case Name:
+Height Phobia
+Created by:
+Ahmad Tayyab
+Last updated by:
+Ahmad Tayyab
+Date Created:
+03/14/2026
+Revision Date:
+03/14/2026
+Actor:
+User
+Description:
+User selects the Height Phobia therapy module. System loads a virtual environment such as a balcony, bridge, or cliff.
+Trigger:
+User selects Height Phobia from phobia list.
+Pre-condition:
+User is on Select Phobia Type screen.
+Post- condition:
+System loads height-based VR environment at selected difficulty.
+Normal flow:
+User selects Height Phobia.
+System displays difficulty levels (Beginner, Intermediate, Advanced).
+User selects difficulty.
+System loads corresponding environment (Low Balcony, High Bridge, or Mountain Cliff)..
+Alternative flow:
+3a. User changes mind.
+3a.1. User goes back to phobia selection
+3a.2. Return to UC-03
+Exceptions:
+Environment file missing. VR headset not detected.
+Includes:
+N/A
+Frequency of use:
+High.
+Special Requirements:
+Realistic height environments. Adjustable height levels.
+4.3.5 Use Case 5: Darkness Phobia
+Table 24: Darkness Phobia
+Use case ID:
+UC-05
+Use case Name:
+View AI Interpretation
+Created by:
+Ahmad Tayyab
+Last updated by:
+Ahmad Tayyab
+Date Created:
+03/14/2026
+Revision Date:
+03/14/2026
+Actor:
+User
+Description:
+User selects the Darkness Phobia therapy module. System loads a virtual environment with controlled exposure to darkness.
+Trigger:
+User selects Darkness Phobia from phobia list
+Pre-condition:
+User is on Select Phobia Type screen.
+Post- condition:
+System loads Darkness-based VR environment at selected difficulty.
+Normal flow:
+User selects Darkness Phobia.
+System displays difficulty levels (Beginner, Intermediate, Advanced).
+User selects difficulty.
+System loads corresponding environment 
+Alternative flow:
+ 3a. User changes mind.
+ 3a.1. User goes back to phobia selection.
+ 3a.2. Return to UC-03.
+Exceptions:
+Environment file missing. VR headset not detected.
+Includes:
+N/A
+Frequency of use:
+High
+Special Requirements:
+Realistic Dark Themed Stages with sounds. Gradual exposure control.
+Use Case 6: Crowd Phobia
+Table 25: Crowd Phobia
+Use case ID:
+UC-06
+Use case Name:
+Crowd Phobia
+Created by:
+Ahmad Tayyab
+Last updated by:
+Ahmad Tayyab
+Date Created:
+03/14/2026
+Revision Date:
+03/14/2026
+Actor:
+User
+Description:
+User selects the Crowd Phobia therapy module. System loads a virtual environment with gradual exposure to crowds.
+Trigger:
+User selects Crowd Phobia from phobia list.
+Pre-condition:
+User is on Select Phobia Type screen.
+Post- condition:
+System loads crowd-based VR environment at selected difficulty.
+Normal flow:
+User selects Crowd Phobia.
+System displays difficulty levels (Beginner, Intermediate, Advanced).
+User selects difficulty.
+System loads corresponding environment (Small group, Medium crowd, Large audience).
+Alternative flow:
+ 3a. User changes mind.
+ 3a.1. User goes back to phobia selection.
+ 3a.2. Return to UC-03.
+Exceptions:
+Environment file missing. VR headset not detected.
+Includes:
+N/A
+Frequency of use:
+High
+Special Requirements:
+Realistic crowd animations. Adjustable crowd density.
+Use Case 7: Baseline Measurement
+Table 26: Baseline Measurement
+Use case ID:
+UC-07
+Use case Name:
+Baseline Measurement
+Created by:
+Ahmad Tayyab
+Last updated by:
+Ahmad Tayyab
+Date Created:
+03/15/2026
+Revision Date:
+03/15/2026
+Actor:
+System
+Description:
+System records 1 minute of baseline heart rate and head movement data (rotation speed and movement frequency) to establish normal levels for the user before each 2 minute exposure session begins.
+Trigger:
+User clicks "Start Session" after selecting phobia.
+Pre-condition:
+Phobia type and difficulty level are selected. VR headset is connected.
+Post- condition:
+Baseline heart rate (average) is recorded and stored for this session.
+Normal flow:
+System prompts user to remain calm for 1 minute..
+System triggers UC-08 (Data Collection).
+System collects heart rate data every second for 1 minute.
+System collects head movement data:- Rotation speed (degrees per second)- Movement frequency (position changes per second).
+After 2 minutes, system calculates:- Average baseline HR- Average baseline head movement score.
+System stores baseline data with session record.
+System notifies user that baseline is complete.
+System prompts user to proceed to UC-09 (Start Exposure)
+Alternative flow:
+ 3a. Gadget disconnects during baseline.    3a.1. System pauses baseline.    3a.2. System prompts user to reconnect.    3a.3. Upon reconnection, baseline restarts from beginning.    3a.4. Return to step 1.
+Exceptions:
+VR headset disconnects. Gadget battery low.
+Includes:
+UC-08 (Data Collection) is triggered automatically.
+Frequency of use:
+High
+Special Requirements:
+Clear instructions for user to remain still and calm for 1 minute.
+Use Case 8: Data Collection and AI recommendation
+Table 27: Data Collection
+Use case ID:
+UC-08
+Use case Name:
+Data Collection
+Created by:
+Shehroz Abbas
+Last updated by:
+Ahmad Tayyab
+Date Created:
+03/15/2026
+Revision Date:
+03/15/2026
+Actor:
+Wearable Gadgets
+Description:
+The Polar H10 gadget sends heart rate data and head movement data (rotation speed, movement frequency) to system during baseline and exposure sessions. The Data is used to predict stress and stage.
+Trigger:
+Baseline Measurement starts (UC-07) or Start Exposure begins (UC-09).
+Pre-condition:
+Gadget is paired and connected via Bluetooth. VR headset is tracking.
+Post- condition:
+Heart rate and behavioral data are collected and stored. 
+Normal flow:
+Gadget detects user's heart rate every second.
+VR headset tracks head movement:- Rotation speed (degrees per second)- Movement frequency (position changes per second).
+ Gadget transmits data to system.
+ System receives and timestamps: - Heart rate reading - Rotation speed - Movement frequency.
+System stores data with session ID and timestamp.
+This continues for duration of baseline or exposure.
+AI predicts and suggests user whether to stay on the same stage or move to next.
+Alternative flow:
+2a. Connection lost.  2a.1. System detects disconnection.  2a.2. System pauses data collection.  2a.3. System notifies user to reconnect.  2a.4. Upon reconnection, collection resumes.
+Exceptions:
+Bluetooth interference. Gadget battery dies. Headset tracking loss.
+Includes:
+N/A.
+Frequency of use:
+Continuous during every session.
+Special Requirements:
+Low latency transmission. Accurate timestamping.
+Use Case 9: Start Exposure
+Table 28: Start Exposure
+Use case ID:
+UC-09
+Use case Name:
+Feedback
+Created by:
+Sehar Saleem
+Last updated by:
+Ahmad Tayyab
+Date Created:
+03/15/2026
+Revision Date:
+03/15/2026
+Actor:
+User
+Description:
+User begins VR exposure session after baseline measurement. System loads environment and starts session.
+Trigger:
+User selects "Start" after baseline measurement completes.
+Pre-condition:
+Phobia type is selected. Baseline data is recorded. VR headset and gadget are connected.
+Post- condition:
+VR environment loads and session begins. Panic Detection is active.
+Normal flow:
+System confirms gadget connection.
+ System loads VR environment based on selected phobia and difficulty.
+ User is placed in safe room.
+ Countdown displays.
+ User enters exposure environment.
+ Session timer starts.
+ System triggers UC-08 (Data Collection).
+ System triggers UC-10 (Panic Detection).
+ Session continues for duration.
+ After session ends, user returns to safe room
+Alternative flow:
+ 1a. Gadget not connected.   1a.1. System prompts user to connect.   1a.2. User connects gadget.   1a.3. Return to step 1. 3a. User feels unready.   3a.1. User can remain in safe room.   3a.2. User exits session when ready. 9a. Panic detected during session (via UC-10).   9a.1. Safety mechanisms may end session early.   9a.2. User returns to safe room.
+Exceptions:
+VR headset disconnects. Gadget battery low.
+Includes:
+UC-08, UC-10
+Frequency of use:
+Every Session.
+Special Requirements:
+Clear timer display. Easy exit option always available.
+Use Case 10: Panic Detection
+Table 29: Panic Detection
+Use case ID:
+UC-10
+Use case Name:
+Track Reports
+Created by:
+Sehar Saleem
+Last updated by:
+Shehroz Abbas
+Date Created:
+03/15/2026
+Revision Date:
+03/16/2026
+Actor:
+System
+Description:
+System calculates ΔHR, Head Movement score, and Time Spent to generate Panic Score. Uses AI (Decision Tree/Random Forest) to classify panic level and recommend action.
+Trigger:
+Start Exposure begins (UC-09).
+Pre-condition:
+Baseline data exists. Current HR and movement data are being received from UC-08.
+Post- condition:
+Panic event is logged if detected. AI recommendation is generated. Safety action may be triggered.
+Normal flow:
+System receives current data every second from UC-08:- Heart rate- Rotation speed- Movement frequency
+System calculates ΔHR = Current HR - Baseline HR.
+ System calculates Head Movement (HM) Score:- Combines rotation speed and movement frequency- Scaled to 0-100 based on deviation from baseline
+ System calculates Time Spent (TS) Score:- Tracks consecutive seconds where HR or movement exceeds thresholds- If panic time < 15 seconds → high stress- Scaled to 0-100
+ System computes Panic Score = (ΔHR × 0.5) + (HM × 0.3) + (TS × 0.2).
+ If ΔHR > 25, system flags as high priority.
+ System sends Panic Score to AI model (Decision Tree/Random Forest).
+ AI model classifies panic level:- 0 - 10: Calm stress → AI recommends "Continue Exposure"- 10 - 18: Panic detected → AI recommends "Repeat Level"- 18+: Severe panic → AI recommends "Stop / Safe Room"
+ System logs panic event with:- Timestamp- ΔHR value- Head Movement Score- Time Spent Score- Calculated Panic Score- AI classification- AI recommendation
+If score ≥ 18, system triggers safety mechanism.
+System continues monitoring until session ends.
+Alternative flow:
+ 10a. Safety mechanism triggered.   10a.1. System pauses exposure.   10a.2. System teleports user to safe room.   10a.3. Session ends.
+Exceptions:
+Database error. Permission denied.
+Includes:
+N/A
+Frequency of use:
+Every second during every session.
+Special Requirements:
+Low latency processing. AI model trained on panic data. 
+Use Case 11: Feedback
+Table 30: Feedback
+Use case ID:
+UC-11
+Use case Name:
+Showing Performance
+Created by:
+Ahmad Tayyab
+Last updated by:
+Ahmad Tayyab
+Date Created:
+03/16/2026
+Revision Date:
+03/16/2026
+Actor:
+User, Admin
+Description:
+Admin views anonymized system analytics including total sessions, average duration, and panic event statistics.User views session feedback including Panic Scores, heart rate graph, and AI recommendations.
+Trigger:
+Session ends (completed, paused, or aborted).
+Pre-condition:
+Session data has been recorded.
+Post- condition:
+Feedback is displayed to user and saved to session history.
+Normal flow:
+System retrieves session data.
+ System calculates statistics:- Session duration- Baseline HR - Peak heart rate- Average heart rate- Number of panic events- Average Panic Score- Highest Panic Score- AI recommendations per panic event- Graph of heart rate over time
+System displays feedback screen.
+ User views feedback.
+ User submits feedback.
+ System saves feedback to database.
+Alternative flow:
+ 5a. User skips rating.   5a.1. Feedback is saved without rating. 6a. User skips comments.   6a.1. Feedback is saved without comments.
+Exceptions:
+Database error.
+Includes:
+N/A.
+Frequency of use:
+Every session.
+Special Requirements:
+Clear visual graphs showing Panic Score and AI recommendations.
+Use Case 12: Analyze Performance
+Table 31: Analyze Performance
+Use case ID:
+UC-11
+Use case Name:
+Analyze Performance
+Created by:
+Ahmad Tayyab
+Last updated by:
+Ahmad Tayyab
+Date Created:
+03/16/2026
+Revision Date:
+03/16/2026
+Actor:
+Admin
+Description:
+Admin views anonymized system analytics including total sessions, average duration, and panic event statistics.
+Trigger:
+Admin selects "Performance" from admin dashboard.
+Pre-condition:
+Admin is logged in.
+Post- condition:
+Performance data is displayed.
+Normal flow:
+System retrieves anonymized session data.
+ System calculates statistics:- Total number of sessions- Average session duration- Sessions per phobia type- Average baseline HR across users- Average head movement patterns- Average Panic Score across all sessions- Total panic events- Average panic events per session
+System generates charts and graphs.
+ System displays performance dashboard.
+ Admin views data.
+ Admin may filter by date range or phobia type
+Alternative flow:
+ 2a. No data available.   2a.1. System displays "No session data found."
+Exceptions:
+Database error.
+Includes:
+N/A.
+Frequency of use:
+Medium
+Special Requirements:
+Clear visual charts. Data must be anonymized. AI performance metrics.
+Use Case 13: Manage Accounts
+Table 32: Manage Accounts
+Use case ID:
+UC-11
+Use case Name:
+Analyze Performance
+Created by:
+Ahmad Tayyab
+Last updated by:
+Ahmad Tayyab
+Date Created:
+03/16/2026
+Revision Date:
+03/16/2026
+Actor:
+Admin
+Description:
+Admin can view, suspend, or delete user accounts.
+Trigger:
+Admin selects "Manage Users" from admin dashboard.
+Pre-condition:
+Admin is logged in.
+Post- condition:
+User accounts are updated based on admin actions.
+Normal flow:
+System displays list of all users.
+Admin selects a user.
+Admin views user details.
+Admin chooses action:- Suspend account- Activate account- Delete account
+System confirms action.
+System updates database.
+System logs the action.
+Alternative flow:
+  4a. Admin edits user details.   4a.1. Admin updates email or name.   4a.2. System saves changes.   4a.3. Return to step 5.
+Exceptions:
+Database error.
+Includes:
+N/A.
+Frequency of use:
+Low
+Special Requirements:
+Audit log for all admin actions. Confirmation before deletion.
+System Sequence Diagrams
+4.4.1 Login
+Figure 2: SSD for Login PHOBIA RELIEF THERAPY
+Figure 3 SSD for Register PHOBIA RELIEF THERAPYFigure 3 SSD for Register PHOBIA RELIEF THERAPY4.4.2 Register
+Figure 3 SSD for Register PHOBIA RELIEF THERAPY
+Figure 3 SSD for Register PHOBIA RELIEF THERAPY
+4.4.3 Select Phobia Type
+Figure 4:  SSD for Select Phobia PHOBIA RELIEF THERAPYFigure 4:  SSD for Select Phobia PHOBIA RELIEF THERAPYFigure 4: SSD for Track ReportFigure 4: SSD for Track Report
+Figure 4:  SSD for Select Phobia PHOBIA RELIEF THERAPY
+Figure 4:  SSD for Select Phobia PHOBIA RELIEF THERAPY
+Figure 4: SSD for Track Report
+Figure 4: SSD for Track Report
+Figure 5 SSD for Crowd Phobia PHOBIA RELIEF THERAPYFigure 5 SSD for Crowd Phobia PHOBIA RELIEF THERAPY4.4.4 Crowd Phobia
+Figure 5 SSD for Crowd Phobia PHOBIA RELIEF THERAPY
+Figure 5 SSD for Crowd Phobia PHOBIA RELIEF THERAPY
+Figure 6 SSD for Darkness Phobia PHOBIA RELIEF THERAPYFigure 6 SSD for Darkness Phobia PHOBIA RELIEF THERAPY4.4.5 Darkness Phobia
+Figure 6 SSD for Darkness Phobia PHOBIA RELIEF THERAPY
+Figure 6 SSD for Darkness Phobia PHOBIA RELIEF THERAPY
+Figure 7 SSD for Height Phobia PHOBIA RELIEF THERAPYFigure 7 SSD for Height Phobia PHOBIA RELIEF THERAPY4.4.6 Height Phobia
+Figure 7 SSD for Height Phobia PHOBIA RELIEF THERAPY
+Figure 7 SSD for Height Phobia PHOBIA RELIEF THERAPY
+4.4.7 Baseline Measurement
+Figure 8: Baseline Measurement
+4.4.8 Data Collection And AI recommendation
+Figure 9 Data Collection and AI Suggestion PHOBIA RELIEF THERAPY
+Figure 10 SSD for Start Exposure  PHOBIA RELIEF THERAPYFigure 10 SSD for Start Exposure  PHOBIA RELIEF THERAPY4.4.9 Start Exposure
+Figure 10 SSD for Start Exposure  PHOBIA RELIEF THERAPY
+Figure 10 SSD for Start Exposure  PHOBIA RELIEF THERAPY
+4.4.10 Panic Detection
+Figure 11 SSD for Panic Detection PHOBIA RELIEF THERAPY
+4.4.11 Feedback
+Figure 12 SSD for Feedback PHOBIA RELIEF THERAPY
+Figure 13 SSD for Analyze Performance PHOBIA RELIEF THERAPYFigure 13 SSD for Analyze Performance PHOBIA RELIEF THERAPY4.4.12 Analyze Performance
+Figure 13 SSD for Analyze Performance PHOBIA RELIEF THERAPY
+Figure 13 SSD for Analyze Performance PHOBIA RELIEF THERAPY
+Figure 14 SSD for Manage Accounts PHOBIA RELIEF THERAPYFigure 14 SSD for Manage Accounts PHOBIA RELIEF THERAPY4.4.13 Manage Accounts
+Figure 14 SSD for Manage Accounts PHOBIA RELIEF THERAPY
+Figure 14 SSD for Manage Accounts PHOBIA RELIEF THERAPY
+Activity Diagram
+Figure 15 : Activity Diagram for PHOBIA RELIEF THERAPY
+Class Diagram
+Figure 16: Class Diagram for PHOBIA RELIEF THERAPY
+Figure 17: Domain Model for PHOBIA RELIEF THERAPYFigure 17: Domain Model for PHOBIA RELIEF THERAPYDomain Model
+Figure 17: Domain Model for PHOBIA RELIEF THERAPY
+Figure 17: Domain Model for PHOBIA RELIEF THERAPY
+Figure 18 : Package Diagram for PHOBIA RELIEF THERAPYFigure 18 : Package Diagram for PHOBIA RELIEF THERAPYPackage Diagram
+Figure 18 : Package Diagram for PHOBIA RELIEF THERAPY
+Figure 18 : Package Diagram for PHOBIA RELIEF THERAPY
+Schema
+4.9.1 User Schema
+Figure 19 User SchemaFigure 19 User Schema
+Figure 19 User Schema
+Figure 19 User Schema
+Figure 20 User Profile SchemaFigure 20 User Profile Schema4.9.2 User Profile Schema
+Figure 20 User Profile Schema
+Figure 20 User Profile Schema
+Figure 21 Phobias SchemaFigure 21 Phobias Schema4.9.3 Phobias Schema
+Figure 21 Phobias Schema
+Figure 21 Phobias Schema
+4.9.4 VR Environments Schema
+Figure 22 VR Environments SchemaFigure 22 VR Environments Schema
+Figure 22 VR Environments Schema
+Figure 22 VR Environments Schema
+4.9.5 Therapy Session SchemaFigure 23 Therapy Session SchemaFigure 23 Therapy Session Schema
+Figure 23 Therapy Session Schema
+Figure 23 Therapy Session Schema
+4.9.6 Physiological Data SchemaFigure 24 Physiological Data SchemaFigure 24 Physiological Data Schema
+Figure 24 Physiological Data Schema
+Figure 24 Physiological Data Schema
+4.9.7 Panic Events Schema
+Figure 25 Panic Event SchemaFigure 25 Panic Event Schema
+Figure 25 Panic Event Schema
+Figure 25 Panic Event Schema
+Figure 26 Feedback SchemaFigure 26 Feedback Schema4.9.8 Feedback Schema
+Figure 26 Feedback Schema
+Figure 26 Feedback Schema
+Figure 27 Headset Tracking SchemaFigure 27 Headset Tracking Schema4.9.9 Headset Tracking Schema
+Figure 27 Headset Tracking Schema
+Figure 27 Headset Tracking Schema
+Data Flow Diagrams
+Figure 28 DFD Level 0 PHOBIA RELIEF THERAPYFigure 28 DFD Level 0 PHOBIA RELIEF THERAPY4.10.1Data Flow Diagram: Level 0
+Figure 28 DFD Level 0 PHOBIA RELIEF THERAPY
+Figure 28 DFD Level 0 PHOBIA RELIEF THERAPY
+Figure 29 DFD Level 2 PHOBIA RELIEF THERAPYFigure 29 DFD Level 2 PHOBIA RELIEF THERAPY4.10.2 Data Flow Diagram : Level 1
+Figure 29 DFD Level 2 PHOBIA RELIEF THERAPY
+Figure 29 DFD Level 2 PHOBIA RELIEF THERAPY
+Figure 30 DFD Level 3 PHOBIA RELIEF THERAPYFigure 30 DFD Level 3 PHOBIA RELIEF THERAPY4.10.3 Data Flow Diagram: Level 2
+Figure 30 DFD Level 3 PHOBIA RELIEF THERAPY
+Figure 30 DFD Level 3 PHOBIA RELIEF THERAPY
+References
+[1] Morina, N., Ijntema, H., Meyerbröker, K., & Emmelkamp, P. M. G. (2015). Can virtual reality exposure therapy gains be generalized to real-life? A meta-analysis of studies applying behavioral assessments. Behaviour Research and Therapy, 74, 18-24.
+[2] Opriş, D., Pintea, S., García-Palacios, A., et al. (2012). Virtual reality exposure therapy in anxiety disorders: A quantitative meta-analysis. Depression and Anxiety, 29(2), 85-93.
+[3] Powers, M. B., & Emmelkamp, P. M. G. (2008). Virtual reality exposure therapy for anxiety disorders: A meta-analysis. Journal of Anxiety Disorders, 22(3), 561-569.
+Physiological Monitoring in VR Therapy
+[4] Polar Electro. (2023). Polar H10 heart rate sensor: Bluetooth developer guide. Kempele, Finland: Polar Electro Oy. Retrieved from https://developer.polar.com
+[5] Polar Electro. (2022). Polar H10 user manual: Heart rate monitoring and data accuracy. Kempele, Finland: Polar Electro Oy.

@@ -1,13 +1,16 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
 using PhobiaReliefTherapy.Data;
 using PhobiaReliefTherapy.Managers;
+using PhobiaReliefTherapy.UI;
+using PhobiaReliefTherapy.Theme;
 
 namespace PhobiaReliefTherapy.Therapy
 {
     /// <summary>
-    /// Handles the selection of the phobia type from the Dashboard/Selection Scene.
+    /// UC-03 through UC-06: browse phobia modules, descriptions, difficulty, then baseline.
     /// </summary>
     public class PhobiaSelectionManager : MonoBehaviour
     {
@@ -20,34 +23,32 @@ namespace PhobiaReliefTherapy.Therapy
         public TextMeshProUGUI instructionText;
         public TextMeshProUGUI selectedPhobiaText;
 
-        private GameObject levelPanel;
+        private GameObject detailRoot;
+        private GameObject browseRoot;
+        private string pendingPhobia;
 
         private void Start()
         {
             AutoBindMissingFields();
-
-            if (heightPhobiaButton != null)
-            {
-                heightPhobiaButton.onClick.RemoveAllListeners();
-                heightPhobiaButton.onClick.AddListener(() => SelectPhobia("Height"));
-            }
-                
-            if (darknessPhobiaButton != null)
-            {
-                darknessPhobiaButton.onClick.RemoveAllListeners();
-                darknessPhobiaButton.onClick.AddListener(() => SelectPhobia("Darkness"));
-            }
-                
-            if (crowdPhobiaButton != null)
-            {
-                crowdPhobiaButton.onClick.RemoveAllListeners();
-                crowdPhobiaButton.onClick.AddListener(() => SelectPhobia("Crowd"));
-            }
+            if (SceneManager.GetActiveScene().name == "PhobiaSelectionScene")
+                EnsureSelectionUi();
+            WirePhobiaButton(heightPhobiaButton, "Height");
+            WirePhobiaButton(darknessPhobiaButton, "Darkness");
+            WirePhobiaButton(crowdPhobiaButton, "Crowd");
 
             if (instructionText != null)
-                instructionText.text = "Choose a phobia track to begin your exposure therapy.";
+                instructionText.text = "Choose a phobia track. AI will set the starting stage from baseline heart rate and head movement.";
 
             UpdateSelectedPhobiaText();
+        }
+
+        private void WirePhobiaButton(Button button, string phobia)
+        {
+            if (button == null)
+                return;
+
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(() => ShowPhobiaDetail(phobia));
         }
 
         private void AutoBindMissingFields()
@@ -70,103 +71,139 @@ namespace PhobiaReliefTherapy.Therapy
             return result != null ? result : AutoBindHelper.FindComponentByName<T>(objectName);
         }
 
-        private void SelectPhobia(string phobiaType)
+        private void EnsureSelectionUi()
         {
-            Debug.Log($"Phobia Selected: {phobiaType}");
+            if (heightPhobiaButton != null && darknessPhobiaButton != null && crowdPhobiaButton != null)
+                return;
+
+            var canvas = ClinicalUIFactory.EnsureOverlayCanvas();
+            var card = ClinicalUIFactory.CreateCard(ClinicalUIFactory.OverlayRoot(canvas), new Vector2(920, 680), "PhobiaSelectCard");
+
+            instructionText = ClinicalUIFactory.CreateText("InstructionText", card.transform,
+                "Choose a phobia track to begin exposure therapy.", 22, TextAlignmentOptions.Center, UIElementType.HeadingText);
+            ClinicalUIFactory.Anchor(instructionText.rectTransform, new Vector2(0.08f, 0.82f), new Vector2(0.92f, 0.94f));
+
+            heightPhobiaButton = ClinicalUIFactory.CreateButton("HeightButton", card.transform, "Height Phobia");
+            ClinicalUIFactory.Anchor(heightPhobiaButton.GetComponent<RectTransform>(), new Vector2(0.15f, 0.62f), new Vector2(0.85f, 0.62f), new Vector2(0, 58));
+
+            darknessPhobiaButton = ClinicalUIFactory.CreateButton("DarknessButton", card.transform, "Darkness Phobia");
+            ClinicalUIFactory.Anchor(darknessPhobiaButton.GetComponent<RectTransform>(), new Vector2(0.15f, 0.46f), new Vector2(0.85f, 0.46f), new Vector2(0, 58));
+
+            crowdPhobiaButton = ClinicalUIFactory.CreateButton("CrowdButton", card.transform, "Crowd Phobia");
+            ClinicalUIFactory.Anchor(crowdPhobiaButton.GetComponent<RectTransform>(), new Vector2(0.15f, 0.30f), new Vector2(0.85f, 0.30f), new Vector2(0, 58));
+
+            var back = ClinicalUIFactory.CreateButton("BackDashButton", card.transform, "Back to dashboard", false);
+            ClinicalUIFactory.Anchor(back.GetComponent<RectTransform>(), new Vector2(0.3f, 0.12f), new Vector2(0.7f, 0.12f), new Vector2(0, 48));
+            back.onClick.AddListener(() => SceneLoader.Instance.LoadScene("DashboardScene"));
+            browseRoot = card;
+        }
+
+        private void ShowPhobiaDetail(string phobiaType)
+        {
+            pendingPhobia = phobiaType;
             UserData.SelectedPhobia = phobiaType;
             UpdateSelectedPhobiaText();
-            
-            // Phase 2: show difficulty selection (SRS §3.2.2, §3.2.7).
-            ShowLevelSelection();
+            CacheBrowseRoot();
+            SetBrowseVisible(false);
+
+            if (detailRoot != null)
+                Destroy(detailRoot);
+
+            var canvas = ClinicalUIFactory.EnsureOverlayCanvas();
+            detailRoot = ClinicalUIFactory.CreateFullScreenPanel(canvas.transform, "PhobiaDetailOverlay");
+            var card = ClinicalUIFactory.CreateCard(detailRoot.transform, new Vector2(860, 700), "PhobiaDetailCard");
+
+            var title = ClinicalUIFactory.CreateText("DetailTitle", card.transform, phobiaType + " Phobia", 32, TextAlignmentOptions.Center, UIElementType.HeadingText);
+            ClinicalUIFactory.Anchor(title.rectTransform, new Vector2(0.08f, 0.86f), new Vector2(0.92f, 0.96f));
+
+            var body = ClinicalUIFactory.CreateText("DetailBody", card.transform,
+                PhobiaCatalog.Description(phobiaType) + "\n\n" +
+                PhobiaCatalog.RecommendedStart(phobiaType) + "\n\n" +
+                PhobiaCatalog.PreSessionInstructions(),
+                18, TextAlignmentOptions.TopLeft);
+            ClinicalUIFactory.Anchor(body.rectTransform, new Vector2(0.08f, 0.42f), new Vector2(0.92f, 0.84f));
+
+            var beginner = ClinicalUIFactory.CreateButton("BeginnerBtn", card.transform, "Beginner");
+            ClinicalUIFactory.Anchor(beginner.GetComponent<RectTransform>(), new Vector2(0.06f, 0.28f), new Vector2(0.32f, 0.28f), new Vector2(0, 52));
+            beginner.onClick.AddListener(() => ConfirmSelection("Low"));
+
+            var intermediate = ClinicalUIFactory.CreateButton("IntermediateBtn", card.transform, "Intermediate", false);
+            ClinicalUIFactory.Anchor(intermediate.GetComponent<RectTransform>(), new Vector2(0.37f, 0.28f), new Vector2(0.63f, 0.28f), new Vector2(0, 52));
+            intermediate.onClick.AddListener(() => ConfirmSelection("Medium"));
+
+            var advanced = ClinicalUIFactory.CreateButton("AdvancedBtn", card.transform, "Advanced", false);
+            ClinicalUIFactory.Anchor(advanced.GetComponent<RectTransform>(), new Vector2(0.68f, 0.28f), new Vector2(0.94f, 0.28f), new Vector2(0, 52));
+            advanced.onClick.AddListener(() => ConfirmSelection("High"));
+
+            bool showManualStage = UserData.AllowManualStageSelection;
+            beginner.gameObject.SetActive(showManualStage);
+            intermediate.gameObject.SetActive(showManualStage);
+            advanced.gameObject.SetActive(showManualStage);
+
+            var start = ClinicalUIFactory.CreateButton("StartBaselineBtn", card.transform, "Continue to baseline");
+            ClinicalUIFactory.Anchor(start.GetComponent<RectTransform>(), new Vector2(0.18f, 0.26f), new Vector2(0.82f, 0.26f), new Vector2(0, 54));
+            start.onClick.AddListener(() => ConfirmSelection("High"));
+            start.gameObject.SetActive(!showManualStage);
+
+            var cancel = ClinicalUIFactory.CreateButton("CancelPhobia", card.transform, "Back", false);
+            ClinicalUIFactory.Anchor(cancel.GetComponent<RectTransform>(), new Vector2(0.35f, 0.10f), new Vector2(0.65f, 0.10f), new Vector2(0, 46));
+            cancel.onClick.AddListener(() =>
+            {
+                if (detailRoot != null)
+                    Destroy(detailRoot);
+                detailRoot = null;
+                SetBrowseVisible(true);
+            });
         }
 
-        private void ShowLevelSelection()
+        private void CacheBrowseRoot()
         {
-            if (heightPhobiaButton != null) heightPhobiaButton.gameObject.SetActive(false);
-            if (darknessPhobiaButton != null) darknessPhobiaButton.gameObject.SetActive(false);
-            if (crowdPhobiaButton != null) crowdPhobiaButton.gameObject.SetActive(false);
+            if (browseRoot != null)
+                return;
+            if (heightPhobiaButton != null)
+                browseRoot = heightPhobiaButton.transform.parent != null
+                    ? heightPhobiaButton.transform.parent.gameObject
+                    : heightPhobiaButton.gameObject;
+        }
 
+        private void SetBrowseVisible(bool visible)
+        {
+            CacheBrowseRoot();
+            if (browseRoot != null && browseRoot.GetComponent<Canvas>() == null)
+                browseRoot.SetActive(visible);
+
+            if (heightPhobiaButton != null)
+                heightPhobiaButton.gameObject.SetActive(visible);
+            if (darknessPhobiaButton != null)
+                darknessPhobiaButton.gameObject.SetActive(visible);
+            if (crowdPhobiaButton != null)
+                crowdPhobiaButton.gameObject.SetActive(visible);
             if (instructionText != null)
-                instructionText.text = $"Select the exposure level for {UserData.SelectedPhobia} Phobia:";
+                instructionText.gameObject.SetActive(visible);
+            if (selectedPhobiaText != null)
+                selectedPhobiaText.gameObject.SetActive(visible);
 
-            levelPanel = new GameObject("LevelSelectionPanel", typeof(RectTransform), typeof(VerticalLayoutGroup));
-            levelPanel.transform.SetParent(heightPhobiaButton.transform.parent, false);
-
-            var layout = levelPanel.GetComponent<VerticalLayoutGroup>();
-            var parentLayout = heightPhobiaButton.transform.parent.GetComponent<VerticalLayoutGroup>();
-            if (parentLayout != null)
-            {
-                layout.spacing = parentLayout.spacing;
-                layout.childAlignment = parentLayout.childAlignment;
-                layout.childControlWidth = parentLayout.childControlWidth;
-                layout.childControlHeight = parentLayout.childControlHeight;
-                layout.childForceExpandWidth = parentLayout.childForceExpandWidth;
-                layout.childForceExpandHeight = parentLayout.childForceExpandHeight;
-            }
-
-            CreateLevelButton("Level 1: Beginner (Low)", () => ConfirmLevel("Low", 1));
-            CreateLevelButton("Level 2: Intermediate (Medium)", () => ConfirmLevel("Medium", 2));
-            CreateLevelButton("Level 3: Advanced (High)", () => ConfirmLevel("High", 3));
-            CreateLevelButton("Back to Phobias", CancelLevelSelection, true);
+            var back = AutoBindField<Button>("BackDashButton");
+            if (back != null)
+                back.gameObject.SetActive(visible);
         }
 
-        private void CreateLevelButton(string label, System.Action onClickAction, bool isBackButton = false)
+        private void ConfirmSelection(string difficulty)
         {
-            if (heightPhobiaButton == null) return;
-
-            GameObject btnGO = Instantiate(heightPhobiaButton.gameObject, levelPanel.transform);
-            btnGO.SetActive(true);
-            btnGO.name = label.Replace(" ", "");
-
-            Button btn = btnGO.GetComponent<Button>();
-            btn.onClick.RemoveAllListeners();
-            btn.onClick.AddListener(() => onClickAction());
-
-            if (isBackButton)
+            UserData.SelectedPhobia = pendingPhobia;
+            UserData.SelectedDifficulty = UserData.AllowManualStageSelection ? difficulty : "High";
+            UserData.CurrentStage = UserData.AllowManualStageSelection
+                ? PhobiaCatalog.StageFromDifficulty(difficulty)
+                : 1;
+            UserData.ResetSessionState();
+            UserData.AiStageRecommendation = "";
+            SetBrowseVisible(false);
+            if (detailRoot != null)
             {
-                var img = btn.GetComponent<Image>();
-                if (img != null)
-                {
-                    img.color = new Color32(45, 45, 60, 255);
-                }
+                Destroy(detailRoot);
+                detailRoot = null;
             }
-
-            var text = btnGO.GetComponentInChildren<TextMeshProUGUI>();
-            if (text != null)
-            {
-                text.text = label;
-            }
-            else
-            {
-                var legacyText = btnGO.GetComponentInChildren<Text>();
-                if (legacyText != null)
-                    legacyText.text = label;
-            }
-        }
-
-        private void ConfirmLevel(string levelName, int stage)
-        {
-            UserData.SelectedDifficulty = levelName;
-            UserData.CurrentStage = stage;
-            Debug.Log($"Level Confirmed: {levelName} (Stage {stage})");
-
-            if (levelPanel != null)
-                Destroy(levelPanel);
-
             SceneLoader.Instance.LoadScene("BaselineScene");
-        }
-
-        private void CancelLevelSelection()
-        {
-            if (levelPanel != null)
-                Destroy(levelPanel);
-
-            if (instructionText != null)
-                instructionText.text = "Choose a phobia track to begin your exposure therapy.";
-
-            if (heightPhobiaButton != null) heightPhobiaButton.gameObject.SetActive(true);
-            if (darknessPhobiaButton != null) darknessPhobiaButton.gameObject.SetActive(true);
-            if (crowdPhobiaButton != null) crowdPhobiaButton.gameObject.SetActive(true);
         }
 
         private void UpdateSelectedPhobiaText()

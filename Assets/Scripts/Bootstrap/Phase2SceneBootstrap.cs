@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using PhobiaReliefTherapy.Therapy;
 using PhobiaReliefTherapy.Admin;
+using PhobiaReliefTherapy.Managers;
 
 namespace PhobiaReliefTherapy.Bootstrap
 {
@@ -17,13 +18,22 @@ namespace PhobiaReliefTherapy.Bootstrap
         {
             switch (scene.name)
             {
+                case "LoginScene":
+                case "RegisterScene":
+                    if (Object.FindObjectOfType<AuthManager>() == null)
+                        new GameObject("AuthManager").AddComponent<AuthManager>();
+                    break;
                 case "FeedbackScene":
                     if (Object.FindObjectOfType<FeedbackManager>() == null)
                         new GameObject("FeedbackManager").AddComponent<FeedbackManager>();
                     break;
                 case "DashboardScene":
-                    if (Object.FindObjectOfType<DashboardSessionHistory>() == null)
-                        new GameObject("DashboardSessionHistory").AddComponent<DashboardSessionHistory>();
+                    if (Object.FindObjectOfType<DashboardManager>() == null)
+                        new GameObject("DashboardManager").AddComponent<DashboardManager>();
+                    break;
+                case "PhobiaSelectionScene":
+                    if (Object.FindObjectOfType<PhobiaSelectionManager>() == null)
+                        new GameObject("PhobiaSelectionManager").AddComponent<PhobiaSelectionManager>();
                     break;
                 case "AdminScene":
                     if (Object.FindObjectOfType<AdminDashboardManager>() == null)

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
 using System.Text;
@@ -15,9 +16,16 @@ namespace PhobiaReliefTherapy.Therapy
     public class DashboardSessionHistory : MonoBehaviour
     {
         public TextMeshProUGUI historyText;
+        [HideInInspector] public GameObject historyRoot;
 
         private void Start()
         {
+            if (SceneManager.GetActiveScene().name != "DashboardScene")
+            {
+                enabled = false;
+                return;
+            }
+
             if (historyText == null)
                 historyText = AutoBindHelper.FindComponentByName<TextMeshProUGUI>("SessionHistoryText");
 
@@ -25,6 +33,12 @@ namespace PhobiaReliefTherapy.Therapy
 
             StartCoroutine(LoadHistory());
             StartCoroutine(DatabaseManager.Instance.SyncPendingLocalSessions());
+        }
+
+        private void OnDestroy()
+        {
+            if (historyRoot != null)
+                Destroy(historyRoot);
         }
 
         private IEnumerator LoadHistory()
@@ -50,25 +64,17 @@ namespace PhobiaReliefTherapy.Therapy
             }
 
             var local = LocalSessionStore.GetSessionsForUser(UserData.UserId);
+            var merged = DatabaseManager.MergeSessions(local, remoteSessions);
             var builder = new StringBuilder();
             builder.AppendLine("Recent Sessions");
 
             int count = 0;
-            for (int i = local.Count - 1; i >= 0 && count < 5; i--)
+            foreach (var s in merged)
             {
-                var s = local[i];
-                builder.AppendLine($"- {s.DateCompleted}: {s.Phobia} ({s.Difficulty}) | Peak {s.PeakHeartRate} BPM | {s.ExposureTime:F0}s");
+                builder.AppendLine(LocalSessionStore.FormatDetail(s, false));
                 count++;
-            }
-
-            if (remoteSessions.Length > 0 && count == 0)
-            {
-                for (int i = remoteSessions.Length - 1; i >= 0 && count < 5; i--)
-                {
-                    var s = remoteSessions[i];
-                    builder.AppendLine($"- {s.DateCompleted}: {s.Phobia} ({s.Difficulty}) | Final {s.FinalHeartRate} BPM | {s.ExposureTime:F0}s");
-                    count++;
-                }
+                if (count >= 5)
+                    break;
             }
 
             if (count == 0)

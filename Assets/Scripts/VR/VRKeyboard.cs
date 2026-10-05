@@ -97,8 +97,6 @@ namespace PhobiaReliefTherapy.VR
 
         private void HandleDrag()
         {
-            // Check both hands for grip press
-            bool anyGrip = false;
             foreach (XRNode node in new[] { XRNode.LeftHand, XRNode.RightHand })
             {
                 InputDevices.GetDevicesAtXRNode(node, _deviceBuf);
@@ -108,7 +106,6 @@ namespace PhobiaReliefTherapy.VR
                 device.TryGetFeatureValue(CommonUsages.gripButton, out bool grip);
                 if (!grip) continue;
 
-                anyGrip      = true;
                 draggingNode = node;
 
                 // World-space position + forward direction of the controller

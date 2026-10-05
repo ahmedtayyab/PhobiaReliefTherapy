@@ -67,6 +67,7 @@ namespace PhobiaReliefTherapy.Managers
             
             var image = overlayGO.GetComponent<Image>();
             image.color = new Color32(13, 14, 18, 255); // #0D0E12 charcoal theme background
+            image.raycastTarget = false;
             
             fadeGroup = overlayGO.GetComponent<CanvasGroup>();
             fadeGroup.alpha = 0f;
@@ -87,6 +88,9 @@ namespace PhobiaReliefTherapy.Managers
         {
             if (fadeGroup != null)
             {
+                var fadeImage = fadeGroup.GetComponent<Image>();
+                if (fadeImage != null)
+                    fadeImage.raycastTarget = true;
                 fadeGroup.blocksRaycasts = true;
                 float elapsed = 0f;
                 float duration = 0.35f;
@@ -99,14 +103,10 @@ namespace PhobiaReliefTherapy.Managers
                 fadeGroup.alpha = 1f;
             }
 
-            // Async scene load
             var op = SceneManager.LoadSceneAsync(sceneName);
-            while (!op.isDone)
-            {
+            while (op != null && !op.isDone)
                 yield return null;
-            }
 
-            // Give a tiny frame delay for Awake/Start methods of new scene components to execute
             yield return new WaitForSeconds(0.1f);
 
             if (fadeGroup != null)
@@ -121,6 +121,9 @@ namespace PhobiaReliefTherapy.Managers
                 }
                 fadeGroup.alpha = 0f;
                 fadeGroup.blocksRaycasts = false;
+                var fadeImage = fadeGroup.GetComponent<Image>();
+                if (fadeImage != null)
+                    fadeImage.raycastTarget = false;
             }
         }
 

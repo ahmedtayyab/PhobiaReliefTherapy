@@ -25,7 +25,7 @@ namespace PhobiaReliefTherapy.Therapy
         public Image progressBarFill;
         public Button continueButton;
 
-        public float measurementDuration = 20f; // seconds
+        public float measurementDuration = 60f;
 
         [Header("Skybox Setup")]
         public Material baselineSkyboxMaterial;
@@ -65,16 +65,13 @@ namespace PhobiaReliefTherapy.Therapy
             if (resultText != null)
                 resultText.text = "";
             if (stageText != null)
-                stageText.text = $"Stage {UserData.CurrentStage}: Baseline Measurement";
+                stageText.text = "Baseline Measurement";
 
             SensorManager.EnsureInstanceExists();
-            SensorManager.Instance.InitializeSensor();
             VRManager.EnsureInstanceExists();
             VRManager.Instance.InitializeVR();
 
-            if (sensorModeText != null)
-                sensorModeText.text = "Sensor: connection skipped (mock active)";
-
+            UpdateSensorModeText();
             StartBaselineMeasurement();
         }
 
@@ -82,6 +79,9 @@ namespace PhobiaReliefTherapy.Therapy
         {
             if (isMeasuring)
             {
+                UpdateSensorModeText();
+                if (instructionText != null)
+                    instructionText.text = "Remain still and calm.\n" + SensorManager.GetBaselineInstruction();
 #if UNITY_ANDROID && !UNITY_EDITOR
                 // On Quest: always hide flat 2D background, let the skybox + HMD rotation do the work
                 if (customBackgroundGO != null && customBackgroundGO.activeSelf)
@@ -334,36 +334,19 @@ namespace PhobiaReliefTherapy.Therapy
                 if (panelImage != null) panelImage.enabled = false;
             }
 
-            // Move the timer to a corner (Top-Right corner of Canvas Panel, or center-right if VR is active)
-            if (timerText != null)
-            {
-                originalTimerParent = timerText.transform.parent;
-                originalTimerPosition = timerText.transform.localPosition;
+            IgnoreLayout(timerText != null ? timerText.gameObject : null);
+            IgnoreLayout(progressBarFill != null ? progressBarFill.gameObject : null);
+            if (progressBarFill != null && progressBarFill.transform.parent != null)
+                IgnoreLayout(progressBarFill.transform.parent.gameObject);
 
-                // Move timerText to be a direct child of Panel or Canvas to float freely
-                timerText.transform.SetParent(panelTransform != null ? panelTransform : canvas.transform, true);
+            var panelLayout = panelTransform != null ? panelTransform.GetComponent<VerticalLayoutGroup>() : null;
+            if (panelLayout != null)
+                panelLayout.enabled = false;
+            var canvasLayout = canvas.GetComponent<VerticalLayoutGroup>();
+            if (canvasLayout != null)
+                canvasLayout.enabled = false;
 
-                RectTransform rect = timerText.rectTransform;
-                if (IsVRActive())
-                {
-                    rect.anchorMin = new Vector2(0.75f, 0.85f);
-                    rect.anchorMax = new Vector2(0.75f, 0.85f);
-                    rect.pivot = new Vector2(0.5f, 0.5f);
-                    rect.anchoredPosition = Vector2.zero;
-                    timerText.alignment = TextAlignmentOptions.Center;
-                }
-                else
-                {
-                    rect.anchorMin = new Vector2(1, 1);
-                    rect.anchorMax = new Vector2(1, 1);
-                    rect.pivot = new Vector2(1, 1);
-                    rect.anchoredPosition = new Vector2(-50f, -50f); // Top-right offset
-                    timerText.alignment = TextAlignmentOptions.TopRight;
-                }
-                timerText.fontSize = 36f;
-                timerText.fontStyle = FontStyles.Bold;
-                timerText.color = Color.white;
-            }
+            LayoutHorizontalTimer(panelTransform != null ? panelTransform : canvas.transform);
 
             // Move instructionText to a corner (Bottom-Left corner of Canvas Panel, or center-bottom if VR is active)
             if (instructionText != null)
@@ -377,6 +360,7 @@ namespace PhobiaReliefTherapy.Therapy
                 originalInstructionColor = instructionText.color;
 
                 // Move instructionText to be a direct child of Panel or Canvas to float freely
+                IgnoreLayout(instructionText.gameObject);
                 instructionText.transform.SetParent(panelTransform != null ? panelTransform : canvas.transform, true);
 
                 RectTransform rect = instructionText.rectTransform;
@@ -402,6 +386,75 @@ namespace PhobiaReliefTherapy.Therapy
                 instructionText.fontStyle = FontStyles.Normal;
                 instructionText.color = new Color(0.95f, 0.95f, 0.95f, 0.95f); // Super crisp readable white
             }
+        }
+
+        private static void IgnoreLayout(GameObject go)
+        {
+            if (go == null)
+                return;
+            var layout = go.GetComponent<LayoutElement>();
+            if (layout == null)
+                layout = go.AddComponent<LayoutElement>();
+            layout.ignoreLayout = true;
+        }
+
+        private void LayoutHorizontalTimer(Transform parent)
+        {
+            if (timerText != null)
+            {
+                originalTimerParent = timerText.transform.parent;
+                originalTimerPosition = timerText.transform.localPosition;
+                timerText.transform.SetParent(parent, false);
+
+                RectTransform rect = timerText.rectTransform;
+                rect.anchorMin = new Vector2(0.58f, 0.88f);
+                rect.anchorMax = new Vector2(0.94f, 0.88f);
+                rect.pivot = new Vector2(1f, 0.5f);
+                rect.anchoredPosition = Vector2.zero;
+                rect.sizeDelta = new Vector2(0f, 56f);
+                timerText.alignment = TextAlignmentOptions.MidlineRight;
+                timerText.enableWordWrapping = false;
+                timerText.overflowMode = TextOverflowModes.Overflow;
+                timerText.fontSize = 36f;
+                timerText.fontStyle = FontStyles.Bold;
+                timerText.color = Color.white;
+            }
+
+            if (progressBarFill == null)
+                return;
+
+            progressBarFill.type = Image.Type.Filled;
+            progressBarFill.fillMethod = Image.FillMethod.Horizontal;
+            progressBarFill.fillOrigin = (int)Image.OriginHorizontal.Left;
+            progressBarFill.fillAmount = 0f;
+            progressBarFill.gameObject.SetActive(true);
+
+            var bar = progressBarFill.rectTransform;
+            if (bar.parent != null && bar.parent != parent && bar.parent.GetComponent<Slider>() != null)
+            {
+                var slider = bar.parent.GetComponent<RectTransform>();
+                slider.SetParent(parent, false);
+                StretchHorizontalBar(slider);
+                var sliderComp = slider.GetComponent<Slider>();
+                if (sliderComp != null)
+                    sliderComp.direction = Slider.Direction.LeftToRight;
+            }
+            else
+            {
+                bar.SetParent(parent, false);
+                StretchHorizontalBar(bar);
+            }
+        }
+
+        private static void StretchHorizontalBar(RectTransform rect)
+        {
+            rect.anchorMin = new Vector2(0.08f, 0.88f);
+            rect.anchorMax = new Vector2(0.56f, 0.88f);
+            rect.pivot = new Vector2(0f, 0.5f);
+            rect.anchoredPosition = Vector2.zero;
+            rect.sizeDelta = new Vector2(0f, 18f);
+            rect.localRotation = Quaternion.identity;
+            rect.localScale = Vector3.one;
         }
 
         private void StartBaselineMeasurement()
@@ -441,16 +494,41 @@ namespace PhobiaReliefTherapy.Therapy
                 }
             }
 
-            instructionText.text = "Relax and focus on the calm environment...\n(Hardware sensor skipped. Simulating vitals...)";
-            SensorManager.Instance.StartBaselineMeasurement(measurementDuration, OnBaselineComplete);
-            StartCoroutine(BaselineTimerRoutine());
+            SessionVitalsHistory.Clear();
+            instructionText.text = "Remain still and calm.\n" + SensorManager.GetBaselineInstruction();
+            measurementDuration = SessionTiming.BaselineSeconds;
+            SensorManager.Instance.InitializeSensor(() =>
+            {
+                UpdateSensorModeText();
+                if (instructionText != null)
+                    instructionText.text = "Remain still and calm.\n" + SensorManager.GetBaselineInstruction();
+                SensorManager.Instance.StartBaselineMeasurement(measurementDuration, OnBaselineComplete);
+                StartCoroutine(BaselineTimerRoutine());
+            });
+            EnsureSkipButton();
+        }
+
+        private void UpdateSensorModeText()
+        {
+            if (sensorModeText == null || SensorManager.Instance == null)
+                return;
+
+            int bpm = SensorManager.Instance.CurrentHeartRate;
+            sensorModeText.text = $"Sensor: {SensorManager.Instance.SensorSourceName} ({bpm} BPM)";
         }
 
         private IEnumerator BaselineTimerRoutine()
         {
+            HeadMovementTracker.EnsureInstanceExists();
             float timer = measurementDuration;
             while (timer > 0)
             {
+                if (SessionTiming.ConsumeSkip())
+                    timer = 0f;
+
+                if (HeadMovementTracker.Instance != null)
+                    SessionMetrics.RecordHeadMovementSample(HeadMovementTracker.Instance.AgitationScore);
+
                 float progress = 1f - (timer / measurementDuration);
                 if (timerText != null)
                     timerText.text = Mathf.CeilToInt(timer).ToString() + "s";
@@ -476,6 +554,8 @@ namespace PhobiaReliefTherapy.Therapy
             ExposureSessionMonitor.EnsureInstanceExists();
             if (ExposureSessionMonitor.Instance != null)
                 ExposureSessionMonitor.Instance.CaptureBaselineHeadMovement();
+
+            ExposureStageAdvisor.AssignStageFromBaseline(heartRate, SessionMetrics.BaselineHeadMovementScore);
 
             // Snap camera back to original rotation and clear flags
             if (Camera.main != null)
@@ -534,52 +614,121 @@ namespace PhobiaReliefTherapy.Therapy
                 hasAppliedSkybox = false;
             }
 
-            // Restore instructionText parent and layout properties
-            if (instructionText != null && originalInstructionParent != null)
-            {
-                instructionText.transform.SetParent(originalInstructionParent, false); // Snap back to Layout Group bounds
-                instructionText.rectTransform.sizeDelta = originalInstructionSizeDelta;
-                instructionText.alignment = originalInstructionAlignment;
-                instructionText.fontSize = originalInstructionFontSize;
-                instructionText.fontStyle = originalInstructionFontStyle;
-                instructionText.color = originalInstructionColor;
-            }
-
-            // Hide the floating corner timer when complete
             if (timerText != null)
-            {
                 timerText.gameObject.SetActive(false);
+            if (progressBarFill != null)
+                progressBarFill.gameObject.SetActive(false);
+
+            LayoutBaselineResultsCard(heartRate);
+        }
+
+        private void LayoutBaselineResultsCard(int heartRate)
+        {
+            Transform card = FindResultsCard();
+            if (card != null)
+            {
+                var vlg = card.GetComponent<VerticalLayoutGroup>();
+                if (vlg != null)
+                    vlg.enabled = false;
+                var fitter = card.GetComponent<ContentSizeFitter>();
+                if (fitter != null)
+                    fitter.enabled = false;
             }
 
             if (resultText != null)
-                resultText.text = $"Baseline Heart Rate: {heartRate} BPM";
-            if (instructionText != null)
-                instructionText.text = "Baseline measurement complete. Physical sensor check skipped successfully.\n\nYou may proceed to the safe room.";
-
-            if (continueButton != null)
             {
-                // Set the button text to "Continue" instead of "Button"
-                var btnText = continueButton.GetComponentInChildren<TextMeshProUGUI>();
-                if (btnText != null)
-                {
-                    btnText.text = "Continue";
-                }
-                else
-                {
-                    var legacyText = continueButton.GetComponentInChildren<Text>();
-                    if (legacyText != null)
-                        legacyText.text = "Continue";
-                }
-
-                // Place the continue button at the very bottom of the card panel to avoid text overlap
-                continueButton.transform.SetAsLastSibling();
-
-                continueButton.gameObject.SetActive(true);
-                continueButton.onClick.RemoveAllListeners();
-                continueButton.onClick.AddListener(() => {
-                    SceneLoader.Instance.LoadScene("SafeRoomScene");
-                });
+                resultText.gameObject.SetActive(true);
+                resultText.text = $"Baseline heart rate ({SessionTiming.BaselineSeconds:0}s average): {heartRate} BPM";
+                PlaceResultsText(resultText, card, new Vector2(0.08f, 0.58f), new Vector2(0.92f, 0.82f), 26f, TextAlignmentOptions.Center);
             }
+
+            if (instructionText != null)
+            {
+                instructionText.gameObject.SetActive(true);
+                instructionText.text =
+                    "Baseline complete. Stay relaxed until you enter the Safe Room.\n" +
+                    "During exposure, press A (right) or X (left) for Emergency / Safe Room.\n\n" +
+                    UserData.AiStageRecommendation;
+                PlaceResultsText(instructionText, card, new Vector2(0.08f, 0.28f), new Vector2(0.92f, 0.56f), 20f, TextAlignmentOptions.Center);
+            }
+
+            if (stageText != null)
+            {
+                stageText.gameObject.SetActive(true);
+                PlaceResultsText(stageText, card, new Vector2(0.08f, 0.84f), new Vector2(0.92f, 0.96f), 30f, TextAlignmentOptions.Center);
+            }
+
+            if (continueButton == null)
+                return;
+
+            if (card != null)
+                continueButton.transform.SetParent(card, false);
+
+            IgnoreLayout(continueButton.gameObject);
+            var rect = continueButton.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.28f, 0.10f);
+            rect.anchorMax = new Vector2(0.72f, 0.10f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = Vector2.zero;
+            rect.sizeDelta = new Vector2(0f, 56f);
+            rect.localRotation = Quaternion.identity;
+            rect.localScale = Vector3.one;
+
+            var btnText = continueButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (btnText != null)
+            {
+                btnText.text = "Continue";
+                btnText.enableWordWrapping = false;
+                btnText.overflowMode = TextOverflowModes.Overflow;
+                ClinicalUIFactory.AlignButtonLabel(btnText);
+            }
+            else
+            {
+                var legacyText = continueButton.GetComponentInChildren<Text>();
+                if (legacyText != null)
+                    legacyText.text = "Continue";
+            }
+
+            continueButton.transform.SetAsLastSibling();
+            continueButton.gameObject.SetActive(true);
+            continueButton.onClick.RemoveAllListeners();
+            continueButton.onClick.AddListener(() => SceneLoader.Instance.LoadScene("SafeRoomScene"));
+        }
+
+        private Transform FindResultsCard()
+        {
+            foreach (var card in disabledCardPanels)
+            {
+                if (card != null && card.activeInHierarchy)
+                    return card.transform;
+            }
+
+            var named = GameObject.Find("CardPanel");
+            return named != null ? named.transform : null;
+        }
+
+        private void PlaceResultsText(TextMeshProUGUI tmp, Transform card, Vector2 anchorMin, Vector2 anchorMax, float fontSize, TextAlignmentOptions align)
+        {
+            if (tmp == null)
+                return;
+
+            if (card != null)
+                tmp.transform.SetParent(card, false);
+
+            IgnoreLayout(tmp.gameObject);
+            var rect = tmp.rectTransform;
+            rect.anchorMin = anchorMin;
+            rect.anchorMax = anchorMax;
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            rect.localRotation = Quaternion.identity;
+            rect.localScale = Vector3.one;
+            tmp.alignment = align;
+            tmp.enableWordWrapping = true;
+            tmp.overflowMode = TextOverflowModes.Overflow;
+            tmp.fontSize = fontSize;
+            tmp.fontStyle = FontStyles.Normal;
         }
 
         private bool IsVRActive()
@@ -599,6 +748,34 @@ namespace PhobiaReliefTherapy.Therapy
 
             return false;
 #endif
+        }
+
+        private void EnsureSkipButton()
+        {
+            if (!Application.isEditor || continueButton == null || continueButton.transform.parent == null)
+                return;
+
+            if (transform.Find("SkipBaselineButton") != null)
+                return;
+
+            var skip = new GameObject("SkipBaselineButton", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
+            skip.transform.SetParent(continueButton.transform.parent, false);
+            var rect = skip.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.7f, 0.02f);
+            rect.anchorMax = new Vector2(0.98f, 0.10f);
+            rect.offsetMin = rect.offsetMax = Vector2.zero;
+            skip.GetComponent<Image>().color = new Color(1, 1, 1, 0.15f);
+            var textGO = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+            textGO.transform.SetParent(skip.transform, false);
+            var tRect = textGO.GetComponent<RectTransform>();
+            tRect.anchorMin = Vector2.zero;
+            tRect.anchorMax = Vector2.one;
+            tRect.offsetMin = tRect.offsetMax = Vector2.zero;
+            var tmp = textGO.GetComponent<TextMeshProUGUI>();
+            tmp.text = "Skip (editor)";
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.fontSize = 16;
+            skip.GetComponent<Button>().onClick.AddListener(() => SessionTiming.SkipRequested = true);
         }
     }
 }
