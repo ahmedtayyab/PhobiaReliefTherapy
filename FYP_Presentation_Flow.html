@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Phobia Relief Therapy - How We Present</title>
+  <style>
+    :root {
+      --ink: #1a2332;
+      --muted: #4a5568;
+      --line: #d6dde8;
+      --accent: #c2410c;
+      --paper: #ffffff;
+      --wash: #f7f5f2;
+      --code: #0f172a;
+    }
+    * { box-sizing: border-box; }
+    html { font-size: 11pt; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--wash);
+      font-family: "Segoe UI", "Calibri", "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.45;
+    }
+    .wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 32px 28px 64px;
+      background: var(--paper);
+      box-shadow: 0 0 0 1px var(--line);
+    }
+    h1 {
+      font-size: 22pt;
+      line-height: 1.2;
+      margin: 0 0 6px;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      font-size: 13pt;
+      color: var(--accent);
+      font-weight: 700;
+      margin: 0 0 16px;
+    }
+    h2 {
+      font-size: 14pt;
+      margin: 28px 0 10px;
+      padding-top: 10px;
+      border-top: 2px solid var(--ink);
+      page-break-after: avoid;
+    }
+    h3 {
+      font-size: 12pt;
+      margin: 18px 0 8px;
+      color: var(--accent);
+      page-break-after: avoid;
+    }
+    p { margin: 0 0 10px; }
+    ul, ol { margin: 0 0 12px; padding-left: 1.3em; }
+    li { margin: 0 0 4px; }
+    strong { font-weight: 700; }
+    code, pre {
+      font-family: "Cascadia Mono", "Consolas", "Courier New", monospace;
+      font-size: 9.5pt;
+    }
+    code {
+      background: #f1f3f7;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+    pre {
+      background: var(--code);
+      color: #e2e8f0;
+      padding: 12px 14px;
+      border-radius: 6px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      page-break-inside: avoid;
+    }
+    .note {
+      background: #fff7ed;
+      border-left: 4px solid var(--accent);
+      padding: 10px 12px;
+      margin: 0 0 14px;
+    }
+    .say {
+      background: #ecfdf5;
+      border-left: 4px solid #166534;
+      padding: 10px 12px;
+      margin: 0 0 14px;
+    }
+    .never {
+      background: #fff1f2;
+      border-left: 4px solid #9f1239;
+      padding: 10px 12px;
+      margin: 0 0 14px;
+    }
+    .cmd-box {
+      background: #102a43;
+      color: #f0f4f8;
+      padding: 16px 18px;
+      border-radius: 8px;
+      margin: 12px 0 16px;
+      page-break-inside: avoid;
+    }
+    .cmd-box h3 { color: #ffedd5; margin-top: 0; }
+    .cmd-box pre { background: #0b1c2c; margin: 8px 0 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 0 14px;
+      font-size: 10pt;
+      page-break-inside: auto;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #1a2332;
+      color: #fff;
+      font-weight: 600;
+    }
+    tr:nth-child(even) td { background: #f8fafc; }
+    .meta { color: var(--muted); font-size: 10pt; margin-bottom: 18px; }
+    .print-hint {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      padding: 10px 12px;
+      margin-bottom: 18px;
+      border-radius: 6px;
+    }
+    .q {
+      font-weight: 700;
+      margin: 14px 0 4px;
+    }
+    .q::before { content: "Q. "; color: var(--accent); }
+    .a { margin: 0 0 12px; }
+    .a::before { content: "A. "; font-weight: 700; }
+    .toc { columns: 2; column-gap: 24px; font-size: 10.5pt; }
+    .toc li { break-inside: avoid; }
+    @media print {
+      body { background: #fff; }
+      .wrap { box-shadow: none; max-width: none; padding: 0; }
+      .print-hint { display: none; }
+      h2, h3 { break-after: avoid; }
+      pre, table, .note, .say, .never, .cmd-box { break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="print-hint"><strong>PDF:</strong> Ctrl+P -&gt; Save as PDF -&gt; Background graphics on. Use this file on presentation day. Keep <code>FYP_AI_Defense.html</code> for deep AI backup and <code>FYP_Viva_Guide.html</code> for Polar commands.</p>
+
+    <h1>Phobia Relief Therapy in VR</h1>
+    <p class="subtitle">How we present: live demo, then questions</p>
+    <p class="meta">Panel order: show the product working, then defend the AI. Most questions will be theoretical. The center of gravity is the decision tree, the formula, and the thresholds.</p>
+
+    <h2>Contents</h2>
+    <ol class="toc">
+      <li>How the hour runs</li>
+      <li>Roles and setup</li>
+      <li>60-second opening</li>
+      <li>Live demo script</li>
+      <li>Values cheat sheet</li>
+      <li>Why we chose those values</li>
+      <li>Questioning: AI and thresholds</li>
+      <li>If they wander off AI</li>
+      <li>What we admit</li>
+      <li>Close</li>
+    </ol>
+
+    <h2>1. How the hour runs</h2>
+    <table>
+      <tr><th>Block</th><th>Time</th><th>What you do</th></tr>
+      <tr><td>Setup already done</td><td>before they sit</td><td>Quest Link, Polar streaming, Unity Play, login screen ready</td></tr>
+      <tr><td>Opening</td><td>about 1 minute</td><td>One person speaks the pitch. No slides required.</td></tr>
+      <tr><td>Live demo</td><td>8 to 12 minutes</td><td>Headset on one teammate. Narrator talks over each screen. Point at BPM and AI text.</td></tr>
+      <tr><td>Board formula</td><td>2 minutes</td><td>Write the score and the three bands before they start firing.</td></tr>
+      <tr><td>Questions</td><td>rest of the slot</td><td>Theoretical. AI, thresholds, why those numbers, stress, safety.</td></tr>
+    </table>
+    <div class="note">
+      Do not start with a long architecture lecture. They will remember the headset, the live BPM, and whether you can explain 0.5 / 0.3 / 0.2. Demo first. Theory after they have seen it.
+    </div>
+
+    <h2>2. Roles and setup</h2>
+    <p>Three jobs. Do not all talk at once.</p>
+    <table>
+      <tr><th>Job</th><th>Does</th></tr>
+      <tr><td>Driver</td><td>Wears the Quest. Laser, grip-drag menus, A/X emergency if asked.</td></tr>
+      <tr><td>Narrator</td><td>Faces the panel. Names each screen and the AI decision. Does not narrate button clicks.</td></tr>
+      <tr><td>Sensor watch</td><td>Laptop facing the panel if possible. Polar window showing BPM: 78 ... and the Unity game view.</td></tr>
+    </table>
+
+    <div class="cmd-box">
+      <h3>Must be running before they enter</h3>
+      <pre>python tools\polar_hr_bridge.py</pre>
+      <p style="margin:10px 0 0;color:#cbd5e1;">Quest Link USB. Polar on the chest, electrodes wet. Unity Play. forceMockSensor false. LaptopPlaytest false.</p>
+    </div>
+    <ul>
+      <li>Login ready: <code>user@phobia.local</code> / <code>user1234</code> (or a real cloud account you already tested).</li>
+      <li>If time is short, Editor <strong>F1</strong> skips the 60 s / 120 s wait. Say you skipped the timer, not the measurement idea.</li>
+      <li>If Polar dies, say so. Do not silently switch to mock and still call it live.</li>
+    </ul>
+    <div class="never">
+      Do not promise live Polar on a standalone Quest APK. The bridge talks to 127.0.0.1 on the PC. Demo is Quest Link.
+    </div>
+
+    <h2>3. 60-second opening</h2>
+    <div class="say">
+      “This is a VR exposure therapy app. The patient logs in, we take a 60-second baseline of Polar H10 heart rate and headset movement, then a decision-tree AI picks Beginner, Intermediate, or Advanced. They go through a Safe Room into a 2-minute 360-degree exposure for heights, darkness, or crowds. During exposure the same tree scores stress every second and can lower intensity or send them back to the Safe Room. Data is stored locally and synced to Supabase. We will demo that path, then we can go into the AI.”
+    </div>
+    <p>If they ask for stack in the same breath: Unity 2022.3, OpenXR, XRI, Meta Quest, Polar H10, Supabase.</p>
+
+    <h2>4. Live demo script</h2>
+    <p>Walk this path. Narrator says the green lines. Driver does not explain unless asked.</p>
+    <pre>Login  -&gt;  Dashboard  -&gt;  Start New Session
+     -&gt;  Baseline (60 s)  -&gt;  AI announces stage
+     -&gt;  Pick Height / Darkness / Crowd
+     -&gt;  Safe Room (5 s)  -&gt;  Exposure (120 s)
+     -&gt;  Feedback  -&gt;  Dashboard stats</pre>
+
+    <h3>Login and dashboard</h3>
+    <p class="say">“Accounts are local plus Supabase. This is the patient hub. Start New Session is the only primary action.”</p>
+    <p>Optional 20 seconds: open Admin Hub only if they care. Start PRT is the only orange button there.</p>
+
+    <h3>Baseline (this is the first AI moment)</h3>
+    <p class="say">“For one minute the patient sits still. We average heart rate and head movement. That personal baseline is the zero for the rest of the session. The AI does not use a population average of 72 BPM. It uses this person, today.”</p>
+    <p>When the stage text appears, stop and let them read it.</p>
+    <p class="say">“Tree A just ran. Resting BPM and movement mapped to stage 1, 2, or 3. Manual Beginner buttons are hidden. The system picks.”</p>
+    <table>
+      <tr><th>If baseline looks like</th><th>Expect</th></tr>
+      <tr><td>BPM 70-95, little head motion</td><td>Stage 3 Advanced</td></tr>
+      <tr><td>BPM up to 108, moderate motion</td><td>Stage 2 Intermediate</td></tr>
+      <tr><td>Higher BPM or lots of fidgeting</td><td>Stage 1 Beginner</td></tr>
+    </table>
+
+    <h3>Phobia select and Safe Room</h3>
+    <p class="say">“They pick the fear track. Difficulty is already chosen. Safe Room is the briefing and the abort landing pad. Five-second countdown, then exposure. Polar must still be connected or we do not start.”</p>
+
+    <h3>Exposure (second AI moment)</h3>
+    <p>Pick <strong>one</strong> phobia. Darkness is easiest to explain (three images by stage). Heights or crowd if the 360 looks stronger on the projector.</p>
+    <p class="say">“Every second we sample Polar and headset agitation. That becomes PanicScore. Below 10 we continue. 10 to 18 we lower the stage. 18 and above we can stop and return here. The first 20 seconds cannot abort, so putting the headset on is not a panic event.”</p>
+    <p>Point at live BPM on the HUD and the Polar terminal so they see they match.</p>
+    <p>If you want a visible AI action: stand up or breathe fast after the 20 s grace so BPM rises. Narrate the score crossing 10. If it does not rise, do not fake it. Show emergency instead: Quest <strong>A</strong> or <strong>X</strong>.</p>
+    <p class="say">“A and X are not the AI. They are a hard human override. We do not trust the tree with the only exit.”</p>
+
+    <h3>Feedback and stop</h3>
+    <p class="say">“Session writes peak HR, average HR, panic events, and the AI recommendation. Then we can take questions.”</p>
+    <p>Do not burn remaining demo time on scrolling stats unless they ask. The questioning is the main event.</p>
+
+    <h3>If something breaks</h3>
+    <table>
+      <tr><th>Problem</th><th>What to say</th></tr>
+      <tr><td>No BPM in the Python window</td><td>Strap wet / Bluetooth. We will not call mock data live.</td></tr>
+      <tr><td>Overlay menus invisible in headset</td><td>World-space conversion issue. Use the laptop view and keep talking.</td></tr>
+      <tr><td>Timer too long</td><td>F1 skip. “The live protocol is 60 and 120. We skip only for the panel clock.”</td></tr>
+      <tr><td>Safe Room blocked</td><td>Polar packets missing. Show the gate: no sensor, no exposure.</td></tr>
+    </table>
+
+    <h2>5. Values cheat sheet (write this after the demo)</h2>
+    <p>Put the formula on the board before the first AI question. Then you are answering against numbers they can see.</p>
+    <pre>dHR        = current BPM - 60 s baseline BPM
+PanicScore = 0.5 x dHR  +  0.3 x head movement  +  0.2 x time spent
+
+below 10   Calm Stress      continue
+10 to 18   Panic Detected   lower stage by 1
+18+        Severe Panic     Safe Room if score &gt;= 22 and dHR &gt;= 20</pre>
+
+    <table>
+      <tr><th>Thing</th><th>Value</th><th>One-line why</th></tr>
+      <tr><td>Baseline</td><td>60 s average</td><td>Personal rest. SRS use case is 1 minute per session.</td></tr>
+      <tr><td>Exposure</td><td>120 s</td><td>Graded dose, not a 20-minute clinical hour.</td></tr>
+      <tr><td>Sample rate</td><td>1 Hz</td><td>UC-10: every second.</td></tr>
+      <tr><td>Weights</td><td>50% / 30% / 20%</td><td>SRS formula. Polar is the trusted sensor so HR wins.</td></tr>
+      <tr><td>Calm / panic / severe</td><td>10 and 18</td><td>SRS bands. With no movement, 10 = +20 BPM, 18 = +36 BPM.</td></tr>
+      <tr><td>Stage 3 max rest</td><td>95 BPM</td><td>Top of our rest band. Calm Polar can still get Advanced.</td></tr>
+      <tr><td>Stage 2 max rest</td><td>108 BPM</td><td>Mild tachycardia. Above this, start Beginner.</td></tr>
+      <tr><td>Movement stage gates</td><td>16 and 28</td><td>Fidget vs agitation on the headset score.</td></tr>
+      <tr><td>Stress second</td><td>dHR &gt; 16 or move &gt; 2.4x baseline</td><td>Duration only counts when something is actually up.</td></tr>
+      <tr><td>Time spent saturates</td><td>15 s</td><td>SRS: under 15 s is acute; then TS = 100.</td></tr>
+      <tr><td>Force score 10</td><td>dHR &gt; 32</td><td>Do not stay Calm through a large HR jump.</td></tr>
+      <tr><td>Force score 22</td><td>dHR &gt; 36</td><td>Same +36 that hits the severe line from HR alone.</td></tr>
+      <tr><td>Abort extra gate</td><td>score 22 and dHR 20</td><td>Stricter than a naive 18+.</td></tr>
+      <tr><td>No abort at start</td><td>20 s grace</td><td>Donning the headset is not panic.</td></tr>
+      <tr><td>Lower-stage cooldown</td><td>8 s</td><td>No flickering every sample.</td></tr>
+      <tr><td>Polar port</td><td>UDP 7878</td><td>Python bridge on the same PC.</td></tr>
+      <tr><td>Emergency</td><td>A or X</td><td>Not AI.</td></tr>
+    </table>
+
+    <h2>6. Why we chose those values</h2>
+    <p>Three buckets. If you mix them, they will think you made the SRS up after coding.</p>
+
+    <h3>From the SRS (we implemented the spec)</h3>
+    <ul>
+      <li>Formula 0.5 / 0.3 / 0.2</li>
+      <li>Classes Calm / Panic / Severe at 10 and 18</li>
+      <li>Actions continue / repeat level / Safe Room</li>
+      <li>1-second sampling, 15-second time window</li>
+      <li>AI named as Decision Tree or Random Forest - we took the tree</li>
+    </ul>
+
+    <h3>From physiology plus Polar in a headset</h3>
+    <ul>
+      <li>Adult rest is roughly 60-100 BPM. Our rest band is 55-95 because seated Polar in VR sits high, often 70-95, not a lying-down lab 60.</li>
+      <li>Stage 3 ceiling 95 = top of that rest band, so a calm patient is not punished into Beginner.</li>
+      <li>Stage 2 ceiling 108 = mild tachycardia. Higher rest means start easy.</li>
+      <li>With movement zero, PanicScore = 0.5 x dHR, so the SRS integers 10 and 18 are a +20 BPM rise and a +36 BPM rise. +20 over personal rest is a real sympathetic bump while seated. +36 on a 75 rest is 111 BPM, tachycardia.</li>
+      <li>Heart rate gets 50% because Polar H10 is chest ECG. Head movement is 30% because looking around a 360 photo is noisy. Time is 20% so a 1-second spike is not a panic attack.</li>
+    </ul>
+
+    <h3>Safety we added after live tests</h3>
+    <ul>
+      <li>SRS said immediate evaluate around dHR 25-28. Live Polar fidgeted into that too easily, so code uses 32 and 36.</li>
+      <li>Abort needs score 22 and dHR 20 and 20 s grace, not every 18+.</li>
+      <li>We lower difficulty in-session. We do not raise it in-session. VRET should not spike while they are inside the stimulus.</li>
+    </ul>
+    <div class="say">
+      Short version: “SRS gave the formula and the three classes. Polar in VR set the rest gates at 95 and 108. Safety tests set 32, 36, and the 20-second grace. None of this is a trained neural net.”
+    </div>
+
+    <h2>7. Questioning: AI and thresholds</h2>
+    <p>This is the main block. Answer in two or three sentences. Offer the file name if they want to see code: <code>PanicDetectionService.cs</code> and <code>ExposureStageAdvisor.cs</code>.</p>
+
+    <p class="q">This is not AI. It is just if-else.</p>
+    <p class="a">A decision tree at runtime is nested if-else. ID3 and CART produce the same shape. Ours is a knowledge-based tree: features from Polar and the headset, classes from the SRS, actions that change the session. Russell and Norvig define AI as agents that perceive and act. ISO 22989 is recommendations for a human-defined goal. Machine learning is one subfield, not the definition. Our SRS literally says AI (Decision Tree / Random Forest).</p>
+
+    <p class="q">Where is the model file?</p>
+    <p class="a">There is none. The model is the code. Same inputs always give the same stage and the same recommendation. For a safety loop that is a strength.</p>
+
+    <p class="q">How can you call a formula AI?</p>
+    <p class="a">The formula is the scoring function. The AI is score plus tree plus action. Hospitals do the same with early-warning scores: weighted vitals, then a protocol. 0.5 dHR + 0.3 movement + 0.2 time is that score.</p>
+
+    <p class="q">Where did 0.5, 0.3, 0.2 come from?</p>
+    <p class="a">SRS section 3.2.5 and UC-10. We did not fit them with gradient descent. Heart rate is half because Polar H10 is the clinical-grade channel. Movement supports it. Time stops a blink of tachycardia counting as panic. They sum to 1 so they are percentages of influence.</p>
+
+    <p class="q">How did you choose 10 and 18?</p>
+    <p class="a">They are the SRS classification bands. They also match physiology: if the patient is still, score is 0.5 times the rise in BPM, so 10 means +20 over their own baseline and 18 means +36. We did not pick 10 and 18 as round exam numbers after the fact. The spec and the heart-rate math agree.</p>
+
+    <p class="q">How did you choose 95 and 108 for starting stage?</p>
+    <p class="a">95 is the top of our resting band 55-95. Live Polar rest in the headset is usually 70-95, so a calm person can still get Advanced. 108 is mild tachycardia. Above that, Tree A starts them at Beginner. Movement 16 and 28 is the second test on the same tree.</p>
+
+    <p class="q">Are these thresholds accurate?</p>
+    <p class="a">Polar BPM is accurate as a chest ECG strap. The classes are a transparent heuristic, not a DSM-5 diagnosis and not an F1 score. We have no labelled panic corpus. What we can claim: personal baseline, reproducible rules, and a safety bias (false lower-stage is better than missed distress). Tools, PRT, Run SRS Logic Tests checks the formula without a headset.</p>
+
+    <p class="q">Is the stress even real?</p>
+    <p class="a">On the graphs, stress is PanicScore, a proxy for sympathetic arousal relative to that session’s baseline. It is believable because the input is live Polar, because it is dHR not raw BPM, and because you can watch it rise if the wearer stands or breathes fast. It is not cortisol and not a psychologist’s SUDS rating. We say proxy, not diagnosis.</p>
+
+    <p class="q">Why not Random Forest or a neural net?</p>
+    <p class="a">A forest needs labelled rows of (dHR, HM, TS, what a clinician said). We do not have that. Training on ten classmates would overfit and would be a worse thing to put on a Safe Room abort. The SRS allowed Decision Tree or Random Forest. We shipped the tree so we can walk every branch. Future work is log SUDS and compare a trained model against this expert tree, keeping this tree as fallback.</p>
+
+    <p class="q">Why is heart rate weighted more than movement?</p>
+    <p class="a">Polar H10 is ECG. Headset motion in a 360 photo includes ordinary looking around. If we weighted movement first, exploring the scene would look like panic. Time spent only accumulates when dHR is above 16 or movement is 2.4 times baseline, so a glance does not fill the 20% term either.</p>
+
+    <p class="q">Walk through a number.</p>
+    <p class="a">Baseline 75, now 95, sitting still, no stress seconds: dHR = 20, score = 10, class = Panic Detected, AI says Repeat Level, after 8 seconds we drop one stage. Same person at 111 BPM: dHR = 36, score forced to 22, Severe, Safe Room if 20 seconds have passed. That is the board example. Use it.</p>
+
+    <p class="q">What can you change later?</p>
+    <p class="a">Weights, 10 and 18, 95 and 108, 32 and 36, the 20-second grace, the 8-second cooldown. Those are constants. We would change them with labelled sessions, not by gut on demo day. We would not turn manual Beginner buttons back on for the default patient path.</p>
+
+    <p class="q">Why 60 seconds baseline, not 8 minutes?</p>
+    <p class="a">An early requirements paragraph said 8 minutes. The use case we implemented is 1 minute before each 2-minute exposure, so the baseline matches this session’s rest, including today’s caffeine or nerves. Long clinical intake is out of scope.</p>
+
+    <p class="q">Why can it lower difficulty but not raise it during the 2 minutes?</p>
+    <p class="a">Safety. If they are coping, the HUD may recommend a higher stage after this session. Jumping Advanced while they are still on the balcony would violate graded exposure.</p>
+
+    <p class="q">What if they freeze instead of fidgeting?</p>
+    <p class="a">We track freeze. It is not in the panic formula. That is a real gap. A still, terrified patient is scored mainly from heart rate, and they still have A/X. We do not pretend freeze is solved.</p>
+
+    <p class="q">Caffeine, athletes, beta blockers?</p>
+    <p class="a">Baseline eats resting differences. We classify change, not 72 vs 90. Drugs that flatten HR make the tree conservative. Emergency still works.</p>
+
+    <p class="q">Is this a medical device?</p>
+    <p class="a">No. Student VRET prototype with a documented decision policy. Not FDA, not a diagnosis.</p>
+
+    <h2>8. If they wander off AI</h2>
+    <p>Keep answers short and steer back. They said the focus would be AI; do not volunteer a 10-minute XR lecture.</p>
+
+    <p class="q">Why 360 photos, not a 3D city?</p>
+    <p class="a">One skybox, stable 90 Hz, small build. Intensity is exposure on the material, and darkness has three images by stage. The AI still has a real stimulus.</p>
+
+    <p class="q">Why world-space UI?</p>
+    <p class="a">Screen-space overlay is invisible in the headset. We convert to world space, scale about 0.001, XRI laser. Grip drags the menu.</p>
+
+    <p class="q">How does Polar reach Unity?</p>
+    <p class="a">Python bleak on the PC reads BLE, UDP 7878 to Unity. Quest Link. Not a Quest-only APK path.</p>
+
+    <p class="q">Where is data stored?</p>
+    <p class="a">JSON locally, Supabase when online. Offline session still saves.</p>
+
+    <p class="q">Appointments?</p>
+    <p class="a">Out of scope. Do not apologize at length.</p>
+
+    <p class="q">Why Unity coroutines?</p>
+    <p class="a">Unity is one game thread. Sleep would freeze the headset. Timers yield.</p>
+
+    <p class="q">Show tests.</p>
+    <p class="a">Tools -&gt; PRT -&gt; Run SRS Logic Tests. Calm &lt; 10, large dHR can force Safe Room, elevated baseline cannot start Advanced.</p>
+
+    <h2>9. What we admit (this helps)</h2>
+    <ul>
+      <li>Not a trained Random Forest.</li>
+      <li>Not diagnostic accuracy, no ROC curve.</li>
+      <li>Appointments not built.</li>
+      <li>Live Polar needs the PC bridge.</li>
+      <li>Freeze is tracked and unused in the score.</li>
+      <li>Old write-ups that say 20 s / 30 s are stale. Code is 60 / 120.</li>
+    </ul>
+    <div class="never">
+      Never: machine learning, trained model, 90% accurate, “the AI thinks,” live Polar on a standalone APK, appointments are coming next week.
+    </div>
+
+    <h2>10. Close</h2>
+    <p>When they wind down, do not add new features. Repeat the same sentence as the opening, with the numbers filled in.</p>
+    <div class="say">
+      “We showed a live Polar baseline, a decision tree choosing the start stage, and the same tree scoring stress every second with 0.5, 0.3, 0.2. Thresholds 10 and 18 are the SRS bands and they match +20 and +36 BPM. 95 and 108 are rest gates for Tree A. Abort is conservative: 22, +20 BPM, and 20 seconds of grace. Emergency is human. That is the AI we are defending.”
+    </div>
+    <p>If two of you answer the same question, the second person only adds a number or a file name. Do not restart the speech.</p>
+  </div>
+</body>
+</html>

@@ -5,6 +5,7 @@ using System.Collections;
 using PhobiaReliefTherapy.Data;
 using PhobiaReliefTherapy.Managers;
 using PhobiaReliefTherapy.Theme;
+using PhobiaReliefTherapy.UI;
 using PhobiaReliefTherapy;
 using PhobiaReliefTherapy.Bootstrap;
 
@@ -34,6 +35,7 @@ namespace PhobiaReliefTherapy.Therapy
             VRManager.Instance.InitializeVR();
 
             PopulateSummary();
+            StyleCommentsField();
             LocalSessionStore.PersistFromCurrentMetrics();
 
             if (saveButton != null)
@@ -54,6 +56,7 @@ namespace PhobiaReliefTherapy.Therapy
         private System.Collections.IEnumerator ShowFeedbackInHeadset()
         {
             yield return null;
+            yield return null;
 
             Transform card = titleText != null ? titleText.transform.parent : null;
             if (card == null && summaryText != null)
@@ -62,44 +65,117 @@ namespace PhobiaReliefTherapy.Therapy
                 yield break;
 
             Canvas oldCanvas = card.GetComponentInParent<Canvas>();
+            var worldGo = GameObject.Find("FeedbackWorldCanvas");
+            if (worldGo == null)
+                worldGo = new GameObject("FeedbackWorldCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
 
-            var worldGo = new GameObject("FeedbackWorldCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             var worldCanvas = worldGo.GetComponent<Canvas>();
             worldCanvas.renderMode = RenderMode.WorldSpace;
-            worldCanvas.sortingOrder = 80;
+            worldCanvas.sortingOrder = 120;
             var scaler = worldGo.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
             scaler.scaleFactor = 1f;
+
             var worldRect = worldGo.GetComponent<RectTransform>();
             worldRect.sizeDelta = new Vector2(1000f, 820f);
+            worldRect.anchorMin = worldRect.anchorMax = new Vector2(0.5f, 0.5f);
+            worldRect.pivot = new Vector2(0.5f, 0.5f);
 
             card.SetParent(worldGo.transform, false);
+            card.localScale = Vector3.one;
+            card.localRotation = Quaternion.identity;
             var cardRect = card.GetComponent<RectTransform>();
             if (cardRect != null)
             {
                 cardRect.anchorMin = cardRect.anchorMax = new Vector2(0.5f, 0.5f);
+                cardRect.pivot = new Vector2(0.5f, 0.5f);
                 cardRect.anchoredPosition = Vector2.zero;
-                if (cardRect.sizeDelta.x < 200f)
-                    cardRect.sizeDelta = new Vector2(900f, 720f);
+                cardRect.sizeDelta = new Vector2(900f, 720f);
             }
 
-            if (oldCanvas != null && oldCanvas != worldCanvas)
+            card.gameObject.SetActive(true);
+            worldGo.SetActive(true);
+
+            if (oldCanvas != null && oldCanvas.gameObject != worldGo)
                 oldCanvas.enabled = false;
 
+            PhobiaReliefTherapy.VR.VrWorldMenu.EnsureVrRaycaster(worldCanvas);
+
             float waited = 0f;
-            while (waited < 2.5f)
+            while (waited < 4f)
             {
                 Camera cam = PhobiaReliefTherapy.VR.VrWorldMenu.FindVrCamera();
                 if (cam != null)
                 {
                     worldCanvas.worldCamera = cam;
-                    PhobiaReliefTherapy.VR.VrWorldMenu.AttachAndPlace(worldCanvas, cam, recenterIfLoose: true);
-                    PhobiaReliefTherapy.VR.VrWorldMenu.PlaceInFront(worldCanvas, cam, 1.3f);
+                    var dragger = worldGo.GetComponent<PhobiaReliefTherapy.VR.VRMenuDragger>();
+                    if (dragger == null || !dragger.UserPlaced)
+                    {
+                        PhobiaReliefTherapy.VR.VrWorldMenu.PlaceInFront(worldCanvas, cam, 1.25f, ignoreSavedPose: true);
+                        PhobiaReliefTherapy.VR.VrWorldMenu.AttachAndPlace(worldCanvas, cam, recenterIfLoose: false);
+                    }
+                    else
+                    {
+                        PhobiaReliefTherapy.VR.VrWorldMenu.EnsureVrRaycaster(worldCanvas);
+                        dragger.RefreshCollider();
+                    }
                 }
 
                 waited += Time.deltaTime;
                 yield return null;
             }
+        }
+
+        private void StyleCommentsField()
+        {
+            if (commentsInput == null)
+                return;
+
+            var dark = new Color(0.075f, 0.082f, 0.102f, 1f);
+            var themeable = commentsInput.GetComponent<ThemeableUI>();
+            if (themeable == null)
+                themeable = commentsInput.gameObject.AddComponent<ThemeableUI>();
+            themeable.elementType = UIElementType.InputField;
+            themeable.overrideTypography = true;
+            themeable.ApplyTheme();
+
+            foreach (var img in commentsInput.GetComponentsInChildren<Image>(true))
+            {
+                if (img == null)
+                    continue;
+                var gradient = img.GetComponent<UIGradient>();
+                if (gradient != null)
+                    Destroy(gradient);
+                img.color = dark;
+                img.raycastTarget = img.gameObject == commentsInput.gameObject;
+            }
+
+            var rootImage = commentsInput.GetComponent<Image>();
+            if (rootImage != null)
+            {
+                rootImage.color = dark;
+                rootImage.raycastTarget = true;
+            }
+
+            if (commentsInput.textComponent != null)
+            {
+                var text = commentsInput.textComponent;
+                text.color = Color.white;
+                text.fontSize = 20;
+                text.alignment = TextAlignmentOptions.Left;
+                ClinicalUIFactory.Stretch(text.rectTransform, 14f, 8f);
+            }
+
+            if (commentsInput.placeholder is TextMeshProUGUI placeholder)
+            {
+                placeholder.color = new Color(0.86f, 0.88f, 0.92f, 0.65f);
+                placeholder.fontSize = 20;
+                placeholder.fontStyle = FontStyles.Italic;
+                ClinicalUIFactory.Stretch(placeholder.rectTransform, 14f, 8f);
+            }
+
+            commentsInput.caretColor = new Color32(255, 87, 34, 255);
+            commentsInput.selectionColor = new Color32(255, 87, 34, 60);
         }
 
         private void AutoBindMissingFields()
@@ -182,6 +258,7 @@ namespace PhobiaReliefTherapy.Therapy
             }
 
             yield return new WaitForSeconds(0.8f);
+            LocalSessionStore.ClearOpenSession();
             SceneLoader.Instance.LoadScene("DashboardScene");
         }
     }

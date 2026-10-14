@@ -333,38 +333,38 @@ public static class AuthSceneBuilder
     private static void ArrangeLoginLayout(RectTransform title, RectTransform email, RectTransform password, RectTransform forgotPasswordButton, RectTransform loginButton, RectTransform createAccountButton, RectTransform errorText)
     {
         title.anchorMin = new Vector2(0.08f, 0.80f);
-        title.anchorMax = new Vector2(0.92f, 0.90f);
+        title.anchorMax = new Vector2(0.92f, 0.92f);
         title.offsetMin = Vector2.zero;
         title.offsetMax = Vector2.zero;
 
-        email.anchorMin = new Vector2(0.20f, 0.63f);
-        email.anchorMax = new Vector2(0.80f, 0.63f);
-        email.sizeDelta = new Vector2(0, 48);
+        email.anchorMin = new Vector2(0.18f, 0.70f);
+        email.anchorMax = new Vector2(0.82f, 0.70f);
+        email.sizeDelta = new Vector2(0, 46);
         email.anchoredPosition = Vector2.zero;
 
-        password.anchorMin = new Vector2(0.20f, 0.47f);
-        password.anchorMax = new Vector2(0.80f, 0.47f);
-        password.sizeDelta = new Vector2(0, 48);
+        password.anchorMin = new Vector2(0.18f, 0.58f);
+        password.anchorMax = new Vector2(0.82f, 0.58f);
+        password.sizeDelta = new Vector2(0, 46);
         password.anchoredPosition = Vector2.zero;
 
-        forgotPasswordButton.anchorMin = new Vector2(0.20f, 0.37f);
-        forgotPasswordButton.anchorMax = new Vector2(0.80f, 0.37f);
-        forgotPasswordButton.sizeDelta = new Vector2(0, 28);
+        forgotPasswordButton.anchorMin = new Vector2(0.22f, 0.46f);
+        forgotPasswordButton.anchorMax = new Vector2(0.78f, 0.46f);
+        forgotPasswordButton.sizeDelta = new Vector2(0, 26);
         forgotPasswordButton.anchoredPosition = Vector2.zero;
 
-        loginButton.anchorMin = new Vector2(0.5f, 0.28f);
-        loginButton.anchorMax = new Vector2(0.5f, 0.28f);
-        loginButton.sizeDelta = new Vector2(240, 54);
+        loginButton.anchorMin = new Vector2(0.22f, 0.33f);
+        loginButton.anchorMax = new Vector2(0.78f, 0.33f);
+        loginButton.sizeDelta = new Vector2(0, 44);
         loginButton.anchoredPosition = Vector2.zero;
 
-        createAccountButton.anchorMin = new Vector2(0.10f, 0.16f);
-        createAccountButton.anchorMax = new Vector2(0.90f, 0.16f);
-        createAccountButton.sizeDelta = new Vector2(0, 30);
+        createAccountButton.anchorMin = new Vector2(0.22f, 0.18f);
+        createAccountButton.anchorMax = new Vector2(0.78f, 0.18f);
+        createAccountButton.sizeDelta = new Vector2(0, 44);
         createAccountButton.anchoredPosition = Vector2.zero;
 
-        errorText.anchorMin = new Vector2(0.10f, 0.06f);
-        errorText.anchorMax = new Vector2(0.90f, 0.06f);
-        errorText.sizeDelta = new Vector2(0, 30);
+        errorText.anchorMin = new Vector2(0.12f, 0.09f);
+        errorText.anchorMax = new Vector2(0.88f, 0.09f);
+        errorText.sizeDelta = new Vector2(0, 28);
         errorText.anchoredPosition = Vector2.zero;
     }
 
@@ -390,19 +390,19 @@ public static class AuthSceneBuilder
         password.sizeDelta = new Vector2(0, 48);
         password.anchoredPosition = Vector2.zero;
 
-        registerButton.anchorMin = new Vector2(0.5f, 0.25f);
-        registerButton.anchorMax = new Vector2(0.5f, 0.25f);
-        registerButton.sizeDelta = new Vector2(240, 54);
+        registerButton.anchorMin = new Vector2(0.22f, 0.33f);
+        registerButton.anchorMax = new Vector2(0.78f, 0.33f);
+        registerButton.sizeDelta = new Vector2(0, 44);
         registerButton.anchoredPosition = Vector2.zero;
 
-        loginButton.anchorMin = new Vector2(0.10f, 0.14f);
-        loginButton.anchorMax = new Vector2(0.90f, 0.14f);
-        loginButton.sizeDelta = new Vector2(0, 30);
+        loginButton.anchorMin = new Vector2(0.22f, 0.18f);
+        loginButton.anchorMax = new Vector2(0.78f, 0.18f);
+        loginButton.sizeDelta = new Vector2(0, 26);
         loginButton.anchoredPosition = Vector2.zero;
 
-        errorText.anchorMin = new Vector2(0.10f, 0.06f);
-        errorText.anchorMax = new Vector2(0.90f, 0.06f);
-        errorText.sizeDelta = new Vector2(0, 30);
+        errorText.anchorMin = new Vector2(0.12f, 0.09f);
+        errorText.anchorMax = new Vector2(0.88f, 0.09f);
+        errorText.sizeDelta = new Vector2(0, 28);
         errorText.anchoredPosition = Vector2.zero;
     }
 

@@ -20,7 +20,7 @@ namespace PhobiaReliefTherapy.Therapy
         public Material darknessSkyboxMaterial;
 
         [Header("Settings")]
-        public float exposureDuration = 30f;
+        public float exposureDuration = 120f;
 
         private Texture2D darknessTexture;
         private Sprite darknessSprite;
@@ -97,7 +97,7 @@ namespace PhobiaReliefTherapy.Therapy
         {
             if (sessionEnded) return;
             sessionEnded = true;
-            Debug.Log($"Safety triggered: {evaluation.Classification} — {evaluation.AiRecommendation}");
+            Debug.Log($"Safety triggered: {evaluation.Classification} - {evaluation.AiRecommendation}");
             TherapySessionHelper.AbortToSafeRoom(true);
         }
 
@@ -419,7 +419,7 @@ namespace PhobiaReliefTherapy.Therapy
                     timerRect.sizeDelta = new Vector2(300f, 80f);
 
                     timerText = timerGO.GetComponent<TextMeshProUGUI>();
-                    timerText.text = "30s";
+                    timerText.text = $"{SessionTiming.ExposureSeconds:0}s";
                     timerText.alignment = TextAlignmentOptions.TopRight;
 
                     ThemeableUI timerTheme = timerGO.AddComponent<ThemeableUI>();

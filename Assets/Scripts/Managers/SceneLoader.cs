@@ -80,6 +80,12 @@ namespace PhobiaReliefTherapy.Managers
         /// </summary>
         public void LoadScene(string sceneName)
         {
+            if (string.IsNullOrEmpty(sceneName))
+            {
+                Debug.LogError("SceneLoader: empty scene name.");
+                return;
+            }
+
             Debug.Log($"Transitioning to Scene: {sceneName}");
             StartCoroutine(TransitionCoroutine(sceneName));
         }
@@ -104,8 +110,15 @@ namespace PhobiaReliefTherapy.Managers
             }
 
             var op = SceneManager.LoadSceneAsync(sceneName);
-            while (op != null && !op.isDone)
-                yield return null;
+            if (op == null)
+            {
+                Debug.LogError("SceneLoader: could not load '" + sceneName + "'. Check Build Settings.");
+            }
+            else
+            {
+                while (!op.isDone)
+                    yield return null;
+            }
 
             yield return new WaitForSeconds(0.1f);
 

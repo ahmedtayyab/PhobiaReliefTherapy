@@ -6,7 +6,7 @@ namespace PhobiaReliefTherapy.Therapy
 {
     /// <summary>
     /// Selects exposure stage from baseline vitals and the user's requested difficulty (SRS §3.2.7 / UC-08).
-    /// Live Polar rest is typically 70–95 BPM; stage gates use that range, not a low-70s lab rest.
+    /// Live Polar rest is typically 70-95 BPM; stage gates use that range, not a low-70s lab rest.
     /// </summary>
     public static class ExposureStageAdvisor
     {
@@ -38,7 +38,7 @@ namespace PhobiaReliefTherapy.Therapy
             UserData.AiStageRecommendation =
                 $"AI selected Stage {finalStage} ({PhobiaCatalog.ToDifficultyLabel(UserData.SelectedDifficulty)})." + safetyNote;
 
-            Debug.Log($"ExposureStageAdvisor: Stage {UserData.CurrentStage} ({UserData.SelectedDifficulty}) — {UserData.AiStageRecommendation}");
+            Debug.Log($"ExposureStageAdvisor: Stage {UserData.CurrentStage} ({UserData.SelectedDifficulty}) - {UserData.AiStageRecommendation}");
         }
     }
 }

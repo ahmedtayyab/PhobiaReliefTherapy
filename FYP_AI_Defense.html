@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Phobia Relief Therapy - AI Defense Guide</title>
+  <style>
+    :root {
+      --ink: #1a2332;
+      --muted: #4a5568;
+      --line: #d6dde8;
+      --accent: #c2410c;
+      --paper: #ffffff;
+      --wash: #f7f5f2;
+      --code: #0f172a;
+      --ok: #166534;
+      --bad: #9f1239;
+    }
+    * { box-sizing: border-box; }
+    html { font-size: 11pt; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--wash);
+      font-family: "Segoe UI", "Calibri", "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.45;
+    }
+    .wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 32px 28px 64px;
+      background: var(--paper);
+      box-shadow: 0 0 0 1px var(--line);
+    }
+    h1 {
+      font-size: 22pt;
+      line-height: 1.2;
+      margin: 0 0 6px;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      font-size: 13pt;
+      color: var(--accent);
+      font-weight: 700;
+      margin: 0 0 16px;
+    }
+    h2 {
+      font-size: 14pt;
+      margin: 28px 0 10px;
+      padding-top: 10px;
+      border-top: 2px solid var(--ink);
+      page-break-after: avoid;
+    }
+    h3 {
+      font-size: 12pt;
+      margin: 18px 0 8px;
+      color: var(--accent);
+      page-break-after: avoid;
+    }
+    p { margin: 0 0 10px; }
+    ul, ol { margin: 0 0 12px; padding-left: 1.3em; }
+    li { margin: 0 0 4px; }
+    strong { font-weight: 700; }
+    code, pre {
+      font-family: "Cascadia Mono", "Consolas", "Courier New", monospace;
+      font-size: 9.5pt;
+    }
+    code {
+      background: #f1f3f7;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+    pre {
+      background: var(--code);
+      color: #e2e8f0;
+      padding: 12px 14px;
+      border-radius: 6px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      page-break-inside: avoid;
+    }
+    .note {
+      background: #fff7ed;
+      border-left: 4px solid var(--accent);
+      padding: 10px 12px;
+      margin: 0 0 14px;
+    }
+    .say {
+      background: #ecfdf5;
+      border-left: 4px solid #166534;
+      padding: 10px 12px;
+      margin: 0 0 14px;
+    }
+    .never {
+      background: #fff1f2;
+      border-left: 4px solid #9f1239;
+      padding: 10px 12px;
+      margin: 0 0 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 0 14px;
+      font-size: 10pt;
+      page-break-inside: auto;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #1a2332;
+      color: #fff;
+      font-weight: 600;
+    }
+    tr:nth-child(even) td { background: #f8fafc; }
+    .meta { color: var(--muted); font-size: 10pt; margin-bottom: 18px; }
+    .print-hint {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      padding: 10px 12px;
+      margin-bottom: 18px;
+      border-radius: 6px;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 8.5pt;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 3px;
+      margin-right: 6px;
+    }
+    .tag-say { background: #dcfce7; color: #166534; }
+    .tag-never { background: #ffe4e6; color: #9f1239; }
+    .toc { columns: 2; column-gap: 24px; font-size: 10.5pt; }
+    .toc li { break-inside: avoid; }
+    @media print {
+      body { background: #fff; }
+      .wrap { box-shadow: none; max-width: none; padding: 0; }
+      .print-hint { display: none; }
+      h2 { break-after: avoid; }
+      pre, table, .note, .say, .never { break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="print-hint"><strong>Make a PDF:</strong> press Ctrl+P -&gt; Destination: Save as PDF -&gt; turn on Background graphics -&gt; Save. Pair this with <code>FYP_Viva_Guide.html</code> (product + Polar). This file is only the AI claim.</p>
+
+    <h1>Phobia Relief Therapy in VR</h1>
+    <p class="subtitle">How to call this AI - and not get it rejected</p>
+    <p class="meta">Defense notes for the oral viva. Numbers match the live Unity code in <code>PanicDetectionService.cs</code>, <code>ExposureStageAdvisor.cs</code>, and <code>HeartRateBleConstants.cs</code>. Do not quote older docs that still mention Random Forest training or 8-minute baseline.</p>
+
+    <div class="say">
+      <strong>The sentence that keeps the claim:</strong>
+      “Our AI is a knowledge-based clinical decision tree. It perceives Polar heart rate and headset movement, scores them with the SRS weighted formula, and recommends continue, lower intensity, or Safe Room. It is symbolic AI, not a trained neural network.”
+    </div>
+
+    <div class="never">
+      <strong>Never say:</strong> machine learning, deep learning, trained model, neural network, Random Forest we trained, 90% accuracy, medical diagnosis, DSM-5 panic, FDA device, “the AI thinks.”
+    </div>
+
+    <h2>Contents</h2>
+    <ol class="toc">
+      <li>The one-line claim</li>
+      <li>Why examiners reject “AI”</li>
+      <li>What AI legally and academically is</li>
+      <li>How our two trees are AI, with project facts</li>
+      <li>How the formula is part of the AI</li>
+      <li>Where the formula came from</li>
+      <li>How thresholds were chosen</li>
+      <li>Worked numbers (board)</li>
+      <li>Are they accurate?</li>
+      <li>Is the stress score believable?</li>
+      <li>What can be modified</li>
+      <li>Why not Random Forest</li>
+      <li>What the AI does not do</li>
+      <li>Likely examiner questions</li>
+      <li>Cite these if pushed</li>
+    </ol>
+
+    <h2>1. The one-line claim</h2>
+    <p>Call the system <strong>rule-based / knowledge-based AI</strong>, implemented as <strong>two explicit decision trees</strong> plus a <strong>weighted panic score</strong>. The SRS (UC-10) names this component “AI (Decision Tree / Random Forest).” We shipped the Decision Tree option because we do not have a labelled clinical dataset.</p>
+    <p>That is still AI. Machine learning is one subfield of AI, not the definition of AI.</p>
+
+    <table>
+      <tr><th>Layer</th><th>What it is in this project</th><th>File</th></tr>
+      <tr><td>Perception</td><td>Polar H10 BPM every second; headset rotation, travel, jerk</td><td>SensorManager, HeadMovementTracker</td></tr>
+      <tr><td>Internal state</td><td>60 s personal baseline HR and movement</td><td>BaselineManager, SessionMetrics</td></tr>
+      <tr><td>Feature score</td><td>PanicScore = 0.5 dHR + 0.3 HM + 0.2 TS</td><td>PanicDetectionService</td></tr>
+      <tr><td>Classifier tree B</td><td>score -&gt; Calm / Panic / Severe -&gt; action</td><td>PanicDetectionService, AdaptiveExposureController</td></tr>
+      <tr><td>Classifier tree A</td><td>rest BPM + movement -&gt; stage 1 / 2 / 3</td><td>ExposureStageAdvisor</td></tr>
+      <tr><td>Actuation</td><td>lower skybox intensity, or abort to Safe Room</td><td>TherapySessionHelper</td></tr>
+    </table>
+    <p>Russell and Norvig define an intelligent agent as something that <em>perceives</em> an environment and <em>acts</em> to achieve goals. That is this pipeline. The goal is safe graded exposure, not “sound smart.”</p>
+
+    <h2>2. Why examiners reject “AI”</h2>
+    <p>They reject it when students use the word as branding: a few if-statements, no mapping to a known AI method, and a claim of training that the repo cannot show.</p>
+    <p>You will not be rejected if you do three things:</p>
+    <ol>
+      <li><strong>Name the method:</strong> knowledge-engineered decision tree (expert system), not “an AI model.”</li>
+      <li><strong>Show the artefact:</strong> walk the if-statements in two C# files. There is no .pkl or .onnx. That is a feature (inspectable), not a missing file.</li>
+      <li><strong>Stay inside the SRS:</strong> UC-10 allowed Decision Tree <em>or</em> Random Forest. Choosing the tree is a documented engineering decision, not a downgrade they can fail you on.</li>
+    </ol>
+    <p>If someone says “this is just if-else,” answer: “Yes. A decision tree at inference time <em>is</em> nested if-else. ID3 and CART produce the same shape. Ours was written by domain rules instead of information gain because we have no labelled panic corpus.”</p>
+
+    <h2>3. What AI is (so the claim is not a slogan)</h2>
+    <p>Use this stack of definitions. They are stronger than “ChatGPT is AI so we are AI.”</p>
+    <table>
+      <tr><th>Source</th><th>What it lets you say</th></tr>
+      <tr><td>Russell and Norvig, AIMA</td><td>AI includes search, logic, expert systems, and learning. Learning is optional.</td></tr>
+      <tr><td>ISO/IEC 22989</td><td>An AI system makes predictions, recommendations, or decisions for human-defined objectives. Ours recommends continue / repeat / stop.</td></tr>
+      <tr><td>MYCIN (Shortliffe) / CDSS</td><td>Hospital expert systems were AI for decades with rules and thresholds, no neural nets.</td></tr>
+      <tr><td>Quinlan ID3 / CART</td><td>Decision trees are a canonical AI classifier. Inference is a path of tests.</td></tr>
+      <tr><td>Our SRS UC-10</td><td>The requirement text is “Uses AI (Decision Tree/Random Forest) to classify panic level and recommend action.”</td></tr>
+    </table>
+    <p>Hospital scores such as NEWS, GCS, and Apgar are weighted vitals plus bands. Nobody calls them neural nets. They are still decision support. Ours is the same family, wired into VR.</p>
+    <div class="note">
+      ISO language is useful if a panelist treats “AI” as only deep learning. Read it as: defined objective (safe VRET) + recommendations + decisions. That is the standard, not Twitter.
+    </div>
+
+    <h2>4. How the decision trees are AI in our case</h2>
+    <p>A decision tree maps features to a class by testing thresholds. We have two trees. Both are deterministic: same inputs, same output, every time. That is required for a safety-adjacent FYP. A black box that sometimes sends someone to the Safe Room and sometimes does not would be harder to defend.</p>
+
+    <h3>Tree A - starting stage (before exposure)</h3>
+    <p><strong>Job:</strong> pick Beginner / Intermediate / Advanced from the 60-second baseline average. Manual stage buttons are hidden (<code>AllowManualStageSelection = false</code>).</p>
+    <pre>features:  baselineBPM, baselineHeadMovement
+classes:   1 Beginner, 2 Intermediate, 3 Advanced
+
+if BPM &lt;= 95  and movement &lt;= 16  -&gt; Stage 3
+else if BPM &lt;= 108 and movement &lt;= 28 -&gt; Stage 2
+else                                -&gt; Stage 1</pre>
+    <p><strong>Facts from the code:</strong></p>
+    <ul>
+      <li>95 is <code>StageAdvancedMaxBpm</code>, also the top of our resting band 55-95.</li>
+      <li>108 is <code>StageIntermediateMaxBpm</code>.</li>
+      <li>Live Polar seated rest in the headset is typically 70-95, not a textbook 60. The gates were set so a calm patient can still receive Advanced. A 70 BPM / low-movement baseline is Stage 3. An 88 BPM calm Polar rest is still Stage 3. 95 BPM with high movement (40) is Stage 1. These cases are in <code>SrsLogicTests</code>.</li>
+    </ul>
+
+    <h3>Tree B - live recommendation (during the 120 s exposure)</h3>
+    <p><strong>Job:</strong> every 1 second, classify the panic score and act.</p>
+    <pre>features:  PanicScore, deltaHR, consecutiveStressSeconds
+classes:   Calm Stress | Panic Detected | Severe Panic
+actions:   Continue | Lower stage by 1 | Return to Safe Room
+
+if score &lt; 10           -&gt; Continue Exposure
+else if score &lt; 18      -&gt; Repeat Level (lower stage, 8 s cooldown)
+else                    -&gt; Stop / Safe Room
+                           but only abort if score &gt;= 22
+                           AND deltaHR &gt;= 20
+                           AND 20 s grace has passed</pre>
+    <p>Extra reflex rules (still tree leaves, not a second model):</p>
+    <ul>
+      <li>deltaHR &gt; 36 forces score to at least 22 (immediate high risk).</li>
+      <li>deltaHR &gt; 32 and score still &lt; 10 lifts score to 10 (do not ignore a large HR jump just because the patient is sitting still).</li>
+    </ul>
+    <p>Calm does not auto-jump the skybox mid-session. After 20 s calm and 12 s since the last change, the HUD may recommend advancing <em>after this session</em>. That is conservative on purpose: VRET should not spike difficulty while the patient is still inside the stimulus.</p>
+
+    <h3>Why this is a tree, not “random ifs”</h3>
+    <ul>
+      <li>Features are named and shared with the SRS (dHR, HM, TS).</li>
+      <li>Classes are named and shared with the SRS (Calm Stress, Panic Detected, Severe Panic).</li>
+      <li>Actions are named and shared with the SRS (Continue, Repeat Level, Stop / Safe Room).</li>
+      <li>Every path is exclusive. A sample cannot be Calm and Severe at once.</li>
+      <li>You can draw it on the board as a tree with three leaves. That drawing <em>is</em> the model.</li>
+    </ul>
+
+    <h2>5. How the formula is AI</h2>
+    <p>The formula is not a neural net. Do not defend it as one. Defend it as the <strong>feature function</strong> (the scoring step) that the tree classifies.</p>
+    <pre>deltaHR     = currentBPM - personalBaselineBPM
+
+HM score    = 0 if movement is not above baseline
+            = min(100, (currentMove - baselineMove) / baselineMove x 45)
+
+TS score    = 0 if no stress seconds, or deltaHR &lt;= 5
+            = (stressSeconds / 15) x 100   if under 15 s
+            = 100                          if 15 s or more
+
+PanicScore  = 0.5 x deltaHR  +  0.3 x HM  +  0.2 x TS</pre>
+    <p>In classical AI this is:</p>
+    <ul>
+      <li>a <strong>linear discriminant</strong> (weighted sum of evidence), and</li>
+      <li>the same idea as a <strong>certainty factor / utility score</strong> in expert systems.</li>
+    </ul>
+    <p>Weights sum to 1.0, so they are percentages of influence, not magic numbers. Heart rate is half the vote because Polar H10 is an ECG chest strap, the most trustworthy channel we have. Head movement is 30% because looking around a 360 scene is noisy. Time spent is 20% so a 1-second spike is not treated the same as 15 seconds of elevated state (SRS: panic time under 15 s is acute stress; at 15 s the TS term saturates).</p>
+    <p>A stress second, in the session that actually changes intensity, is counted when <strong>deltaHR &gt; 16</strong> or movement &gt; <strong>2.4 x</strong> baseline movement (floor 15). That is <code>ExposureSessionMonitor</code>. The HUD graph is slightly more sensitive (deltaHR &gt; 10) for display only. If asked which one is “the AI,” answer: the monitor path. That is what lowers the stage and opens the Safe Room.</p>
+
+    <h2>6. Where the formula came from</h2>
+    <p><strong>Primary source:</strong> our own SRS, section 3.2.5 and use case UC-10.</p>
+    <pre>Panic Score = (dHR x 0.5) + (HM x 0.3) + (TS x 0.2)
+
+0-10   Calm Stress        Continue exposure
+10-18  Panic Detected     Repeat current difficulty
+18+    Severe Panic       Stop / teleport to Safe Room</pre>
+    <p>UC-10 was written in the requirements phase (created Sehar Saleem, revised Shehroz Abbas, March 2026). The implementation in C# is a faithful encoding of that requirement, plus a small number of safety gates we added after live Polar tests (see next section).</p>
+    <p><strong>It did not come from</strong> a downloaded sklearn model, a Kaggle notebook, or a paper’s exact coefficients. Say that honestly. What <em>did</em> come from literature is the <em>choice of signals</em>:</p>
+    <ul>
+      <li>VRET meta-analyses in our SRS references ([1] Morina 2015, [2] Opris 2012, [3] Powers and Emmelkamp 2008) treat VR exposure as clinically meaningful. They do not hand us 0.5 / 0.3 / 0.2, but they justify HR-monitored graded exposure.</li>
+      <li>Polar H10 developer guide and user manual ([4], [5] in the SRS) justify using chest ECG BPM as the primary physiological channel.</li>
+      <li>Sympathetic arousal in seated exposure shows up first as a rise over <em>that person’s</em> rest, which is why we subtract baseline instead of using raw BPM.</li>
+    </ul>
+    <p><strong>Why those weights, in one breath:</strong> “Heart rate is the clinical-grade sensor, so it dominates. Movement is a behavioural second channel. Duration stops us treating a blink of tachycardia as a panic attack. The SRS frozen those weights so the tree is reproducible.”</p>
+
+    <h2>7. How we selected the thresholds</h2>
+    <p>There are three groups. Keep them separate in the viva so you do not mix “SRS wrote this” with “we tuned this on Polar.”</p>
+
+    <h3>Group 1 - from the SRS (do not invent a story)</h3>
+    <table>
+      <tr><th>Value</th><th>SRS</th><th>Code</th></tr>
+      <tr><td>Weights 0.5 / 0.3 / 0.2</td><td>3.2.5, UC-10</td><td>PanicDetectionService</td></tr>
+      <tr><td>Bands 0-10, 10-18, 18+</td><td>3.2.5, UC-10</td><td>same</td></tr>
+      <tr><td>TS window 15 s</td><td>3.2.5 “panic time &lt; 15 s”</td><td>ComputeTimeSpentScore</td></tr>
+      <tr><td>Sample every 1 s</td><td>UC-10 normal flow</td><td>ExposureSessionMonitor</td></tr>
+    </table>
+
+    <h3>Group 2 - physiological, then confirmed on live Polar</h3>
+    <table>
+      <tr><th>Value</th><th>Why it is not arbitrary</th></tr>
+      <tr><td>Resting band 55-95 BPM</td><td>Adult rest is commonly cited around 60-100 (AHA-style range). Polar in a headset sits high in that band, so we used 55-95 rather than a lab 50-70.</td></tr>
+      <tr><td>Stage 3 max rest = 95</td><td>Top of our rest band. Calm Polar rest can still start Advanced.</td></tr>
+      <tr><td>Stage 2 max rest = 108</td><td>Mild tachycardia territory. Above this, start Beginner.</td></tr>
+      <tr><td>Therapy clamp 40-180</td><td>Plausible seated VR. Device clamp 30-220 is Polar’s spec.</td></tr>
+      <tr><td>Stress second at dHR &gt; 16</td><td>About a 0.5 x 16 = 8 point HR contribution, enough to matter, not every breath.</td></tr>
+      <tr><td>HM excess scaled x 45, cap 100</td><td>Puts movement on a 0-100 scale comparable to TS, so 0.3 x HM is not in a different unit system from 0.2 x TS.</td></tr>
+    </table>
+
+    <h3>Group 3 - safety bias we added (stricter than a naive read of 18+)</h3>
+    <p>SRS 3.2.5 said “if dHR &gt; 28, immediately evaluate.” UC-10 said “if dHR &gt; 25, high priority.” After watching live Polar rest sit in the 70-95 range, a +25 jump was too easy to hit from fidgeting. Code uses:</p>
+    <table>
+      <tr><th>Gate</th><th>Value</th><th>Intent</th></tr>
+      <tr><td>High-priority floor</td><td>dHR &gt; 32 lifts score to at least 10</td><td>Do not stay “Calm” through a large HR jump</td></tr>
+      <tr><td>Immediate severe floor</td><td>dHR &gt; 36 lifts score to at least 22</td><td>Matches 0.5 x 36 = 18, then forces the Safe Room band</td></tr>
+      <tr><td>Actual abort</td><td>score &gt;= 22 AND dHR &gt;= 20 AND 20 s grace</td><td>Putting the headset on must not teleport you</td></tr>
+      <tr><td>Lower-stage cooldown</td><td>8 s</td><td>No oscillation every sample</td></tr>
+    </table>
+    <p><strong>Viva line:</strong> “SRS gave the formula and the three classes. We kept those. Polar in VR forced us to raise the instantaneous dHR gates from 25/28 to 32/36, and to require a second condition plus a 20 s grace before Safe Room. That is safety engineering, not silent changing of the SRS classes.”</p>
+
+    <h2>8. Worked numbers (write these on the board)</h2>
+    <p>Assume baseline HR = 75, baseline movement high enough that HM term is 0 unless stated. Formula with HM = 0 and TS = 0 reduces to <strong>PanicScore = 0.5 x dHR</strong>.</p>
+    <table>
+      <tr><th>Now BPM</th><th>dHR</th><th>Score (HM=0, TS=0)</th><th>Class</th></tr>
+      <tr><td>76</td><td>1</td><td>0.5</td><td>Calm Stress</td></tr>
+      <tr><td>95</td><td>20</td><td>10.0</td><td>exactly the Panic Detected line</td></tr>
+      <tr><td>111</td><td>36</td><td>18.0, then forced to 22</td><td>Severe; abort possible after grace</td></tr>
+    </table>
+    <p>That is why 10 and 18 are not random. With heart rate alone:</p>
+    <ul>
+      <li>a <strong>+20 BPM</strong> rise over personal rest is the start of “Panic Detected.”</li>
+      <li>a <strong>+36 BPM</strong> rise is the start of “Severe,” which is also the immediate-evaluate gate.</li>
+    </ul>
+    <p>Seated rest to +20 BPM is a real sympathetic bump, not jogging. +36 BPM on a 75 rest is 111 BPM, which is tachycardia. The bands line up with physiology even though they were specified as integers in the SRS.</p>
+    <p>Add movement and time, and the same HR rise classifies earlier, which is the point of the extra channels.</p>
+    <pre>Example: baseline 75, now 95 (dHR=20), HM score=20, 9 stress seconds
+TS = 9/15 x 100 = 60
+Score = 0.5x20 + 0.3x20 + 0.2x60 = 10 + 6 + 12 = 28  -&gt; Severe
+Abort still needs score &gt;= 22 (yes) and dHR &gt;= 20 (yes) and 20 s grace.</pre>
+    <p>Unit checks: Unity menu <strong>Tools -&gt; PRT -&gt; Run SRS Logic Tests</strong>. Calm at 76 BPM scores &lt; 10. 110 BPM with high movement scores &gt;= 10. dHR &gt; 36 can force Safe Room. Elevated baseline refuses Advanced.</p>
+
+    <h2>9. Are they accurate? What makes them accurate?</h2>
+    <p>Split the question or a hostile examiner will mix Polar accuracy with panic-diagnosis accuracy.</p>
+
+    <h3>What is accurate</h3>
+    <ol>
+      <li><strong>Heart rate measurement.</strong> Polar H10 is a chest-strap ECG device. Vendor docs in our SRS ([4], [5]) and independent validation papers treat it as among the most accurate consumer HR sensors at rest and moderate activity. We clamp 40-180 for therapy so a dropped packet cannot become a panic event.</li>
+      <li><strong>Personal baseline.</strong> Accuracy of a stress index is mostly accuracy of <em>change from that person</em>. A 90 BPM rest in an unfit adult is not panic. A jump from 70 to 90 can be. The 60 s average is the right comparator.</li>
+      <li><strong>Reproducibility.</strong> Same BPM, same movement, same stress seconds always yield the same class. That is a form of accuracy (precision / reliability) that a random forest on 40 student sessions would not have.</li>
+      <li><strong>Safety bias.</strong> In VRET, lowering intensity too soon is a better error than missing a spiral. The extra abort gates exist because false Safe Room is recoverable; missed severe distress is not.</li>
+    </ol>
+
+    <h3>What is not “accurate” in the ML sense</h3>
+    <ol>
+      <li>We have <strong>no ROC curve, no F1, no clinician-labelled panic corpus.</strong> Do not invent one.</li>
+      <li>The score is <strong>not a DSM-5 diagnosis</strong> and not a medical device output.</li>
+      <li>Weights were <strong>not fitted</strong> by gradient descent. They are expert weights from the SRS.</li>
+      <li>Caffeine, fitness, beta blockers, talking, and laggy BLE will move BPM without “panic.” Baseline plus multi-channel scoring reduces that. It does not eliminate it.</li>
+    </ol>
+    <div class="say">
+      <span class="tag tag-say">Say</span>
+      “The HR channel is device-accurate. The classification is a transparent heuristic aligned with the SRS and with sympathetic physiology. We did not claim clinical diagnostic accuracy. We claimed a consistent, inspectable decision policy.”
+    </div>
+    <div class="never">
+      <span class="tag tag-never">Never</span>
+      “Our model is 90% accurate at detecting panic attacks.”
+    </div>
+
+    <h2>10. Is the stress even accurate? Why is it believable?</h2>
+    <p>In this app, “stress” on graphs is <strong>PanicScore</strong> (session average / peak). It is a <strong>proxy for sympathetic arousal plus agitation</strong>, not cortisol, not GSR, not a psychologist’s SUDS rating.</p>
+    <p>It is believable for four engineering reasons, not because we hypnotized the panel:</p>
+    <ol>
+      <li><strong>It is live Polar, not mock, in the demo path.</strong> <code>LaptopPlaytest</code> is false. Exposure will not start without sensor packets. If BPM on the HUD matches the Python bridge window, the input is real.</li>
+      <li><strong>It is relative.</strong> Two patients with rest 62 and rest 88 can both look “normal” in absolute BPM. Only dHR treats them fairly.</li>
+      <li><strong>It is multi-modal.</strong> A noisy head turn without a HR rise does not fill TS (TS requires dHR &gt; 5). A HR rise while the head is still still scores from the 0.5 term and the dHR &gt; 32 floor.</li>
+      <li><strong>You can demonstrate it.</strong> Sit calm: score near 0. Stand up or breathe fast: Polar climbs, score crosses 10, HUD says Panic Detected, intensity can drop. That live coupling is what makes a heuristic believable in a viva.</li>
+    </ol>
+    <p>Honest limits (say these; they make you look safer, not weaker):</p>
+    <ul>
+      <li>Freeze behaviour is tracked (<code>FreezeScore</code>) but <strong>not</strong> in the panic formula. A frozen patient can be terrified. We bias toward agitation. That is a known gap. Emergency A / X still works.</li>
+      <li>Looking around a 360 photo raises movement. Baseline movement and the excess formula exist to discount “just looking.”</li>
+      <li>We do not use HRV (RMSSD) even though Polar H10 can stream it. BPM is what the SRS asked for. HRV is future work, not a missing bug.</li>
+      <li>Admin “avg stress” is mean PanicScore across sessions, with 10 and 18 drawn on the graph as the same bands the tree uses. That is consistent labelling, not a second AI.</li>
+    </ul>
+
+    <h2>11. What can be modified (and what must not)</h2>
+    <p>If they ask “is this frozen science?” say: “No. It is a parameterized expert policy. These constants are the knobs.”</p>
+    <table>
+      <tr><th>Knob</th><th>File</th><th>When you would turn it</th></tr>
+      <tr><td>0.5 / 0.3 / 0.2</td><td>PanicDetectionService</td><td>If a later study shows movement predicts better than HR in 360 photos</td></tr>
+      <tr><td>10 and 18 bands</td><td>same</td><td>If labelled SUDS data shows too many false panics</td></tr>
+      <tr><td>SafeRoom 22, dHR 32/36</td><td>same</td><td>If abort is too rare or too frequent on Polar</td></tr>
+      <tr><td>95 / 108 stage BPM</td><td>HeartRateBleConstants</td><td>Different population (athletes vs anxious rest)</td></tr>
+      <tr><td>Movement 16 / 28</td><td>ExposureStageAdvisor</td><td>If seated fidgeting is mis-read as high arousal</td></tr>
+      <tr><td>Stress second 16 BPM / 2.4x</td><td>ExposureSessionMonitor</td><td>TS filling too fast or too slow</td></tr>
+      <tr><td>20 s grace, 8 s cooldown</td><td>monitor / AdaptiveExposureController</td><td>Comfort vs responsiveness</td></tr>
+      <tr><td>60 s / 120 s</td><td>SessionTiming</td><td>Demo vs protocol length only</td></tr>
+    </table>
+    <p><strong>Do not modify on demo day:</strong> hiding of manual Beginner buttons, live-first Polar, Safe Room emergency, World Space UI. Those are product constraints, not AI knobs.</p>
+    <p><strong>Future upgrades that still keep the claim honest:</strong> add Polar HRV as a fourth term; collect SUDS (0-100) after each session and then, with enough labels, train a real tree or forest and compare it to this expert tree; keep the expert tree as the safety fallback.</p>
+
+    <h2>12. Why not Random Forest</h2>
+    <p>The SRS listed Decision Tree / Random Forest as alternatives. Forest is an ensemble of trees trained on labelled rows. We would need hundreds of samples of (dHR, HM, TS) tagged by a clinician or by a validated SUDS instrument. We do not have that dataset. Training on 10 lab-mates would overfit and would be less ethical to put in a panic abort path.</p>
+    <p>A forest also fails the viva question “show me why it chose Safe Room.” Our tree answers in one sentence. For a student VRET safety loop, interpretability beats a 2% maybe-gain in accuracy we cannot measure.</p>
+    <p>If they insist “the SRS said Random Forest”: “The SRS said Decision Tree <em>or</em> Random Forest. We implemented the tree, which is the model class you can justify without fabricated labels. UC-10 special requirements even said ‘AI model trained on panic data’ as a wish. The functional classification table is what we shipped.”</p>
+
+    <h2>13. What the AI does not do</h2>
+    <ul>
+      <li>It does not replace a therapist or diagnose phobia.</li>
+      <li>It does not run on a standalone Quest APK with live Polar (PC bridge + Quest Link).</li>
+      <li>It does not use Unity ML-Agents, TensorFlow, PyTorch, or sklearn.</li>
+      <li>It does not raise difficulty in the middle of the 120 s (only recommends later). It <em>can</em> lower difficulty immediately.</li>
+      <li>Emergency exit (Quest A or X) is <strong>not</strong> AI. It is a hard override. Always mention that. It shows you did not trust the tree with the patient’s only exit.</li>
+    </ul>
+
+    <h2>14. Likely examiner questions</h2>
+
+    <h3>“This is not AI.”</h3>
+    <p class="say">Classical AI is expert systems and decision trees. Russell and Norvig do not require neural nets. ISO/IEC 22989 is recommendations and decisions for a goal. Our SRS names this block AI. The agent perceives Polar and the headset, maintains baseline state, and acts on the skybox and Safe Room.</p>
+
+    <h3>“Show the model file.”</h3>
+    <p>There is none. The model is <code>PanicDetectionService.Evaluate</code> and <code>ExposureStageAdvisor.AssignStageFromBaseline</code>. Open them.</p>
+
+    <h3>“How is a formula AI?”</h3>
+    <p>The formula is the scoring function. The AI is score plus tree plus action. Same pattern as a clinical early-warning score feeding a protocol.</p>
+
+    <h3>“Where did 0.5 0.3 0.2 come from?”</h3>
+    <p>SRS 3.2.5. Heart rate is the validated sensor so it is 50%. Movement is supporting evidence, 30%. Duration, 20%. They sum to 1. We did not pretend they were fitted.</p>
+
+    <h3>“Who validated the thresholds?”</h3>
+    <p>Classification bands: SRS. Stage BPM: rest physiology plus Polar-in-VR observation (70-95 rest). Abort gates: safety tests so donning the headset is not an abort. Unit tests in <code>SrsLogicTests</code>. Not a hospital RCT. Do not claim one.</p>
+
+    <h3>“Is stress accurate?”</h3>
+    <p>Polar BPM is accurate. Stress is a named proxy (PanicScore) relative to that session’s baseline. Believable because you can raise it live with the strap. Not a blood test.</p>
+
+    <h3>“What if the patient is an athlete / on beta blockers?”</h3>
+    <p>Baseline absorbs resting differences. Absolute 55 BPM vs 90 BPM is not the class. dHR is. Drugs that flatten HR make the tree conservative (harder to hit +20). That is safer than over-triggering. Manual emergency remains.</p>
+
+    <h3>“Why 360 photos instead of a 3D city?”</h3>
+    <p>Stable 90 Hz, one draw, intensity via exposure and (for darkness) three textures. The AI still has a real stimulus; the renderer is a separate engineering choice.</p>
+
+    <h3>“Can this become real ML later?”</h3>
+    <p>Yes. Log (dHR, HM, TS, SUDS, abort). Fit a tree or forest. Compare against this expert tree. Keep this tree as the fail-safe. That is a proper ML upgrade path, which we did not fake in v1.</p>
+
+    <h2>15. Cite these if pushed</h2>
+    <p>Already in the SRS bibliography:</p>
+    <ul>
+      <li>[1] Morina et al. (2015). VRET gains generalize. Behaviour Research and Therapy.</li>
+      <li>[2] Opris et al. (2012). VRET meta-analysis. Depression and Anxiety.</li>
+      <li>[3] Powers and Emmelkamp (2008). VRET for anxiety. Journal of Anxiety Disorders.</li>
+      <li>[4][5] Polar Electro H10 developer guide and user manual.</li>
+    </ul>
+    <p>Add verbally if they challenge the word AI:</p>
+    <ul>
+      <li>Russell, S., and Norvig, P. Artificial Intelligence: A Modern Approach. Intelligent agents; expert systems; decision trees.</li>
+      <li>ISO/IEC 22989. AI concepts and terminology (recommendations / decisions).</li>
+      <li>Shortliffe, E. MYCIN - medical expert system, rules not networks.</li>
+      <li>Quinlan, J. R. Induction of decision trees (ID3).</li>
+    </ul>
+
+    <h2>16. Thirty-second close</h2>
+    <p>If time is gone, say only this:</p>
+    <div class="say">
+      “We implemented the SRS AI block as a knowledge-based decision tree, not a trained forest, because we have no labelled panic dataset and a safety loop must be inspectable. Polar H10 plus a 60-second personal baseline feed a published weighted score. Thresholds 10 and 18 match a +20 and +36 BPM rise when movement is quiet. The tree can lower intensity or return the patient to the Safe Room. Emergency exit is a human override. That is defensible AI for an FYP. It is not a diagnostic medical model, and we do not claim it is.”
+    </div>
+  </div>
+</body>
+</html>

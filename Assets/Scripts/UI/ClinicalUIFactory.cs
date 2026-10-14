@@ -5,6 +5,7 @@ using TMPro;
 using PhobiaReliefTherapy;
 using PhobiaReliefTherapy.Theme;
 using PhobiaReliefTherapy.Managers;
+using PhobiaReliefTherapy.VR;
 
 namespace PhobiaReliefTherapy.UI
 {
@@ -205,36 +206,103 @@ namespace PhobiaReliefTherapy.UI
             var scrollGO = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(ScrollRect));
             scrollGO.transform.SetParent(parent, false);
             var image = scrollGO.GetComponent<Image>();
-            image.color = new Color(1f, 1f, 1f, 0.04f);
+            image.color = new Color(0.07f, 0.08f, 0.10f, 0.92f);
             image.raycastTarget = true;
 
-            var viewport = new GameObject("Viewport", typeof(RectTransform), typeof(Image), typeof(Mask));
+            var viewport = new GameObject("Viewport", typeof(RectTransform), typeof(Image), typeof(RectMask2D));
             viewport.transform.SetParent(scrollGO.transform, false);
-            Stretch(viewport.GetComponent<RectTransform>());
-            viewport.GetComponent<Image>().color = new Color(1, 1, 1, 0.01f);
-            viewport.GetComponent<Mask>().showMaskGraphic = false;
+            var viewportRect = viewport.GetComponent<RectTransform>();
+            viewportRect.anchorMin = Vector2.zero;
+            viewportRect.anchorMax = Vector2.one;
+            viewportRect.offsetMin = new Vector2(8f, 8f);
+            viewportRect.offsetMax = new Vector2(-68f, -8f);
+            var viewportImage = viewport.GetComponent<Image>();
+            viewportImage.color = new Color(1f, 1f, 1f, 0.02f);
+            viewportImage.raycastTarget = true;
 
-            var content = new GameObject("Content", typeof(RectTransform), typeof(ContentSizeFitter));
+            var content = new GameObject("Content", typeof(RectTransform));
             content.transform.SetParent(viewport.transform, false);
             var contentRect = content.GetComponent<RectTransform>();
             contentRect.anchorMin = new Vector2(0f, 1f);
             contentRect.anchorMax = new Vector2(1f, 1f);
             contentRect.pivot = new Vector2(0.5f, 1f);
-            contentRect.offsetMin = Vector2.zero;
-            contentRect.offsetMax = Vector2.zero;
-            content.GetComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            contentRect.anchoredPosition = Vector2.zero;
+            contentRect.sizeDelta = new Vector2(0f, 40f);
 
-            body = CreateText(name + "Body", content.transform, "", 18, TextAlignmentOptions.TopLeft);
-            Stretch(body.rectTransform, 8, 8);
-            var layout = body.gameObject.AddComponent<ContentSizeFitter>();
-            layout.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            body = CreateText(name + "Body", content.transform, "", 17, TextAlignmentOptions.TopLeft);
+            var bodyRect = body.rectTransform;
+            bodyRect.anchorMin = new Vector2(0f, 1f);
+            bodyRect.anchorMax = new Vector2(1f, 1f);
+            bodyRect.pivot = new Vector2(0.5f, 1f);
+            bodyRect.offsetMin = new Vector2(10f, 0f);
+            bodyRect.offsetMax = new Vector2(-10f, 0f);
+            body.enableWordWrapping = true;
+            body.overflowMode = TextOverflowModes.Overflow;
+            body.raycastTarget = false;
+
+            var barGO = new GameObject("Scrollbar", typeof(RectTransform), typeof(Image), typeof(Scrollbar));
+            barGO.transform.SetParent(scrollGO.transform, false);
+            var barRect = barGO.GetComponent<RectTransform>();
+            barRect.anchorMin = new Vector2(1f, 0f);
+            barRect.anchorMax = new Vector2(1f, 1f);
+            barRect.pivot = new Vector2(1f, 0.5f);
+            barRect.sizeDelta = new Vector2(56f, -16f);
+            barRect.anchoredPosition = new Vector2(-8f, 0f);
+            barGO.GetComponent<Image>().color = new Color(0.17f, 0.19f, 0.23f, 1f);
+            barGO.GetComponent<Image>().raycastTarget = true;
+
+            var sliding = new GameObject("Sliding Area", typeof(RectTransform));
+            sliding.transform.SetParent(barGO.transform, false);
+            Stretch(sliding.GetComponent<RectTransform>(), 4f, 8f);
+
+            var handle = new GameObject("Handle", typeof(RectTransform), typeof(Image));
+            handle.transform.SetParent(sliding.transform, false);
+            Stretch(handle.GetComponent<RectTransform>());
+            handle.GetComponent<Image>().color = new Color(1f, 87f / 255f, 34f / 255f, 1f);
+            handle.GetComponent<Image>().raycastTarget = true;
+
+            var bar = barGO.GetComponent<Scrollbar>();
+            bar.handleRect = handle.GetComponent<RectTransform>();
+            bar.direction = Scrollbar.Direction.BottomToTop;
+            bar.targetGraphic = handle.GetComponent<Image>();
+            bar.interactable = true;
+            bar.size = 0.35f;
 
             var scroll = scrollGO.GetComponent<ScrollRect>();
-            scroll.viewport = viewport.GetComponent<RectTransform>();
+            scroll.viewport = viewportRect;
             scroll.content = contentRect;
             scroll.horizontal = false;
             scroll.vertical = true;
+            scroll.movementType = ScrollRect.MovementType.Clamped;
+            scroll.inertia = true;
+            scroll.scrollSensitivity = 40f;
+            scroll.verticalScrollbar = bar;
+            scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.Permanent;
+            scroll.verticalScrollbarSpacing = 6f;
+            scrollGO.AddComponent<VrScrollRelay>();
             return scroll;
+        }
+
+        public static void ApplyScrollBody(TextMeshProUGUI body, string text)
+        {
+            if (body == null)
+                return;
+
+            body.text = text ?? "";
+            body.enableWordWrapping = true;
+            body.overflowMode = TextOverflowModes.Overflow;
+            body.ForceMeshUpdate();
+            float width = Mathf.Max(64f, body.rectTransform.rect.width);
+            float height = Mathf.Max(body.GetPreferredValues(width, 0f).y, body.preferredHeight) + 24f;
+            body.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
+            var content = body.transform.parent as RectTransform;
+            if (content != null)
+                content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
+            Canvas.ForceUpdateCanvases();
+
+            var relay = body.GetComponentInParent<VrScrollRelay>();
+            if (relay != null)
+                relay.MarkDirty();
         }
 
         public static void Anchor(RectTransform rect, Vector2 min, Vector2 max, Vector2? size = null, Vector2? pos = null)

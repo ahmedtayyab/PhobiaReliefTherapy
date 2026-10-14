@@ -731,7 +731,7 @@ namespace PhobiaReliefTherapy.Data
                 yield break;
             }
 
-            string url = $"{SUPABASE_URL}/rest/v1/therapy_sessions?user_id=eq.{userId}&select=*&order=date_completed.desc";
+            string url = $"{SUPABASE_URL}/rest/v1/therapy_sessions?user_id=eq.{userId}&select=*&order=date_completed.desc&limit=1000";
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 ApplyApiHeaders(request, AuthTokenOrAnon());
@@ -775,10 +775,11 @@ namespace PhobiaReliefTherapy.Data
 
         public IEnumerator GetAllSessions(System.Action<TherapySession[]> callback)
         {
-            string url = $"{SUPABASE_URL}/rest/v1/therapy_sessions?select=*&order=date_completed.desc";
+            string url = $"{SUPABASE_URL}/rest/v1/therapy_sessions?select=*&order=date_completed.desc&limit=1000";
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 ApplyApiHeaders(request, AuthTokenOrAnon());
+                request.SetRequestHeader("Range", "0-999");
                 yield return request.SendWebRequest();
 
                 if (request.result == UnityWebRequest.Result.Success)
@@ -852,6 +853,7 @@ namespace PhobiaReliefTherapy.Data
 
             return new LocalSessionStore.StoredSession
             {
+                Id = session.Id,
                 UserId = session.UserId,
                 Phobia = session.Phobia,
                 Difficulty = session.Difficulty,
@@ -928,10 +930,10 @@ namespace PhobiaReliefTherapy.Data
 
         private static string SessionKey(LocalSessionStore.StoredSession session)
         {
-            string day = LocalSessionStore.NormalizeSortKey(session.DateCompleted);
-            if (day.Length >= 16)
-                day = day.Substring(0, 16);
-            return $"{session.UserId}|{session.Phobia}|{session.Stage}|{session.PeakHeartRate}|{session.ExposureTime:F0}|{day}";
+            string stamp = LocalSessionStore.NormalizeSortKey(session.DateCompleted);
+            if (stamp.Length >= 19)
+                stamp = stamp.Substring(0, 19);
+            return $"{session.UserId}|{session.Phobia}|{session.Stage}|{session.PeakHeartRate}|{session.ExposureTime:F0}|{session.PanicEventCount}|{stamp}";
         }
 
         private List<UserRow> ParseUserRows(string json)

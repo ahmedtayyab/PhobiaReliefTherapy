@@ -295,26 +295,31 @@ namespace PhobiaReliefTherapy.Therapy
         private void StartExposure()
         {
             SensorManager.EnsureInstanceExists();
-#if UNITY_EDITOR
-            if (!SensorManager.Instance.IsProviderReady)
-                SensorManager.Instance.InitializeSensor();
-#else
-            if (!SensorManager.Instance.IsSensorConnected)
+            if (!SensorManager.Instance.IsProviderReady || SensorManager.Instance.UseMockSensor)
+                SensorManager.Instance.ReconnectLiveSensor();
+
+            if (!SessionTiming.LaptopPlaytest && !SensorManager.Instance.IsSensorConnected)
             {
                 if (recommendationText != null)
-                    recommendationText.text = "Connect Polar H10 before starting exposure.";
-                SensorManager.Instance.InitializeSensor();
+                    recommendationText.text = "Connect Polar H10 and keep python tools\\polar_hr_bridge.py running before starting exposure.";
                 return;
             }
-#endif
+
+            string scene = PhobiaCatalog.ExposureSceneName(UserData.SelectedPhobia);
+            if (string.IsNullOrEmpty(scene))
+            {
+                if (recommendationText != null)
+                    recommendationText.text = "No phobia is selected. Go back and choose Height, Darkness, or Crowd.";
+                return;
+            }
 
             if (startExposureButton != null)
                 startExposureButton.interactable = false;
 
-            StartCoroutine(CountdownAndEnter());
+            StartCoroutine(CountdownAndEnter(scene));
         }
 
-        private IEnumerator CountdownAndEnter()
+        private IEnumerator CountdownAndEnter(string scene)
         {
             float remaining = SessionTiming.SafeRoomCountdownSeconds;
             while (remaining > 0f)
@@ -328,24 +333,9 @@ namespace PhobiaReliefTherapy.Therapy
                 remaining -= 1f;
             }
 
-            Debug.Log($"Starting Exposure for: {UserData.SelectedPhobia}");
-
-            switch (UserData.SelectedPhobia)
-            {
-                case "Height":
-                    SceneLoader.Instance.LoadScene("HeightScene");
-                    break;
-                case "Darkness":
-                    SceneLoader.Instance.LoadScene("DarknessScene");
-                    break;
-                case "Crowd":
-                    SceneLoader.Instance.LoadScene("CrowdScene");
-                    break;
-                default:
-                    Debug.LogWarning("No phobia selected! Returning to Dashboard.");
-                    SceneLoader.Instance.LoadScene("DashboardScene");
-                    break;
-            }
+            UserData.SelectedPhobia = PhobiaCatalog.Normalize(UserData.SelectedPhobia);
+            Debug.Log($"Starting Exposure for: {UserData.SelectedPhobia} -> {scene}");
+            SceneLoader.Instance.LoadScene(scene);
         }
     }
 }

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Phobia Relief Therapy - Easy Cheat Sheet</title>
+  <style>
+    :root {
+      --ink: #1a2332;
+      --muted: #4a5568;
+      --line: #d6dde8;
+      --accent: #c2410c;
+      --paper: #ffffff;
+      --wash: #f7f5f2;
+      --code: #0f172a;
+    }
+    * { box-sizing: border-box; }
+    html { font-size: 12pt; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--wash);
+      font-family: "Segoe UI", "Calibri", "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.4;
+    }
+    .wrap {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 28px 24px 56px;
+      background: var(--paper);
+      box-shadow: 0 0 0 1px var(--line);
+    }
+    h1 { font-size: 20pt; margin: 0 0 4px; }
+    .subtitle { color: var(--accent); font-weight: 700; margin: 0 0 14px; }
+    h2 {
+      font-size: 14pt;
+      margin: 24px 0 8px;
+      padding-top: 10px;
+      border-top: 2px solid var(--ink);
+    }
+    p { margin: 0 0 10px; }
+    ul, ol { margin: 0 0 12px; padding-left: 1.25em; }
+    li { margin: 0 0 6px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 0 12px;
+      font-size: 11pt;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 7px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: #1a2332; color: #fff; }
+    tr:nth-child(even) td { background: #f8fafc; }
+    pre {
+      font-family: Consolas, "Courier New", monospace;
+      background: var(--code);
+      color: #e2e8f0;
+      padding: 14px 16px;
+      border-radius: 6px;
+      white-space: pre-wrap;
+      font-size: 11pt;
+    }
+    .write {
+      background: #fff7ed;
+      border: 2px solid var(--accent);
+      padding: 12px 14px;
+      margin: 0 0 14px;
+    }
+    .say {
+      background: #ecfdf5;
+      border-left: 4px solid #166534;
+      padding: 10px 12px;
+      margin: 0 0 12px;
+    }
+    .no {
+      background: #fff1f2;
+      border-left: 4px solid #9f1239;
+      padding: 10px 12px;
+      margin: 0 0 12px;
+    }
+    .hint { color: var(--muted); font-size: 10.5pt; margin-bottom: 16px; }
+    .print-hint {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      padding: 8px 12px;
+      margin-bottom: 16px;
+      border-radius: 6px;
+    }
+    .num { font-size: 18pt; font-weight: 700; color: var(--accent); }
+    @media print {
+      body { background: #fff; }
+      .wrap { box-shadow: none; max-width: none; padding: 0; }
+      .print-hint { display: none; }
+      h2, .write, pre, table { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="print-hint">Ctrl+P -&gt; Save as PDF. This is the only sheet you need to memorize. The long files are backup.</p>
+
+    <h1>Easy cheat sheet</h1>
+    <p class="subtitle">What to write. What to say. Nothing extra.</p>
+    <p class="hint">If you remember only one page, remember sections 1, 2, and 3.</p>
+
+    <h2>1. Write this on the board</h2>
+    <p>Copy it exactly. Then talk. Do not invent extra math.</p>
+    <div class="write">
+      <pre>dHR = now BPM - baseline BPM
+
+Score = 0.5 dHR + 0.3 movement + 0.2 time
+
+below 10     keep going
+10 to 18     too stressed, go easier
+18 and up    stop, Safe Room</pre>
+    </div>
+    <p>Under that, write the two extra numbers:</p>
+    <div class="write">
+      <pre>Start stage from rest:
+  95 BPM or less   Advanced
+  108 BPM or less  Intermediate
+  higher           Beginner
+
+Baseline 60 seconds. Exposure 2 minutes.</pre>
+    </div>
+
+    <h2>2. The 8 lines everyone must remember</h2>
+    <ol>
+      <li>Our AI is a <strong>decision tree</strong>. It is rules, not ChatGPT, not a neural network.</li>
+      <li>It looks at <strong>heart rate, head movement, and how long it lasts</strong>.</li>
+      <li>Heart rate is <strong>half</strong> the score because Polar H10 is a chest strap. That number is the most trustworthy.</li>
+      <li>Movement is <strong>30%</strong> because a scared person fidgets, but looking around also moves the head, so it is not the main vote.</li>
+      <li>Time is <strong>20%</strong> so a 1-second jump is not treated as a panic attack.</li>
+      <li><strong>10</strong> means about <strong>+20 BPM</strong> over your own rest. <strong>18</strong> means about <strong>+36 BPM</strong>.</li>
+      <li>We compare to <strong>your 60-second baseline</strong>, not a random 72 BPM from a textbook.</li>
+      <li>Pressing <strong>A or X</strong> is a human exit. That is not the AI.</li>
+    </ol>
+
+    <h2>3. How we made the formula (say this)</h2>
+    <p>Do not say “it was in the SRS” and freeze. Do not say ChatGPT. Say we <strong>designed a 3-part score</strong>.</p>
+    <div class="say">
+      “We asked: what can we actually measure in VR? Polar gives heart rate. The headset gives head movement. We can count how many seconds it stays high. A panic feeling is not one spike. It is the heart going up, the body getting restless, and it not going away. So we made one score from those three things.”
+    </div>
+    <p>Then the weights, in plain words:</p>
+    <div class="say">
+      “We gave heart rate 50% because Polar is ECG on the chest. That is the real signal. We gave movement 30% as backup. We gave time 20% so a short jump does not shut the session. The three parts add to 100%.”
+    </div>
+    <p>Then the 10 and 18:</p>
+    <div class="say">
+      “If the person is sitting still, the score is basically half of the BPM rise. So if your rest is 75 and you go to 95, that is +20, score is 10: getting stressed, make it easier. If you jump about +36 BPM, score is 18: too much, Safe Room. We picked 10 and 18 so those two heart-rate jumps are the two lines.”
+    </div>
+    <p>One example. Memorize <strong>75</strong>.</p>
+    <table>
+      <tr><th>Rest</th><th>Now</th><th>Rise</th><th>Score (sitting still)</th><th>AI does</th></tr>
+      <tr><td>75</td><td>76</td><td>+1</td><td>about 0.5</td><td>keep going</td></tr>
+      <tr><td>75</td><td>95</td><td>+20</td><td>10</td><td>go easier</td></tr>
+      <tr><td>75</td><td>111</td><td>+36</td><td>18</td><td>Safe Room</td></tr>
+    </table>
+    <p>If they ask “did a paper give you 0.5 0.3 0.2?”:</p>
+    <div class="say">
+      “No paper handed us those exact weights. Papers on VR exposure therapy say heart rate is a good stress signal. Polar’s docs say the H10 is accurate. We turned that into a simple weighted score we can explain and test. We did not train a black box.”
+    </div>
+
+    <h2>4. How it is “accurate” (do not overclaim)</h2>
+    <p>Use the word <strong>sensible</strong>, not “90% accurate.”</p>
+    <table>
+      <tr><th>What is solid</th><th>What we do not claim</th></tr>
+      <tr><td>Polar BPM is a real chest reading</td><td>We diagnose panic disorder</td></tr>
+      <tr><td>We use your baseline, not a fake average</td><td>A hospital certified this formula</td></tr>
+      <tr><td>Same numbers always give the same decision</td><td>Neural network / we trained a model</td></tr>
+      <tr><td>+20 and +36 BPM are real body jumps while sitting</td><td>F1 score, ROC curve, 90%</td></tr>
+    </table>
+    <div class="say">
+      “The heart-rate number is accurate because it comes from Polar. The score is our rule for what to do with that number. It is consistent and it is based on a rise over your own rest. It is not a doctor’s diagnosis.”
+    </div>
+    <p>If they want proof it is not random: <strong>Tools -&gt; PRT -&gt; Run SRS Logic Tests</strong> in Unity. That checks the 75-to-95 and 75-to-111 cases.</p>
+
+    <h2>5. Demo talking (keep it this short)</h2>
+    <ol>
+      <li>Login. “Patient account.”</li>
+      <li>Baseline. “60 seconds. We learn this person’s rest.”</li>
+      <li>Stage appears. “AI just picked Beginner, Intermediate, or Advanced from rest BPM.”</li>
+      <li>Pick a phobia. Safe Room. “5 seconds, then 2 minutes.”</li>
+      <li>Exposure. “Every second we score. Under 10 continue. 10 to 18 easier. 18 stop.”</li>
+      <li>A or X. “Human emergency. Not AI.”</li>
+    </ol>
+    <p>One person wears the headset. One person talks. One person shows the Polar window with BPM numbers.</p>
+
+    <h2>6. Tiny Q and A</h2>
+
+    <p><strong>This is not AI.</strong></p>
+    <div class="say">It is a decision tree. Old-school AI. If this, then that. It reads sensors and then it changes the session. That is still AI. We never said it was ChatGPT.</div>
+
+    <p><strong>Show the model file.</strong></p>
+    <div class="say">There is no file. The rules are in the code. We can walk them.</div>
+
+    <p><strong>Why not machine learning?</strong></p>
+    <div class="say">That needs hundreds of labelled panic sessions. We do not have that. A guessy model that sometimes sends you to Safe Room is worse. Rules we can explain are safer.</div>
+
+    <p><strong>Why 95 and 108?</strong></p>
+    <div class="say">In the headset Polar rest is often 70 to 95, not 60. So 95 can still be Advanced. 108 is a bit high, so we start easier. Higher than that is Beginner.</div>
+
+    <p><strong>Is stress real?</strong></p>
+    <div class="say">Stress on the graph is our score. The BPM under it is real Polar. If you stand up, BPM goes up, score goes up. That is what we mean by stress here.</div>
+
+    <p><strong>What if someone is an athlete?</strong></p>
+    <div class="say">We subtract their own rest. 55 to 75 is the same kind of jump as 80 to 100.</div>
+
+    <p><strong>Appointments?</strong></p>
+    <div class="say">Out of scope.</div>
+
+    <p><strong>Live Polar on the Quest alone, no laptop?</strong></p>
+    <div class="say">No. Laptop reads the strap and sends BPM to Unity. Demo is Quest Link.</div>
+
+    <h2>7. Do not say</h2>
+    <div class="no">
+      machine learning &nbsp; trained model &nbsp; neural network &nbsp; ChatGPT wrote the formula &nbsp; 90% accurate &nbsp; we diagnose panic &nbsp; medical device &nbsp; the AI thinks
+    </div>
+
+    <h2>8. Last sentence if your mind goes blank</h2>
+    <p class="num">Score = half heart + some movement + a bit of time.</p>
+    <div class="say">
+      “Heart rate from Polar is half the score. 10 means about +20 BPM. 18 means about +36 BPM. Then the tree says continue, go easier, or Safe Room.”
+    </div>
+  </div>
+</body>
+</html>

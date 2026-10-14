@@ -74,10 +74,10 @@ namespace PhobiaReliefTherapy.Managers
         {
             bool mock = sensorManager.UseMockSensor;
             GUILayout.Label(mock
-                ? $"Mock  ·  {sensorManager.CurrentHeartRate} BPM  (40–180)"
+                ? $"Mock - {sensorManager.CurrentHeartRate} BPM  (40-180)"
                 : sensorManager.IsSensorConnected
-                    ? $"Live Polar  ·  {sensorManager.CurrentHeartRate} BPM"
-                    : $"Waiting for Polar  ·  {sensorManager.CurrentHeartRate} BPM");
+                    ? $"Live Polar - {sensorManager.CurrentHeartRate} BPM"
+                    : $"Waiting for Polar - {sensorManager.CurrentHeartRate} BPM");
             GUILayout.Label(sensorManager.SensorStatusMessage);
 
             if (collapsed)

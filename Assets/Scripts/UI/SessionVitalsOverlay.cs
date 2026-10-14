@@ -222,11 +222,11 @@ namespace PhobiaReliefTherapy.UI
             stressGraph.SetSeries(SessionVitalsHistory.PanicScores);
 
             int hr = Mathf.RoundToInt(SessionVitalsHistory.LastHeartRate);
-            hrValue.text = hr > 0 ? $"{hr} BPM" : "— BPM";
+            hrValue.text = hr > 0 ? $"{hr} BPM" : "- BPM";
             moveValue.text = SessionVitalsHistory.LastJerk >= 20f
-                ? $"Move {SessionVitalsHistory.LastMovement:F0}  ·  jerk spike"
-                : $"Move {SessionVitalsHistory.LastMovement:F0}  ·  jerk {SessionVitalsHistory.LastJerk:F0}";
-            stressValue.text = $"{SessionVitalsHistory.LastPanic:F1}  ·  {lastClassification}";
+                ? $"Move {SessionVitalsHistory.LastMovement:F0} - jerk spike"
+                : $"Move {SessionVitalsHistory.LastMovement:F0} - jerk {SessionVitalsHistory.LastJerk:F0}";
+            stressValue.text = $"{SessionVitalsHistory.LastPanic:F1} - {lastClassification}";
 
             Color stressColor = SessionVitalsHistory.LastPanic >= 18f
                 ? dangerColor
@@ -322,7 +322,7 @@ namespace PhobiaReliefTherapy.UI
 
             stressGraph = CreateCard(graphsRoot, "StressCard",
                 new Vector2(0.04f, 0.36f), new Vector2(0.96f, 0.66f),
-                "Stress score", "ΔHR×0.5 + HM×0.3 + TS×0.2",
+                "Stress score", "dHR x 0.5 + HM x 0.3 + TS x 0.2",
                 calmColor, 0f, 30f, false, new[] { 10f, 18f }, out stressValue);
 
             moveGraph = CreateCard(graphsRoot, "MovementCard",
@@ -340,7 +340,7 @@ namespace PhobiaReliefTherapy.UI
             toggleButton.onClick.AddListener(() => SetGraphsVisible(!graphsVisible));
 
             hintLabel = ClinicalUIFactory.CreateText("GraphHint", canvas.transform,
-                "A / X  ·  Safe Room     B / Y  ·  graphs", 13, TextAlignmentOptions.Center, UIElementType.LabelText);
+                "A / X - Safe Room     B / Y - graphs", 13, TextAlignmentOptions.Center, UIElementType.LabelText);
             ClinicalUIFactory.Anchor(hintLabel.rectTransform,
                 new Vector2(0.62f, 0.02f), new Vector2(0.88f, 0.06f));
             hintLabel.raycastTarget = false;
@@ -395,7 +395,7 @@ namespace PhobiaReliefTherapy.UI
             ClinicalUIFactory.Anchor(titleText.rectTransform, new Vector2(0.07f, 0.78f), new Vector2(0.93f, 0.96f));
             titleText.raycastTarget = false;
 
-            valueLabel = ClinicalUIFactory.CreateText(name + "Value", card.transform, "—", 20,
+            valueLabel = ClinicalUIFactory.CreateText(name + "Value", card.transform, "-", 20,
                 TextAlignmentOptions.TopLeft, UIElementType.SubheadingText);
             ClinicalUIFactory.Anchor(valueLabel.rectTransform, new Vector2(0.07f, 0.58f), new Vector2(0.93f, 0.80f));
             valueLabel.raycastTarget = false;

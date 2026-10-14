@@ -101,7 +101,7 @@ public static class HeightSceneBuilder
         timerRect.sizeDelta = new Vector2(300f, 80f);
 
         TextMeshProUGUI timerText = timerGO.GetComponent<TextMeshProUGUI>();
-        timerText.text = "30s";
+        timerText.text = "120s";
         timerText.alignment = TextAlignmentOptions.TopRight;
         
         ThemeableUI timerTheme = timerGO.AddComponent<ThemeableUI>();

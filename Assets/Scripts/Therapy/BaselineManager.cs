@@ -54,6 +54,8 @@ namespace PhobiaReliefTherapy.Therapy
         private FontStyles originalInstructionFontStyle;
         private Color originalInstructionColor;
 
+        private bool resultsReady;
+
         private void Start()
         {
             VRUIInputBridge.EnsureInstanceExists();
@@ -77,6 +79,12 @@ namespace PhobiaReliefTherapy.Therapy
 
         private void Update()
         {
+            if (resultsReady && SessionTiming.ConsumeSkip())
+            {
+                GoToSafeRoom();
+                return;
+            }
+
             if (isMeasuring)
             {
                 UpdateSensorModeText();
@@ -556,6 +564,7 @@ namespace PhobiaReliefTherapy.Therapy
                 ExposureSessionMonitor.Instance.CaptureBaselineHeadMovement();
 
             ExposureStageAdvisor.AssignStageFromBaseline(heartRate, SessionMetrics.BaselineHeadMovementScore);
+            resultsReady = true;
 
             // Snap camera back to original rotation and clear flags
             if (Camera.main != null)
@@ -587,23 +596,13 @@ namespace PhobiaReliefTherapy.Therapy
             if (panelGo != null)
             {
                 var panelImage = panelGo.GetComponent<Image>();
-                if (panelImage != null) panelImage.enabled = true;
+                if (panelImage != null) panelImage.enabled = false;
             }
 
-            // Re-enable all CardPanels that we set inactive
             foreach (var cardPanel in disabledCardPanels)
             {
                 if (cardPanel != null)
-                {
-                    cardPanel.SetActive(true);
-                    
-                    var themeable = cardPanel.GetComponent<ThemeableUI>();
-                    if (themeable != null)
-                    {
-                        themeable.enabled = true;
-                        themeable.ApplyTheme();
-                    }
-                }
+                    cardPanel.SetActive(false);
             }
 
             // Restore the original skybox material to restore default scene styling
@@ -618,81 +617,61 @@ namespace PhobiaReliefTherapy.Therapy
                 timerText.gameObject.SetActive(false);
             if (progressBarFill != null)
                 progressBarFill.gameObject.SetActive(false);
+            if (progressBarFill != null && progressBarFill.transform.parent != null &&
+                progressBarFill.transform.parent.name.IndexOf("Progress", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                progressBarFill.transform.parent.gameObject.SetActive(false);
 
             LayoutBaselineResultsCard(heartRate);
         }
 
         private void LayoutBaselineResultsCard(int heartRate)
         {
-            Transform card = FindResultsCard();
-            if (card != null)
+            foreach (var cardPanel in disabledCardPanels)
             {
-                var vlg = card.GetComponent<VerticalLayoutGroup>();
-                if (vlg != null)
-                    vlg.enabled = false;
-                var fitter = card.GetComponent<ContentSizeFitter>();
-                if (fitter != null)
-                    fitter.enabled = false;
+                if (cardPanel != null)
+                    cardPanel.SetActive(false);
             }
 
-            if (resultText != null)
-            {
-                resultText.gameObject.SetActive(true);
-                resultText.text = $"Baseline heart rate ({SessionTiming.BaselineSeconds:0}s average): {heartRate} BPM";
-                PlaceResultsText(resultText, card, new Vector2(0.08f, 0.58f), new Vector2(0.92f, 0.82f), 26f, TextAlignmentOptions.Center);
-            }
+            var leftoverSkip = GameObject.Find("SkipBaselineButton");
+            if (leftoverSkip != null)
+                leftoverSkip.SetActive(false);
 
-            if (instructionText != null)
-            {
-                instructionText.gameObject.SetActive(true);
-                instructionText.text =
-                    "Baseline complete. Stay relaxed until you enter the Safe Room.\n" +
-                    "During exposure, press A (right) or X (left) for Emergency / Safe Room.\n\n" +
-                    UserData.AiStageRecommendation;
-                PlaceResultsText(instructionText, card, new Vector2(0.08f, 0.28f), new Vector2(0.92f, 0.56f), 20f, TextAlignmentOptions.Center);
-            }
+            var canvas = ClinicalUIFactory.EnsureOverlayCanvas();
+            Transform parent = ClinicalUIFactory.OverlayRoot(canvas);
+            var old = parent.Find("BaselineResultsCard");
+            if (old != null)
+                Destroy(old.gameObject);
 
-            if (stageText != null)
-            {
-                stageText.gameObject.SetActive(true);
-                PlaceResultsText(stageText, card, new Vector2(0.08f, 0.84f), new Vector2(0.92f, 0.96f), 30f, TextAlignmentOptions.Center);
-            }
+            var cardGO = ClinicalUIFactory.CreateCard(parent, new Vector2(920f, 640f), "BaselineResultsCard");
+            var card = cardGO.transform;
 
-            if (continueButton == null)
-                return;
+            string stageLine = string.IsNullOrEmpty(UserData.AiStageRecommendation)
+                ? $"AI selected Stage {UserData.CurrentStage}"
+                : UserData.AiStageRecommendation;
 
-            if (card != null)
-                continueButton.transform.SetParent(card, false);
+            var title = ClinicalUIFactory.CreateText("BaselineResultsTitle", card, "Baseline complete", 32, TextAlignmentOptions.Center, UIElementType.HeadingText);
+            ClinicalUIFactory.Anchor(title.rectTransform, new Vector2(0.08f, 0.84f), new Vector2(0.92f, 0.95f));
 
-            IgnoreLayout(continueButton.gameObject);
-            var rect = continueButton.GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.28f, 0.10f);
-            rect.anchorMax = new Vector2(0.72f, 0.10f);
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.anchoredPosition = Vector2.zero;
-            rect.sizeDelta = new Vector2(0f, 56f);
-            rect.localRotation = Quaternion.identity;
-            rect.localScale = Vector3.one;
+            var hr = ClinicalUIFactory.CreateText("BaselineResultsHr", card,
+                $"Average heart rate ({SessionTiming.BaselineSeconds:0}s):  {heartRate} BPM",
+                24, TextAlignmentOptions.Center, UIElementType.SubheadingText);
+            ClinicalUIFactory.Anchor(hr.rectTransform, new Vector2(0.08f, 0.68f), new Vector2(0.92f, 0.82f));
 
-            var btnText = continueButton.GetComponentInChildren<TextMeshProUGUI>();
-            if (btnText != null)
-            {
-                btnText.text = "Continue";
-                btnText.enableWordWrapping = false;
-                btnText.overflowMode = TextOverflowModes.Overflow;
-                ClinicalUIFactory.AlignButtonLabel(btnText);
-            }
-            else
-            {
-                var legacyText = continueButton.GetComponentInChildren<Text>();
-                if (legacyText != null)
-                    legacyText.text = "Continue";
-            }
+            var rec = ClinicalUIFactory.CreateText("BaselineResultsRec", card,
+                stageLine + "\n\nStay relaxed until you enter the Safe Room.\nDuring exposure, press A (right) or X (left) for Emergency.",
+                18, TextAlignmentOptions.Center);
+            ClinicalUIFactory.Anchor(rec.rectTransform, new Vector2(0.08f, 0.30f), new Vector2(0.92f, 0.66f));
 
-            continueButton.transform.SetAsLastSibling();
-            continueButton.gameObject.SetActive(true);
+            continueButton = ClinicalUIFactory.CreateButton("ContinueButton", card, "Continue");
+            ClinicalUIFactory.Anchor(continueButton.GetComponent<RectTransform>(), new Vector2(0.22f, 0.12f), new Vector2(0.78f, 0.12f), new Vector2(0f, 55f));
             continueButton.onClick.RemoveAllListeners();
-            continueButton.onClick.AddListener(() => SceneLoader.Instance.LoadScene("SafeRoomScene"));
+            continueButton.onClick.AddListener(GoToSafeRoom);
+        }
+
+        private void GoToSafeRoom()
+        {
+            UserData.SelectedPhobia = PhobiaCatalog.Normalize(UserData.SelectedPhobia);
+            SceneLoader.Instance.LoadScene("SafeRoomScene");
         }
 
         private Transform FindResultsCard()

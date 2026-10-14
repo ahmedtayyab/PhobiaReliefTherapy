@@ -19,7 +19,7 @@ namespace PhobiaReliefTherapy.Therapy
         public Material heightSkyboxMaterial;
 
         [Header("Settings")]
-        public float exposureDuration = 30f;
+        public float exposureDuration = 120f;
 
         private Texture2D heightTexture;
         private Sprite heightSprite;
@@ -66,6 +66,7 @@ namespace PhobiaReliefTherapy.Therapy
 
         private void OnAdaptiveStage(int stage)
         {
+            ApplyStageTexture(Mathf.Clamp(stage, 1, 3));
             TherapySessionHelper.ApplyDifficultyToSkyboxMaterial(RenderSettings.skybox);
         }
 
@@ -95,7 +96,7 @@ namespace PhobiaReliefTherapy.Therapy
         {
             if (sessionEnded) return;
             sessionEnded = true;
-            Debug.Log($"Safety triggered: {evaluation.Classification} — {evaluation.AiRecommendation}");
+            Debug.Log($"Safety triggered: {evaluation.Classification} - {evaluation.AiRecommendation}");
             TherapySessionHelper.AbortToSafeRoom(true);
         }
 
@@ -165,31 +166,77 @@ namespace PhobiaReliefTherapy.Therapy
             return result != null ? result : AutoBindHelper.FindComponentByName<T>(objectName);
         }
 
-        private Texture2D LoadHeightTexture()
+        private Texture2D LoadHeightTextureForStage(int stage)
         {
-            Debug.Log("Loading height texture...");
-            // Try loading from Resources using different name conventions
-            Texture2D tex = Resources.Load<Texture2D>("height_image");
-            if (tex != null) { Debug.Log("Loaded 'height_image' from Resources."); return tex; }
+            string baseName = "height_image";
+            if (stage == 2) baseName = "height_image2";
+            if (stage == 3) baseName = "height_image3";
 
-            Sprite sprite = Resources.Load<Sprite>("height_image");
-            if (sprite != null && sprite.texture != null) { Debug.Log("Loaded 'height_image' sprite from Resources."); return sprite.texture; }
+            Debug.Log($"Loading height texture for stage {stage} (resource: {baseName})...");
 
-            tex = Resources.Load<Texture2D>("height");
-            if (tex != null) { Debug.Log("Loaded 'height' from Resources."); return tex; }
+            Texture2D tex = Resources.Load<Texture2D>(baseName);
+            if (tex != null) { Debug.Log($"Loaded '{baseName}' from Resources."); return tex; }
 
-            sprite = Resources.Load<Sprite>("height");
-            if (sprite != null && sprite.texture != null) { Debug.Log("Loaded 'height' sprite from Resources."); return sprite.texture; }
+            Sprite sprite = Resources.Load<Sprite>(baseName);
+            if (sprite != null && sprite.texture != null) { Debug.Log($"Loaded '{baseName}' sprite from Resources."); return sprite.texture; }
 
-            // Fallbacks to relative paths on filesystem
-            tex = LoadTextureFromFileSystem("Resources/height_image.png");
-            if (tex != null) { Debug.Log("Loaded 'Resources/height_image.png' from fallback."); return tex; }
+            if (stage == 1)
+            {
+                tex = Resources.Load<Texture2D>("height");
+                if (tex != null) { Debug.Log("Loaded 'height' from Resources."); return tex; }
 
-            tex = LoadTextureFromFileSystem("Assets/Resources/height_image.png");
-            if (tex != null) { Debug.Log("Loaded 'Assets/Resources/height_image.png' from fallback."); return tex; }
+                sprite = Resources.Load<Sprite>("height");
+                if (sprite != null && sprite.texture != null) { Debug.Log("Loaded 'height' sprite from Resources."); return sprite.texture; }
 
-            Debug.LogError("Failed to load height texture from any source!");
+                tex = LoadTextureFromFileSystem("Resources/height_image.png");
+                if (tex != null) { Debug.Log("Loaded 'Resources/height_image.png' from fallback."); return tex; }
+
+                tex = LoadTextureFromFileSystem("Assets/Resources/height_image.png");
+                if (tex != null) { Debug.Log("Loaded 'Assets/Resources/height_image.png' from fallback."); return tex; }
+            }
+            else
+            {
+                string suffix = stage == 2 ? "2" : "3";
+                tex = LoadTextureFromFileSystem($"Resources/height_image{suffix}.jpeg");
+                if (tex != null) return tex;
+                tex = LoadTextureFromFileSystem($"Assets/Resources/height_image{suffix}.jpeg");
+                if (tex != null) return tex;
+            }
+
+            Debug.LogError($"Failed to load height texture for stage {stage}!");
             return null;
+        }
+
+        private void ApplyStageTexture(int stage)
+        {
+            Texture2D tex = LoadHeightTextureForStage(stage);
+            if (tex != null)
+            {
+                heightTexture = tex;
+
+                if (RenderSettings.skybox != null)
+                {
+                    RenderSettings.skybox.SetTexture("_MainTex", heightTexture);
+                    DynamicGI.UpdateEnvironment();
+                    Debug.Log($"Applied Stage {stage} 3D Skybox texture.");
+                }
+
+                if (customBackgroundGO != null)
+                {
+                    Image bgImgComponent = customBackgroundGO.GetComponent<Image>();
+                    if (bgImgComponent != null)
+                    {
+                        if (heightSprite != null)
+                        {
+                            Destroy(heightSprite);
+                        }
+                        heightSprite = Sprite.Create(heightTexture, new Rect(0, 0, heightTexture.width, heightTexture.height), new Vector2(0.5f, 0.5f));
+                        bgImgComponent.sprite = heightSprite;
+                        bgImgComponent.color = Color.white;
+                        Debug.Log($"Applied Stage {stage} 2D Fallback background sprite.");
+                    }
+                }
+            }
         }
 
         private Texture2D LoadTextureFromFileSystem(string relativePath)
@@ -278,7 +325,7 @@ namespace PhobiaReliefTherapy.Therapy
                 img.raycastTarget = false;
             }
 
-            heightTexture = LoadHeightTexture();
+            heightTexture = LoadHeightTextureForStage(1);
 
             // 1. 3D Panoramic Skybox setup
             Material skyboxMat = heightSkyboxMaterial;
@@ -364,7 +411,7 @@ namespace PhobiaReliefTherapy.Therapy
                     timerRect.sizeDelta = new Vector2(300f, 80f);
 
                     timerText = timerGO.GetComponent<TextMeshProUGUI>();
-                    timerText.text = "30s";
+                    timerText.text = $"{SessionTiming.ExposureSeconds:0}s";
                     timerText.alignment = TextAlignmentOptions.TopRight;
 
                     ThemeableUI timerTheme = timerGO.AddComponent<ThemeableUI>();
@@ -454,6 +501,8 @@ namespace PhobiaReliefTherapy.Therapy
             isTimerRunning = true;
             int stage = TherapySessionHelper.GetAssignedExposureStage();
             UserData.CurrentStage = stage;
+
+            ApplyStageTexture(stage);
             TherapySessionHelper.ApplyDifficultyToSkyboxMaterial(RenderSettings.skybox);
 
             float remaining = SessionTiming.ExposureSeconds;

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using UnityEngine.XR.Interaction.Toolkit.UI;
 using PhobiaReliefTherapy.Managers;
 using PhobiaReliefTherapy.UI;
@@ -23,29 +24,30 @@ namespace PhobiaReliefTherapy.VR
             var dragger = canvas.GetComponent<VRMenuDragger>();
             if (dragger != null && dragger.UserPlaced && canvas.renderMode == RenderMode.WorldSpace)
             {
-                EnsureInteraction(canvas);
+                EnsureVrRaycaster(canvas);
                 dragger.RefreshCollider();
                 return;
             }
 
             canvas.renderMode = RenderMode.WorldSpace;
             canvas.worldCamera = camera;
-            if (recenterIfLoose && !VrMenuPose.TryApplyScreen(canvas.transform, camera))
-                PlaceInFront(canvas, camera);
+            bool forceFront = canvas.name == "FeedbackWorldCanvas";
+            if (forceFront || (recenterIfLoose && !VrMenuPose.TryApplyScreen(canvas.transform, camera)))
+                PlaceInFront(canvas, camera, forceFront ? 1.25f : DefaultDistance, ignoreSavedPose: forceFront);
 
-            EnsureInteraction(canvas);
+            EnsureVrRaycaster(canvas);
             SoftenFullScreenBackdrop(canvas);
             if (dragger == null)
                 dragger = canvas.gameObject.AddComponent<VRMenuDragger>();
             dragger.RefreshCollider();
         }
 
-        public static void PlaceInFront(Canvas canvas, Camera camera, float distance = DefaultDistance)
+        public static void PlaceInFront(Canvas canvas, Camera camera, float distance = DefaultDistance, bool ignoreSavedPose = false)
         {
             if (canvas == null)
                 return;
 
-            if (VrMenuPose.TryApplyScreen(canvas.transform, camera))
+            if (!ignoreSavedPose && VrMenuPose.TryApplyScreen(canvas.transform, camera))
                 return;
 
             if (camera == null)
@@ -65,10 +67,18 @@ namespace PhobiaReliefTherapy.VR
             return Object.FindObjectOfType<Camera>();
         }
 
-        private static void EnsureInteraction(Canvas canvas)
+        public static void EnsureVrRaycaster(Canvas canvas)
         {
-            if (canvas.GetComponent<GraphicRaycaster>() == null)
-                canvas.gameObject.AddComponent<GraphicRaycaster>();
+            if (canvas == null)
+                return;
+
+            var raycasters = canvas.GetComponents<GraphicRaycaster>();
+            for (int i = 0; i < raycasters.Length; i++)
+            {
+                if (raycasters[i] != null)
+                    Object.Destroy(raycasters[i]);
+            }
+
             if (canvas.GetComponent<TrackedDeviceGraphicRaycaster>() == null)
                 canvas.gameObject.AddComponent<TrackedDeviceGraphicRaycaster>();
         }
@@ -78,6 +88,14 @@ namespace PhobiaReliefTherapy.VR
             foreach (var image in canvas.GetComponentsInChildren<Image>(true))
             {
                 if (image == null || image.GetComponent<Button>() != null)
+                    continue;
+                if (image.GetComponent<Scrollbar>() != null || image.GetComponentInParent<Scrollbar>() != null)
+                    continue;
+                if (image.GetComponent<ScrollRect>() != null || image.GetComponentInParent<ScrollRect>() != null)
+                    continue;
+                if (image.GetComponent<TMP_InputField>() != null || image.GetComponentInParent<TMP_InputField>() != null)
+                    continue;
+                if (image.transform.parent != canvas.transform)
                     continue;
                 var rect = image.rectTransform;
                 bool full = rect.anchorMin == Vector2.zero && rect.anchorMax == Vector2.one;
@@ -96,7 +114,12 @@ namespace PhobiaReliefTherapy.VR
                 return true;
             if (canvas.GetComponentInParent<SessionVitalsOverlay>() != null)
                 return true;
-            return canvas.name == "TransitionCanvas" || canvas.name == "VitalsOverlayCanvas";
+            if (canvas.GetComponentInParent<VRKeyboard>() != null)
+                return true;
+            return canvas.name == "TransitionCanvas"
+                || canvas.name == "VitalsOverlayCanvas"
+                || canvas.name == VRKeyboard.KEYBOARD_ROOT_NAME
+                || canvas.name == "FeedbackWorldCanvas";
         }
     }
 }

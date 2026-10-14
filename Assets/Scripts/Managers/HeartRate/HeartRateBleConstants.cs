@@ -16,8 +16,8 @@ namespace PhobiaReliefTherapy.Managers.HeartRate
         public const int TherapyMaxBpm = 180;
         public const int RestingMinBpm = 55;
         public const int RestingMaxBpm = 95;
-        public const int StageAdvancedMaxBpm = 95;
-        public const int StageIntermediateMaxBpm = 108;
+        public const int StageAdvancedMaxBpm = 200;
+        public const int StageIntermediateMaxBpm = 170;
         public const int InjectStepBpm = 8;
         public const int MildAnxietyDeltaBpm = 18;
         public const int PanicDeltaBpm = 32;

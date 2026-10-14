@@ -62,7 +62,8 @@ namespace PhobiaReliefTherapy.VR
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            // Auto-hide whenever the user navigates to any scene
+            BuildKeyboard();
+            SetVisible(false);
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
@@ -78,12 +79,6 @@ namespace PhobiaReliefTherapy.VR
             targetTMP    = null;
             targetLegacy = null;
             buffer       = "";
-            SetVisible(false);
-        }
-
-        private void Start()
-        {
-            BuildKeyboard();
             SetVisible(false);
         }
 
@@ -113,7 +108,7 @@ namespace PhobiaReliefTherapy.VR
                 device.TryGetFeatureValue(CommonUsages.deviceRotation,  out Quaternion ctrlRot);
                 device.TryGetFeatureValue(CommonUsages.primary2DAxis,   out Vector2    stick);
 
-                // Convert tracking-space → world-space via XROrigin offset
+                // Convert tracking-space -> world-space via XROrigin offset
                 Transform origin = FindXROrigin();
                 if (origin != null)
                 {
@@ -121,10 +116,10 @@ namespace PhobiaReliefTherapy.VR
                     ctrlRot = origin.rotation * ctrlRot;
                 }
 
-                // Thumbstick Y → push / pull distance (0.3 m … 2.0 m)
+                // Thumbstick Y -> push / pull distance (0.3 m ... 2.0 m)
                 dragDistance = Mathf.Clamp(dragDistance + stick.y * Time.deltaTime * 0.8f, 0.3f, 2.0f);
 
-                // Thumbstick X → yaw the keyboard left / right
+                // Thumbstick X -> yaw the keyboard left / right
                 float yawDelta = stick.x * Time.deltaTime * 60f;  // degrees/sec
 
                 // Target position: straight ahead of the controller at dragDistance
@@ -165,6 +160,8 @@ namespace PhobiaReliefTherapy.VR
             isPassword   = field != null && field.contentType == TMP_InputField.ContentType.Password;
             buffer       = field != null ? field.text : "";
             capsOn       = false;
+            if (keyboardRoot == null)
+                BuildKeyboard();
             RefreshDisplay();
             SetVisible(true);
             PositionInFrontOfCamera();
@@ -178,6 +175,8 @@ namespace PhobiaReliefTherapy.VR
             isPassword   = field != null && field.contentType == InputField.ContentType.Password;
             buffer       = field != null ? field.text : "";
             capsOn       = false;
+            if (keyboardRoot == null)
+                BuildKeyboard();
             RefreshDisplay();
             SetVisible(true);
             PositionInFrontOfCamera();
@@ -242,7 +241,7 @@ namespace PhobiaReliefTherapy.VR
         {
             if (displayText == null) return;
             if (isPassword)
-                displayText.text = new string('●', buffer.Length);
+                displayText.text = new string('*', buffer.Length);
             else
                 displayText.text = buffer.Length == 0 ? "<color=#aaa>Type here...</color>" : buffer;
             // also push live text to the field
@@ -268,6 +267,9 @@ namespace PhobiaReliefTherapy.VR
 
         private void BuildKeyboard()
         {
+            if (keyboardRoot != null)
+                return;
+
             // Root world-space canvas
             keyboardRoot = new GameObject("VRKeyboard_Root");
             keyboardRoot.transform.SetParent(transform, false);
@@ -280,9 +282,9 @@ namespace PhobiaReliefTherapy.VR
 
             keyboardRoot.AddComponent<CanvasScaler>();
 
-            // Add TrackedDeviceGraphicRaycaster so XR ray can hit it
-            if (keyboardRoot.GetComponent<GraphicRaycaster>() == null)
-                keyboardRoot.AddComponent<GraphicRaycaster>();
+            var leftover = keyboardRoot.GetComponent<GraphicRaycaster>();
+            if (leftover != null)
+                Destroy(leftover);
             if (keyboardRoot.GetComponent<TrackedDeviceGraphicRaycaster>() == null)
                 keyboardRoot.AddComponent<TrackedDeviceGraphicRaycaster>();
 
@@ -306,7 +308,7 @@ namespace PhobiaReliefTherapy.VR
             dtRect.offsetMin = new Vector2(8, 2); dtRect.offsetMax = new Vector2(-4, -2);
             displayText.alignment = TextAlignmentOptions.MidlineLeft;
 
-            // Drag hint — shown in the top-right of the bar
+            // Drag hint - shown in the top-right of the bar
             var hint = CreateTMP(bar.transform, "DragHint", "✥ Grip+Stick to move", 9, new Color(0.5f, 0.7f, 1f, 0.8f));
             var hintRect = hint.GetComponent<RectTransform>();
             hintRect.anchorMin = new Vector2(0.73f, 0f); hintRect.anchorMax = Vector2.one;

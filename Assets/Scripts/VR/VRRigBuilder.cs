@@ -94,20 +94,7 @@ namespace PhobiaReliefTherapy.VR
 
             // 4. Configure Canvas for tracked controller raycasting
             if (uiCanvas != null)
-            {
-                // Remove standard GraphicRaycaster
-                var oldRaycaster = uiCanvas.GetComponent<GraphicRaycaster>();
-                if (oldRaycaster != null)
-                {
-                    Object.Destroy(oldRaycaster);
-                }
-
-                // Add Tracked Device Graphic Raycaster
-                if (uiCanvas.GetComponent<TrackedDeviceGraphicRaycaster>() == null)
-                {
-                    uiCanvas.gameObject.AddComponent<TrackedDeviceGraphicRaycaster>();
-                }
-            }
+                VrWorldMenu.EnsureVrRaycaster(uiCanvas);
 
             // 5. Configure EventSystem for XR UI input handling
             EventSystem eventSystem = Object.FindObjectOfType<EventSystem>();
@@ -156,6 +143,12 @@ namespace PhobiaReliefTherapy.VR
             rayInteractor.interactionManager  = interactionManager;
             rayInteractor.rayOriginTransform  = rayOriginGO.transform;
             rayInteractor.attachTransform     = rayOriginGO.transform;
+            rayInteractor.lineType = XRRayInteractor.LineType.StraightLine;
+            rayInteractor.maxRaycastDistance = 10f;
+            rayInteractor.enableUIInteraction = true;
+            var triggerProp = typeof(XRRayInteractor).GetProperty("raycastTriggerInteraction");
+            if (triggerProp != null && triggerProp.CanWrite)
+                triggerProp.SetValue(rayInteractor, QueryTriggerInteraction.Collide);
 
             // ── Line Renderer (laser visual) ──────────────────────────────────────
             LineRenderer lineRenderer = controllerGO.GetComponent<LineRenderer>();

@@ -136,7 +136,7 @@ namespace PhobiaReliefTherapy.VR
 
             float width = Mathf.Max(120f, rect.rect.width);
             float height = Mathf.Max(120f, rect.rect.height);
-            canvasCollider.size = new Vector3(width, height, 0.08f);
+            canvasCollider.size = new Vector3(width, height, 48f);
             canvasCollider.center = new Vector3(
                 rect.rect.x + rect.rect.width * 0.5f,
                 rect.rect.y + rect.rect.height * 0.5f,
@@ -194,26 +194,50 @@ namespace PhobiaReliefTherapy.VR
             bestCandidate = null;
         }
 
+        public static bool TryGetPointerAim(XRNode hand, out Ray aim, out Vector2 stick)
+        {
+            return TryGetAim(hand, out aim, out stick);
+        }
+
+        private static XRRayInteractor[] cachedInteractors;
+        private static float interactorCacheTime;
+
+        private static XRRayInteractor[] Interactors()
+        {
+            if (cachedInteractors == null || Time.unscaledTime - interactorCacheTime > 0.4f)
+            {
+                cachedInteractors = Object.FindObjectsOfType<XRRayInteractor>();
+                interactorCacheTime = Time.unscaledTime;
+            }
+
+            return cachedInteractors;
+        }
+
         private static bool TryGetAim(XRNode hand, out Ray aim, out Vector2 stick)
         {
             aim = default;
             stick = Vector2.zero;
 
-            foreach (var interactor in Object.FindObjectsOfType<XRRayInteractor>())
+            var interactors = Interactors();
+            if (interactors != null)
             {
-                if (interactor == null)
-                    continue;
-                var controller = interactor.GetComponent<XRController>();
-                if (controller == null || controller.controllerNode != hand)
-                    continue;
-                if (interactor.rayOriginTransform == null)
-                    continue;
+                for (int i = 0; i < interactors.Length; i++)
+                {
+                    var interactor = interactors[i];
+                    if (interactor == null)
+                        continue;
+                    var controller = interactor.GetComponent<XRController>();
+                    if (controller == null || controller.controllerNode != hand)
+                        continue;
+                    if (interactor.rayOriginTransform == null)
+                        continue;
 
-                aim = new Ray(interactor.rayOriginTransform.position, interactor.rayOriginTransform.forward);
-                InputDevice device = InputDevices.GetDeviceAtXRNode(hand);
-                if (device.isValid)
-                    device.TryGetFeatureValue(CommonUsages.primary2DAxis, out stick);
-                return true;
+                    aim = new Ray(interactor.rayOriginTransform.position, interactor.rayOriginTransform.forward);
+                    InputDevice device = InputDevices.GetDeviceAtXRNode(hand);
+                    if (device.isValid)
+                        device.TryGetFeatureValue(CommonUsages.primary2DAxis, out stick);
+                    return true;
+                }
             }
 
             InputDevice fallback = InputDevices.GetDeviceAtXRNode(hand);
@@ -243,5 +267,7 @@ namespace PhobiaReliefTherapy.VR
                 return true;
             return device.TryGetFeatureValue(CommonUsages.grip, out float grip) && grip >= 0.65f;
         }
+
+        public static bool AnyGrabActive => activeDrag != null;
     }
 }

@@ -53,7 +53,7 @@ namespace PhobiaReliefTherapy.Testing
                 $"score={panic.PanicScore:F2} class={panic.Classification}");
 
             var severe = PanicDetectionService.Evaluate(116, 10f, 0f);
-            Check("UC-10 ΔHR > 36 with a real rise can force Safe Room", severe.PanicScore >= 18f && severe.TriggerSafetyMechanism,
+            Check("UC-10 dHR > 36 with a real rise can force Safe Room", severe.PanicScore >= 18f && severe.TriggerSafetyMechanism,
                 $"score={severe.PanicScore:F2} rec={severe.AiRecommendation}");
 
             UserData.SelectedDifficulty = "High";

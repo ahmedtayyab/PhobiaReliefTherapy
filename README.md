@@ -98,7 +98,7 @@ To eliminate dependency on OS-level keyboards, the system includes a custom, cod
   - Users can press and hold the **Grip** button on either controller to grab the keyboard.
   - While gripping, moving the **Thumbstick up/down** (Y-axis) increases or decreases the floating distance of the keyboard (clamped between `0.3m` and `2.0m`).
   - Moving the **Thumbstick left/right** (X-axis) rotates/yaws the keyboard, allowing the user to angle it comfortably.
-- **Feedback & Password Masking**: The top display bar mirrors typed input dynamically. When targeting password input fields, characters are masked with security dots (`●`).
+- **Feedback & Password Masking**: The top display bar mirrors typed input dynamically. When targeting password input fields, characters are masked with security dots (`*`).
 
 ---
 
@@ -288,7 +288,7 @@ docs/                    # GitHub Pages hosted folder containing signup and rese
 
 ---
 
-## Roadmap (Phase 2 — `phase-2` branch)
+## Roadmap (Phase 2 - `phase-2` branch)
 
 Phase 1 behaviour (20s baseline, 30s exposure stages, skybox panoramas) is preserved. Phase 2 adds SRS-aligned session monitoring without changing VR/UI interaction patterns.
 

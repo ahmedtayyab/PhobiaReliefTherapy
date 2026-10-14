@@ -26,7 +26,7 @@ namespace PhobiaReliefTherapy.Managers.HeartRate
             setpointBpm = restBpm;
             currentBpm = restBpm;
             LatestHeartRate = restBpm;
-            StatusMessage = "Mock sensor ready (physiological range 40–180 BPM).";
+            StatusMessage = "Mock sensor ready (physiological range 40-180 BPM).";
             onComplete?.Invoke(true);
             yield break;
         }

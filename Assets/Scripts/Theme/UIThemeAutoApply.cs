@@ -155,7 +155,10 @@ namespace PhobiaReliefTherapy.Theme
                 return true;
             if (canvas.transform.parent != null && canvas.transform.parent.GetComponent<SceneLoader>() != null)
                 return true;
-            if (canvas.name == "VitalsOverlayCanvas" || canvas.name == "TransitionCanvas")
+            if (canvas.name == "VitalsOverlayCanvas" || canvas.name == "TransitionCanvas"
+                || canvas.name == VRKeyboard.KEYBOARD_ROOT_NAME)
+                return true;
+            if (canvas.GetComponentInParent<VRKeyboard>() != null)
                 return true;
             return canvas.GetComponentInParent<SessionVitalsOverlay>() != null;
         }

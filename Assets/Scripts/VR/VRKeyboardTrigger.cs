@@ -19,9 +19,13 @@ namespace PhobiaReliefTherapy.VR
             tmpField    = GetComponent<TMP_InputField>();
             legacyField = GetComponent<InputField>();
 
-            // Disable the built-in caret / selection that tries to summon OS keyboard
-            if (tmpField    != null) tmpField.shouldHideMobileInput    = true;
-            if (legacyField != null) legacyField.shouldHideMobileInput = true;
+            if (tmpField != null)
+            {
+                tmpField.shouldHideMobileInput = true;
+                tmpField.shouldHideSoftKeyboard = true;
+            }
+            if (legacyField != null)
+                legacyField.shouldHideMobileInput = true;
         }
 
         public void OnPointerDown(PointerEventData eventData) => OpenKeyboard();
@@ -29,6 +33,12 @@ namespace PhobiaReliefTherapy.VR
 
         private void OpenKeyboard()
         {
+            if (tmpField != null)
+            {
+                tmpField.shouldHideMobileInput = true;
+                tmpField.shouldHideSoftKeyboard = true;
+            }
+
             VRKeyboard kb = VRKeyboard.EnsureInstance();
             if (tmpField    != null) { kb.Open(tmpField);    return; }
             if (legacyField != null) { kb.Open(legacyField); return; }

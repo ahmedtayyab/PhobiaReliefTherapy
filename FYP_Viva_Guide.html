@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Phobia Relief Therapy - FYP Viva Guide</title>
+  <style>
+    :root {
+      --ink: #1a2332;
+      --muted: #4a5568;
+      --line: #d6dde8;
+      --accent: #c2410c;
+      --paper: #ffffff;
+      --wash: #f7f5f2;
+      --code: #0f172a;
+    }
+    * { box-sizing: border-box; }
+    html { font-size: 11pt; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--wash);
+      font-family: "Segoe UI", "Calibri", "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.45;
+    }
+    .wrap {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 32px 28px 64px;
+      background: var(--paper);
+      box-shadow: 0 0 0 1px var(--line);
+    }
+    h1 {
+      font-size: 22pt;
+      line-height: 1.2;
+      margin: 0 0 6px;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      font-size: 13pt;
+      color: var(--accent);
+      font-weight: 700;
+      margin: 0 0 16px;
+    }
+    h2 {
+      font-size: 14pt;
+      margin: 28px 0 10px;
+      padding-top: 10px;
+      border-top: 2px solid var(--ink);
+      page-break-after: avoid;
+    }
+    h3 {
+      font-size: 12pt;
+      margin: 18px 0 8px;
+      color: var(--accent);
+      page-break-after: avoid;
+    }
+    p { margin: 0 0 10px; }
+    ul, ol { margin: 0 0 12px; padding-left: 1.3em; }
+    li { margin: 0 0 4px; }
+    strong { font-weight: 700; }
+    code, pre {
+      font-family: "Cascadia Mono", "Consolas", "Courier New", monospace;
+      font-size: 9.5pt;
+    }
+    code {
+      background: #f1f3f7;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+    pre {
+      background: var(--code);
+      color: #e2e8f0;
+      padding: 12px 14px;
+      border-radius: 6px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      page-break-inside: avoid;
+    }
+    .note {
+      background: #fff7ed;
+      border-left: 4px solid var(--accent);
+      padding: 10px 12px;
+      margin: 0 0 14px;
+    }
+    .cmd-box {
+      background: #102a43;
+      color: #f0f4f8;
+      padding: 16px 18px;
+      border-radius: 8px;
+      margin: 12px 0 16px;
+      page-break-inside: avoid;
+    }
+    .cmd-box h3 { color: #ffedd5; margin-top: 0; }
+    .cmd-box pre { background: #0b1c2c; margin: 8px 0 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 0 14px;
+      font-size: 10pt;
+      page-break-inside: auto;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #1a2332;
+      color: #fff;
+      font-weight: 600;
+    }
+    tr:nth-child(even) td { background: #f8fafc; }
+    .meta { color: var(--muted); font-size: 10pt; margin-bottom: 18px; }
+    .print-hint {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      padding: 10px 12px;
+      margin-bottom: 18px;
+      border-radius: 6px;
+    }
+    @media print {
+      body { background: #fff; }
+      .wrap { box-shadow: none; max-width: none; padding: 0; }
+      .print-hint { display: none; }
+      h2 { break-after: avoid; }
+      pre, table, .cmd-box, .note { break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="print-hint"><strong>Make a PDF:</strong> press Ctrl+P -> Destination: Save as PDF -> turn on Background graphics -> Save.</p>
+
+    <h1>Phobia Relief Therapy in VR</h1>
+    <p class="subtitle">Final Year Project - Viva Guide</p>
+    <p class="meta">Values match the current Unity code. Older docs that still say 20 s / 30 s are stale. Live timers are <strong>60 s baseline</strong> and <strong>120 s exposure</strong>.</p>
+
+    <div class="note">
+      <strong>Do not quote</strong> <code>Project_Explanation.md</code> or old README timings in the viva. Trust this guide and <code>SessionTiming.cs</code>.
+    </div>
+
+    <h2>1. One-minute pitch</h2>
+    <p>This is a Virtual Reality Exposure Therapy (VRET) application built in Unity. The patient logs in, sits in a calm baseline room while Polar H10 heart rate and headset movement are averaged for <strong>60 seconds</strong>, then an <strong>AI decision tree</strong> selects Beginner, Intermediate, or Advanced. They pass through a Safe Room, then a <strong>2-minute</strong> 360° exposure for heights, darkness, or crowds. Live panic scoring can lower intensity or return them to the Safe Room. Session data is stored locally and synced to Supabase.</p>
+    <p><strong>Engine:</strong> Unity 2022.3.62f3 &nbsp;-&nbsp; <strong>VR:</strong> OpenXR + XR Interaction Toolkit &nbsp;-&nbsp; <strong>Headset:</strong> Meta Quest (Quest Link for Polar) &nbsp;-&nbsp; <strong>Sensor:</strong> Polar H10 &nbsp;-&nbsp; <strong>Cloud:</strong> Supabase (PostgreSQL + Auth)</p>
+
+    <h2>2. Polar H10 commands (keep this page handy)</h2>
+    <p>Live heart rate does <strong>not</strong> come from Unity Bluetooth. A Python script on the <strong>same Windows PC</strong> reads the strap and sends BPM to Unity on <strong>UDP port 7878</strong>.</p>
+
+    <div class="cmd-box">
+      <h3>Install once</h3>
+      <pre>pip install bleak</pre>
+      <p style="margin:10px 0 0;color:#cbd5e1;">If pip is not found:</p>
+      <pre>python -m pip install bleak</pre>
+      <h3>Run every demo - leave this window open</h3>
+      <pre>cd C:\Users\ahmad\PhobiaReliefTherapy
+python tools\polar_hr_bridge.py</pre>
+      <p style="margin:10px 0 0;color:#cbd5e1;">Expected output: Scanning... Found Polar H10... Streaming to Unity at 127.0.0.1:7878 then repeating BPM: 78</p>
+    </div>
+
+    <ol>
+      <li>Quest on <strong>Quest Link (USB)</strong>. USB Link does not need Wi-Fi. Air Link does.</li>
+      <li>Polar H10 on the chest. <strong>Wet the electrodes.</strong> Strap snug. Laptop Bluetooth on.</li>
+      <li>Unity Editor in <strong>Play</strong>. Leave <code>forceMockSensor</code> <strong>false</strong>.</li>
+      <li>Keep <code>polar_hr_bridge.py</code> running the whole session.</li>
+    </ol>
+    <p><strong>Do not promise</strong> a standalone Quest APK Polar demo. The bridge talks to 127.0.0.1 on the PC.</p>
+
+    <h2>3. Sentences to memorize</h2>
+    <p><strong>What is the AI?</strong> A rule-based decision tree, not a trained neural network. Inputs are change in heart rate, head movement, and time spent in stress.</p>
+    <p><strong>Why not Random Forest?</strong> RF needs labelled clinical data. A decision tree is deterministic, inspectable, and matches the SRS formula. We kept the word AI because the SRS names this adaptive engine AI.</p>
+    <p><strong>How is panic detected?</strong> PanicScore = 0.5 x dHR + 0.3 x head movement + 0.2 x time spent. Below 10 continue; 10-18 lower stage; 18+ stop / Safe Room.</p>
+    <p><strong>Starting stage?</strong> After baseline, <code>ExposureStageAdvisor</code> maps rest BPM and movement to stage 1 / 2 / 3. Manual Beginner / Intermediate / Advanced is hidden.</p>
+    <p><strong>Live Polar on APK?</strong> No. Panel demo is Quest Link + <code>polar_hr_bridge.py</code> on the laptop.</p>
+    <p><strong>Appointments?</strong> Out of scope. <strong>Offline?</strong> Yes - local JSON, Supabase when online.</p>
+
+    <h2>4. How the AI works</h2>
+    <p>Two hand-written C# decision trees. No sklearn, no weights file, no training.</p>
+
+    <h3>Tree A - starting stage</h3>
+    <p><strong>File:</strong> <code>ExposureStageAdvisor.cs</code></p>
+    <pre>if BPM &lt;= 95 and movement &lt;= 16
+    Stage 3  Advanced
+else if BPM &lt;= 108 and movement &lt;= 28
+    Stage 2  Intermediate
+else
+    Stage 1  Beginner</pre>
+    <p>Constants in <code>HeartRateBleConstants.cs</code>: StageAdvancedMaxBpm = <strong>95</strong>, StageIntermediateMaxBpm = <strong>108</strong>. Live Polar rest is typically 70-95 BPM, so a calm seated patient can still get Advanced. <code>AllowManualStageSelection</code> is false.</p>
+    <p><em>Viva line:</em> “The AI is a clinical decision tree. Thresholds are physiological, not learned. We can walk through every if-statement.”</p>
+
+    <h3>Tree B - live recommendations</h3>
+    <p><strong>Files:</strong> <code>PanicDetectionService.cs</code>, <code>AdaptiveExposureController.cs</code>. Sampled every 1 second.</p>
+    <table>
+      <tr><th>Score</th><th>Class</th><th>AI says</th><th>App action</th></tr>
+      <tr><td>below 10</td><td>Calm Stress</td><td>Continue Exposure</td><td>After 20 s calm and 12 s since last change, HUD may suggest advancing next session</td></tr>
+      <tr><td>10 to 18</td><td>Panic Detected</td><td>Repeat Level</td><td>After 8 s cooldown, lower stage by 1 (minimum 1)</td></tr>
+      <tr><td>18+</td><td>Severe Panic</td><td>Stop / Safe Room</td><td>If score >= 22 and dHR >= 20, and 20 s grace passed, return to Safe Room</td></tr>
+    </table>
+    <p>dHR &gt; <strong>36</strong> forces score >= 22. dHR &gt; <strong>32</strong> raises a low score to at least 10. Visible AI: <code>UiAiMark</code> badge plus recommendation text.</p>
+
+    <h2>5. Panic formula (board)</h2>
+    <pre>deltaHR     = currentBPM - BaselineHeartRate
+
+HM score    = 0 if movement is not above baseline
+            = min(100, (currentMove - baselineMove) / baselineMove x 45)
+
+Time score  = 0 if stress seconds = 0 or deltaHR ≤ 5
+            = (stressSeconds / 15) x 100   if under 15 s
+            = 100                          if 15 s or more
+
+PanicScore  = 0.5 x deltaHR  +  0.3 x HM  +  0.2 x TimeSpent</pre>
+    <p>A <strong>stress second</strong> counts when dHR &gt; 16 <strong>or</strong> movement &gt; 2.4 x baseline movement (floor 15).</p>
+    <pre>Agitation = 0.45 x rotationSpeed + 24 x movementFrequency + 0.35 x jerk</pre>
+    <p>Freeze is tracked but not used in panic. Safety does not fire in the first <strong>20 seconds</strong> of exposure. Emergency (not AI): Quest <strong>A</strong> or <strong>X</strong>, Editor keyboard <strong>X</strong>.</p>
+
+    <h2>6. Important values</h2>
+    <p>Change timers only in <code>SessionTiming.cs</code>.</p>
+    <table>
+      <tr><th>What</th><th>Value</th><th>Where</th></tr>
+      <tr><td>Baseline</td><td>60 s</td><td>SessionTiming.BaselineSeconds</td></tr>
+      <tr><td>Exposure</td><td>120 s</td><td>SessionTiming.ExposureSeconds</td></tr>
+      <tr><td>Safe Room countdown</td><td>5 s</td><td>SessionTiming.SafeRoomCountdownSeconds</td></tr>
+      <tr><td>Skip timers (Editor)</td><td>F1</td><td>EditorTherapySimulator</td></tr>
+      <tr><td>Polar UDP port</td><td>7878</td><td>HeartRateBleConstants</td></tr>
+      <tr><td>Polar command</td><td>python tools\polar_hr_bridge.py</td><td>tools/polar_hr_bridge.py</td></tr>
+      <tr><td>BLE Heart Rate UUID</td><td>0000180d-0000-1000-8000-00805f9b34fb</td><td>Bluetooth SIG / Polar</td></tr>
+      <tr><td>Resting BPM</td><td>55-95</td><td>HeartRateBleConstants</td></tr>
+      <tr><td>Therapy clamp</td><td>40-180 BPM</td><td>same</td></tr>
+      <tr><td>Device clamp</td><td>30-220 BPM</td><td>Polar spec</td></tr>
+      <tr><td>Stage 3 max rest BPM</td><td>95</td><td>StageAdvancedMaxBpm</td></tr>
+      <tr><td>Stage 2 max rest BPM</td><td>108</td><td>StageIntermediateMaxBpm</td></tr>
+      <tr><td>Panic weights</td><td>50% / 30% / 20%</td><td>PanicDetectionService</td></tr>
+      <tr><td>Safe Room score gate</td><td>22</td><td>SafeRoomScoreThreshold</td></tr>
+      <tr><td>dHR force-evaluate</td><td>36</td><td>DeltaHrImmediateEvaluateThreshold</td></tr>
+      <tr><td>Skybox intensity</td><td>1.0 / 1.15 / 1.35</td><td>TherapySessionHelper</td></tr>
+      <tr><td>World canvas scale</td><td>~0.001</td><td>1000 px ≈ 1 m</td></tr>
+      <tr><td>Grip drag distance</td><td>0.45-3.2 m</td><td>VRMenuDragger</td></tr>
+      <tr><td>XR Origin Y</td><td>0</td><td>VRRigBuilder double-height fix</td></tr>
+      <tr><td>Laser pitch</td><td>15° down</td><td>VRRigBuilder</td></tr>
+      <tr><td>Theme accent / bg</td><td>#FF5722 / #0D0E12</td><td>ThemePreset</td></tr>
+      <tr><td>Seed admin</td><td>admin@phobia.local / admin123</td><td>LocalAccountStore</td></tr>
+      <tr><td>Seed user</td><td>user@phobia.local / user1234</td><td>LocalAccountStore</td></tr>
+    </table>
+
+    <h2>7. Session flow</h2>
+    <pre>WelcomeScene
+  -> LoginScene / RegisterScene
+  -> DashboardScene
+  -> BaselineScene              (60 s HR + head movement)
+  -> PhobiaSelectionScene       (Height / Darkness / Crowd; AI picks stage)
+  -> SafeRoomScene              (review stage, 5 s countdown)
+  -> Height / Darkness / Crowd  (120 s + live AI)
+  -> FeedbackScene
+  -> DashboardScene             (View stats / Analyze performance)</pre>
+    <p>Admin login opens <code>AdminScene</code>. Press <strong>F1</strong> in the Editor to skip long timers.</p>
+
+    <h2>8. Tools and names</h2>
+    <table>
+      <tr><th>Layer</th><th>Tool</th></tr>
+      <tr><td>Engine</td><td>Unity 2022.3.62f3 LTS</td></tr>
+      <tr><td>VR runtime</td><td>OpenXR</td></tr>
+      <tr><td>VR input</td><td>XR Interaction Toolkit (XRI)</td></tr>
+      <tr><td>Headset</td><td>Meta Quest + Quest Link (USB)</td></tr>
+      <tr><td>Text</td><td>TextMesh Pro</td></tr>
+      <tr><td>Heart rate</td><td>Polar H10, BLE service 0x180D</td></tr>
+      <tr><td>PC BLE -> Unity</td><td>Python package bleak, tools/polar_hr_bridge.py, UDP 127.0.0.1:7878</td></tr>
+      <tr><td>Cloud</td><td>Supabase (PostgreSQL, Auth, REST, RLS)</td></tr>
+      <tr><td>Local cache</td><td>JSON in Application.persistentDataPath</td></tr>
+      <tr><td>Schema</td><td>docs/supabase-admin-schema.sql - Tools -> PRT -> Apply Cloud Setup</td></tr>
+      <tr><td>Tests</td><td>Tools -> PRT -> Run SRS Logic Tests</td></tr>
+      <tr><td>Git</td><td>branch fyp2</td></tr>
+    </table>
+    <p><strong>Not used in shipped AI:</strong> TensorFlow, PyTorch, sklearn Random Forest, Unity ML-Agents.</p>
+
+    <h2>9. File map</h2>
+    <p>Paths under <code>Assets/Scripts/</code> unless noted.</p>
+
+    <h3>Therapy and AI</h3>
+    <table>
+      <tr><th>File</th><th>Contains</th></tr>
+      <tr><td>Therapy/PanicDetectionService.cs</td><td>SRS panic formula. Memorize this file.</td></tr>
+      <tr><td>Therapy/ExposureStageAdvisor.cs</td><td>Baseline -> starting stage.</td></tr>
+      <tr><td>Therapy/AdaptiveExposureController.cs</td><td>Live HUD, lower stage, Safe Room return.</td></tr>
+      <tr><td>Therapy/ExposureSessionMonitor.cs</td><td>1 Hz sample, 20 s grace.</td></tr>
+      <tr><td>Therapy/BaselineManager.cs</td><td>60 s average HR, then advisor.</td></tr>
+      <tr><td>Therapy/SafeRoomManager.cs</td><td>Briefing and abort landing.</td></tr>
+      <tr><td>Therapy/HeightManager.cs</td><td>Acrophobia, 120 s.</td></tr>
+      <tr><td>Therapy/CrowdManager.cs</td><td>Crowd phobia session.</td></tr>
+      <tr><td>Therapy/DarknessManager.cs</td><td>Nyctophobia, three images by stage.</td></tr>
+      <tr><td>Therapy/PhobiaSelectionManager.cs</td><td>Pick track. Manual difficulty hidden.</td></tr>
+      <tr><td>Therapy/PhobiaCatalog.cs</td><td>Low/Medium/High ↔ stages 1/2/3.</td></tr>
+      <tr><td>Therapy/TherapySessionHelper.cs</td><td>Start/complete/abort, persist, emergency.</td></tr>
+      <tr><td>Therapy/DashboardManager.cs</td><td>Patient home.</td></tr>
+      <tr><td>Therapy/DashboardSessionHistory.cs</td><td>View stats / analyze performance.</td></tr>
+      <tr><td>Therapy/FeedbackManager.cs</td><td>Rating, comments, vitals summary.</td></tr>
+    </table>
+
+    <h3>Data</h3>
+    <table>
+      <tr><th>File</th><th>Contains</th></tr>
+      <tr><td>Data/UserData.cs</td><td>User, phobia, CurrentStage, admin flag.</td></tr>
+      <tr><td>Data/SessionMetrics.cs</td><td>Peak/avg HR, movement, panic list.</td></tr>
+      <tr><td>Data/SessionTiming.cs</td><td>Only place for 60 / 120 / 5.</td></tr>
+      <tr><td>Data/SessionVitalsHistory.cs</td><td>HUD sparkline buffers.</td></tr>
+      <tr><td>Data/LocalSessionStore.cs</td><td>PhobiaReliefTherapy_sessions.json</td></tr>
+      <tr><td>Data/LocalAccountStore.cs</td><td>PhobiaReliefTherapy_accounts.json, seed logins.</td></tr>
+      <tr><td>Data/DatabaseManager.cs</td><td>Supabase Auth + session sync.</td></tr>
+      <tr><td>Data/CloudSetup.cs</td><td>Copies SQL, opens Supabase editor.</td></tr>
+    </table>
+
+    <h3>Sensors, VR, UI, tools</h3>
+    <table>
+      <tr><th>File</th><th>Contains</th></tr>
+      <tr><td>Managers/SensorManager.cs</td><td>Live UDP first. forceMockSensor false.</td></tr>
+      <tr><td>Managers/HeartRate/UdpHeartRateProvider.cs</td><td>Parses BPM:72 packets.</td></tr>
+      <tr><td>Managers/HeartRate/MockHeartRateProvider.cs</td><td>Editor fallback.</td></tr>
+      <tr><td>Managers/HeartRate/HeartRateBleConstants.cs</td><td>UUIDs, BPM gates, port 7878.</td></tr>
+      <tr><td>Managers/HeadMovementTracker.cs</td><td>Rotation, jerk, freeze.</td></tr>
+      <tr><td>Managers/PolarSensorDebugUI.cs</td><td>Editor overlay. F8 collapses.</td></tr>
+      <tr><td>Managers/authManager.cs</td><td>Login / register / recovery.</td></tr>
+      <tr><td>VR/VRRigBuilder.cs</td><td>XR Origin, lasers, Y=0, 15° pitch.</td></tr>
+      <tr><td>VR/VrWorldMenu.cs</td><td>Overlay -> World Space for HMD.</td></tr>
+      <tr><td>VR/VRMenuDragger.cs</td><td>Grip drag, stick distance/zoom.</td></tr>
+      <tr><td>VR/VrEmergencyInput.cs</td><td>A / X emergency.</td></tr>
+      <tr><td>VR/VRKeyboard.cs</td><td>In-world keyboard.</td></tr>
+      <tr><td>UI/SessionVitalsOverlay.cs</td><td>Live graphs.</td></tr>
+      <tr><td>UI/UiAiMark.cs</td><td>AI badge.</td></tr>
+      <tr><td>Theme/ThemePreset.cs</td><td>Color tokens.</td></tr>
+      <tr><td>Testing/SrsLogicTests.cs</td><td>Formula tests, no headset.</td></tr>
+      <tr><td>tools/polar_hr_bridge.py</td><td>Polar H10 -> UDP 7878.</td></tr>
+    </table>
+    <p>Runtime images: <code>Assets/Resources/</code> - baseline_image, height_image, crowd_image, darkness_image / 2 / 3, safe_room_preview.</p>
+
+    <h2>10. What you can change</h2>
+    <p><strong>Safe:</strong> timers in SessionTiming.cs; BPM gates in HeartRateBleConstants.cs; panic weights in PanicDetectionService.cs; forceMockSensor only if Polar is dead.</p>
+    <p><strong>Do not touch on demo day:</strong> World Space conversion, VRMenuDragger grab logic, signup success path, AllowManualStageSelection (must stay off).</p>
+
+    <h2>11. Demo checklist</h2>
+    <ol>
+      <li>Unity Play + Quest Link (USB).</li>
+      <li><code>python tools\polar_hr_bridge.py</code> - see BPM lines.</li>
+      <li>Log in: user@phobia.local / user1234, or a real Supabase account.</li>
+      <li>Baseline (or F1) -> AI stage text -> Safe Room -> exposure.</li>
+      <li>Laser on a menu, Grip to drag, stick Y distance, stick X zoom.</li>
+      <li>A or X -> Safe Room.</li>
+    </ol>
+    <p>Mock keys (only if mock is forced): + / - BPM, P panic, C calm. F8 hides the debug panel.</p>
+
+    <h2>12. Where data is stored</h2>
+    <table>
+      <tr><th>Store</th><th>Location</th></tr>
+      <tr><td>Local accounts</td><td>persistentDataPath/PhobiaReliefTherapy_accounts.json</td></tr>
+      <tr><td>Local sessions</td><td>persistentDataPath/PhobiaReliefTherapy_sessions.json</td></tr>
+      <tr><td>Cloud users</td><td>Supabase Auth</td></tr>
+      <tr><td>Cloud sessions</td><td>tables from docs/supabase-admin-schema.sql</td></tr>
+      <tr><td>Tokens</td><td>PlayerPrefs</td></tr>
+    </table>
+    <p>Persist happens at exposure complete or abort. Signup 2xx without a session (email verify pending) is still a successful cloud signup, not “cloud unavailable”.</p>
+
+    <h2>13. Use cases vs what we ship</h2>
+    <table>
+      <tr><th>Area</th><th>Status</th></tr>
+      <tr><td>Login / register / recovery</td><td>Done (cloud + local)</td></tr>
+      <tr><td>Dashboard, phobia select</td><td>Done</td></tr>
+      <tr><td>Baseline 1 minute</td><td>Done</td></tr>
+      <tr><td>AI stage from vitals</td><td>Done (decision tree)</td></tr>
+      <tr><td>Safe Room + emergency</td><td>Done</td></tr>
+      <tr><td>2 minute exposure x 3 phobias</td><td>Done</td></tr>
+      <tr><td>Panic / adaptive intensity</td><td>Done</td></tr>
+      <tr><td>Feedback + stats</td><td>Done</td></tr>
+      <tr><td>Admin users / suspend</td><td>Done</td></tr>
+      <tr><td>Lab appointments</td><td>Not implemented - out of scope</td></tr>
+    </table>
+
+    <h2>14. Likely questions</h2>
+    <p><strong>“This is not AI.”</strong> Classical AI includes expert systems and decision trees. The SRS specifies this formula. A black-box Random Forest would be harder to defend with our dataset.</p>
+    <p><strong>“Show the model file.”</strong> There is none. The model is the code in PanicDetectionService and ExposureStageAdvisor.</p>
+    <p><strong>“Why 360 photos?”</strong> One skybox draw, stable 90 Hz, smaller APK. Intensity via _Exposure and three darkness textures.</p>
+    <p><strong>“Why World Space UI?”</strong> Overlay canvases are invisible in the HMD. Scale ~0.001 plus XRI TrackedDeviceGraphicRaycaster.</p>
+    <p><strong>“Custom keyboard?”</strong> Quest OS keyboard sits outside Unity stereo and glitches.</p>
+    <p><strong>“Double height?”</strong> Floor tracking already includes standing height. Origin at 1.7 m stacked to ~3.4 m. Origin Y = 0.</p>
+    <p><strong>“Coroutines vs Sleep?”</strong> Unity is single-threaded. Sleep would freeze the headset. Timers use yield.</p>
+
+    <h2>15. Honest limitations</h2>
+    <ol>
+      <li>Appointments are not in the product.</li>
+      <li>Live Polar needs the PC bridge + Quest Link, not a standalone APK.</li>
+      <li>AI is not a trained Random Forest.</li>
+      <li>Height and crowd use one panorama each; darkness has three images.</li>
+      <li>Old write-ups say 20/30 seconds. Code is 60/120.</li>
+    </ol>
+
+    <h2>16. Unity menus</h2>
+    <ul>
+      <li><strong>Tools -> PRT -> Run SRS Logic Tests</strong></li>
+      <li><strong>Tools -> PRT -> Apply Cloud Setup</strong></li>
+    </ul>
+  </div>
+</body>
+</html>

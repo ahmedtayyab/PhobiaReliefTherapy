@@ -16,7 +16,7 @@ namespace PhobiaReliefTherapy.Data
     }
 
     /// <summary>
-    /// Holds per-session physiological and panic metrics (SRS §3.2.4–3.2.8, UC-08/10/11).
+    /// Holds per-session physiological and panic metrics (SRS 3.2.4-3.2.8, UC-08/10/11).
     /// </summary>
     public static class SessionMetrics
     {

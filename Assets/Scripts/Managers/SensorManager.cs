@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using PhobiaReliefTherapy.Data;
 using PhobiaReliefTherapy.Managers.HeartRate;
 
 namespace PhobiaReliefTherapy.Managers
@@ -106,7 +107,7 @@ namespace PhobiaReliefTherapy.Managers
             UseMockSensor = true;
             isInitialized = false;
 
-            bool useMockFirst = forceMockSensor;
+            bool useMockFirst = forceMockSensor || SessionTiming.LaptopPlaytest;
             if (useMockFirst)
             {
                 ActivateMockProvider(Application.isEditor

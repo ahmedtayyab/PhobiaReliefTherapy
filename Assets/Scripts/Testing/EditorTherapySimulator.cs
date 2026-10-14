@@ -7,7 +7,7 @@ namespace PhobiaReliefTherapy.Testing
 {
     /// <summary>
     /// Keyboard helpers so the full therapy loop can be exercised in the Editor without VR.
-    /// F1 skip timer · Equals raise HR · Minus lower HR · J jerk · LeftBracket freeze · P panic · C calm
+    /// F1 skip timer - Equals raise HR - Minus lower HR - J jerk - LeftBracket freeze - P panic - C calm
     /// </summary>
     public class EditorTherapySimulator : MonoBehaviour
     {

@@ -8,12 +8,13 @@ using PhobiaReliefTherapy.Theme;
 namespace PhobiaReliefTherapy.Therapy
 {
     /// <summary>
-    /// Shared Phase 2 helpers for exposure scenes — emergency stop, session completion routing.
+    /// Shared Phase 2 helpers for exposure scenes - emergency stop, session completion routing.
     /// </summary>
     public static class TherapySessionHelper
     {
         public static void BeginExposureSession(System.Action<PanicDetectionService.PanicEvaluation> onSafetyTriggered = null)
         {
+            LocalSessionStore.ClearOpenSession();
             ExposureSessionMonitor.EnsureInstanceExists();
             ExposureSessionMonitor.Instance.StartMonitoring(onSafetyTriggered);
         }
@@ -125,7 +126,7 @@ namespace PhobiaReliefTherapy.Therapy
             textRect.offsetMax = Vector2.zero;
 
             var tmp = textGO.GetComponent<TextMeshProUGUI>();
-            tmp.text = "Emergency  ·  A / X";
+            tmp.text = "Emergency  |  A / X";
             tmp.alignment = TextAlignmentOptions.Center;
 
             var textTheme = textGO.AddComponent<ThemeableUI>();

@@ -174,19 +174,40 @@ namespace PhobiaReliefTherapy.Data
             if (s == null)
                 return "";
 
-            string who = includeUser && !string.IsNullOrEmpty(s.Username) ? $"{s.Username}  ·  " : "";
-            string ended = s.Aborted ? "  ·  ended early" : "";
+            string who = includeUser && !string.IsNullOrEmpty(s.Username) ? s.Username + "  |  " : "";
+            string ended = s.Aborted ? "ended early" : "completed";
             var line =
-                $"• {FormatDate(s.DateCompleted)}  {who}{s.Phobia}  {FormatDifficulty(s.Difficulty)} (stage {s.Stage})  {s.ExposureTime:F0}s{ended}\n" +
-                $"    HR  baseline {s.BaselineHeartRate}  avg {s.AverageHeartRate:F0}  peak {s.PeakHeartRate}  final {s.FinalHeartRate}\n" +
-                $"    Movement  baseline {s.BaselineHeadMovementScore:F1}  avg {s.AverageHeadMovementScore:F1}  peak {s.PeakHeadMovementScore:F1}\n" +
-                $"    Panic {s.PanicEventCount}  avg {s.AveragePanicScore:F1}  high {s.HighestPanicScore:F1}  safety {s.SafetyTriggerCount}";
+                $"{FormatDate(s.DateCompleted)}\n" +
+                $"{who}{s.Phobia}  |  {FormatDifficulty(s.Difficulty)}  |  Stage {s.Stage}  |  {s.ExposureTime:F0}s  |  {ended}\n" +
+                $"Heart rate      baseline {s.BaselineHeartRate}   average {s.AverageHeartRate:F0}   peak {s.PeakHeartRate}   final {s.FinalHeartRate}\n" +
+                $"Head movement   baseline {s.BaselineHeadMovementScore:F1}   average {s.AverageHeadMovementScore:F1}   peak {s.PeakHeadMovementScore:F1}\n" +
+                $"Panic           events {s.PanicEventCount}   average {s.AveragePanicScore:F1}   highest {s.HighestPanicScore:F1}   safety stops {s.SafetyTriggerCount}";
 
             if (!string.IsNullOrEmpty(s.AiRecommendation))
-                line += $"\n    AI: {s.AiRecommendation}";
+                line += $"\nAI              {s.AiRecommendation}";
             if (!string.IsNullOrEmpty(s.Feedback) && s.Feedback != s.AiRecommendation)
-                line += $"\n    Note: {s.Feedback}";
-            return line;
+                line += $"\nFeedback        {s.Feedback}";
+            return line + "\n";
+        }
+
+        public static string FormatCompact(StoredSession s, bool includeUser)
+        {
+            if (s == null)
+                return "";
+
+            string who = includeUser && !string.IsNullOrEmpty(s.Username) ? s.Username + "  " : "";
+            string ended = s.Aborted ? "early" : "ok";
+            return $"{FormatDate(s.DateCompleted)}  {who}{s.Phobia}  Stg {s.Stage}  {s.ExposureTime:F0}s  HR {s.AverageHeartRate:F0}/{s.PeakHeartRate}  stress {s.AveragePanicScore:F1}  {ended}";
+        }
+
+        public static string FormatBar(int value, int total, int width = 14)
+        {
+            if (total <= 0 || width <= 0)
+                return "[" + new string('-', width) + "]  0%";
+
+            int filled = Mathf.Clamp(Mathf.RoundToInt(width * (float)value / total), 0, width);
+            int pct = Mathf.RoundToInt(100f * value / total);
+            return "[" + new string('#', filled) + new string('-', width - filled) + "]  " + pct + "%";
         }
 
         public static bool IsHeight(string phobia) => MatchesPhobia(phobia, "Height", "Acro");

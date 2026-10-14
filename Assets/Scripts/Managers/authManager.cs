@@ -62,14 +62,14 @@ namespace PhobiaReliefTherapy.Managers
 
             if (goToRegisterButton != null)
             {
-                EnsureClickableButton(goToRegisterButton);
+                EnsureClickableButton(goToRegisterButton, true);
                 goToRegisterButton.onClick.RemoveAllListeners();
                 goToRegisterButton.onClick.AddListener(() => NavigateToScene("RegisterScene"));
             }
 
             if (goToLoginButton != null)
             {
-                EnsureClickableButton(goToLoginButton);
+                StyleTextLink(goToLoginButton);
                 goToLoginButton.onClick.RemoveAllListeners();
                 goToLoginButton.onClick.AddListener(() => NavigateToScene("LoginScene"));
             }
@@ -97,8 +97,10 @@ namespace PhobiaReliefTherapy.Managers
             EnsureClickableButton(loginButton, false);
             EnsureClickableButton(registerButton, false);
             EnsureClickableButton(goToRegisterButton, true);
-            EnsureClickableButton(goToLoginButton, true);
-            EnsureClickableButton(forgotPasswordButton, true);
+            StyleTextLink(goToLoginButton);
+            StyleTextLink(forgotPasswordButton);
+            StyleTextLink(forgotUsernameButton);
+            ApplyAuthCardLayout();
             RestoreEditorCanvas();
             StartCoroutine(RestoreEditorCanvasDelayed());
             StartCoroutine(ShowCloudStatusOnLogin());
@@ -180,9 +182,10 @@ namespace PhobiaReliefTherapy.Managers
             EnsureClickableButton(loginButton, false);
             EnsureClickableButton(registerButton, false);
             EnsureClickableButton(goToRegisterButton, true);
-            EnsureClickableButton(goToLoginButton, true);
-            EnsureClickableButton(forgotPasswordButton, true);
-            EnsureClickableButton(forgotUsernameButton, true);
+            StyleTextLink(goToLoginButton);
+            StyleTextLink(forgotPasswordButton);
+            StyleTextLink(forgotUsernameButton);
+            ApplyAuthCardLayout();
         }
 
         private static void EnsureClickableButton(Button button, bool secondary)
@@ -217,6 +220,127 @@ namespace PhobiaReliefTherapy.Managers
             textTheme.elementType = UIElementType.ButtonText;
             textTheme.ApplyTheme();
             ClinicalUIFactory.AlignButtonLabel(tmp);
+        }
+
+        private static void StyleTextLink(Button button)
+        {
+            if (button == null)
+                return;
+
+            button.interactable = true;
+
+            var themeable = button.GetComponent<ThemeableUI>();
+            if (themeable != null)
+                themeable.enabled = false;
+
+            var hover = button.GetComponent<ButtonHoverEffect>();
+            if (hover != null)
+                hover.enabled = false;
+
+            var image = button.GetComponent<Image>();
+            if (image == null)
+                image = button.gameObject.AddComponent<Image>();
+            image.color = new Color(1f, 1f, 1f, 0.01f);
+            image.raycastTarget = true;
+            image.sprite = null;
+            button.targetGraphic = image;
+
+            var tmp = button.GetComponentInChildren<TextMeshProUGUI>();
+            if (tmp == null)
+                return;
+
+            tmp.raycastTarget = false;
+            tmp.enableWordWrapping = false;
+            tmp.enableAutoSizing = false;
+            tmp.fontSize = 16f;
+            tmp.fontStyle = FontStyles.Normal;
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.color = new Color32(220, 225, 235, 255);
+            tmp.margin = Vector4.zero;
+        }
+
+        private void ApplyAuthCardLayout()
+        {
+            const float x0 = 0.18f;
+            const float x1 = 0.82f;
+            const float btnX0 = 0.22f;
+            const float btnX1 = 0.78f;
+            const float inputH = 46f;
+            const float buttonH = 44f;
+            const float linkH = 26f;
+
+            if (loginEmailInput != null)
+            {
+                ThemeInput(loginEmailInput);
+                PlaceRow(TitleRect("LoginTitle"), x0, x1, 0.86f, 44f);
+                PlaceRow(loginEmailInput.GetComponent<RectTransform>(), x0, x1, 0.70f, inputH);
+                if (loginPasswordInput != null)
+                {
+                    ThemeInput(loginPasswordInput);
+                    PlaceRow(loginPasswordInput.GetComponent<RectTransform>(), x0, x1, 0.58f, inputH);
+                }
+                if (forgotPasswordButton != null)
+                    PlaceRow(forgotPasswordButton.GetComponent<RectTransform>(), btnX0, btnX1, 0.46f, linkH);
+                if (loginButton != null)
+                    PlaceRow(loginButton.GetComponent<RectTransform>(), btnX0, btnX1, 0.33f, buttonH);
+                if (goToRegisterButton != null)
+                    PlaceRow(goToRegisterButton.GetComponent<RectTransform>(), btnX0, btnX1, 0.18f, buttonH);
+                if (loginErrorText != null)
+                    PlaceRow(loginErrorText.rectTransform, 0.14f, 0.86f, 0.07f, 26f);
+            }
+
+            if (registerNameInput != null)
+            {
+                ThemeInput(registerNameInput);
+                PlaceRow(TitleRect("RegisterTitle"), x0, x1, 0.90f, 44f);
+                PlaceRow(registerNameInput.GetComponent<RectTransform>(), x0, x1, 0.76f, inputH);
+                if (registerEmailInput != null)
+                {
+                    ThemeInput(registerEmailInput);
+                    PlaceRow(registerEmailInput.GetComponent<RectTransform>(), x0, x1, 0.63f, inputH);
+                }
+                if (registerPasswordInput != null)
+                {
+                    ThemeInput(registerPasswordInput);
+                    PlaceRow(registerPasswordInput.GetComponent<RectTransform>(), x0, x1, 0.50f, inputH);
+                }
+                if (registerButton != null)
+                    PlaceRow(registerButton.GetComponent<RectTransform>(), btnX0, btnX1, 0.33f, buttonH);
+                if (goToLoginButton != null)
+                    PlaceRow(goToLoginButton.GetComponent<RectTransform>(), btnX0, btnX1, 0.18f, linkH);
+                if (registerErrorText != null)
+                    PlaceRow(registerErrorText.rectTransform, 0.14f, 0.86f, 0.07f, 26f);
+            }
+        }
+
+        private static RectTransform TitleRect(string name)
+        {
+            var go = GameObject.Find(name);
+            return go != null ? go.GetComponent<RectTransform>() : null;
+        }
+
+        private static void PlaceRow(RectTransform rect, float xMin, float xMax, float y, float height)
+        {
+            if (rect == null)
+                return;
+
+            rect.anchorMin = new Vector2(xMin, y);
+            rect.anchorMax = new Vector2(xMax, y);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.sizeDelta = new Vector2(0f, height);
+            rect.anchoredPosition = Vector2.zero;
+        }
+
+        private static void ThemeInput(TMP_InputField input)
+        {
+            if (input == null)
+                return;
+
+            var themeable = input.GetComponent<ThemeableUI>();
+            if (themeable == null)
+                themeable = input.gameObject.AddComponent<ThemeableUI>();
+            themeable.elementType = UIElementType.InputField;
+            themeable.ApplyTheme();
         }
 
         private void PrefillDemoCredentials()
@@ -582,7 +706,7 @@ namespace PhobiaReliefTherapy.Managers
                 {
                     LocalNotificationStore.Add(local.Id, "Account created", "Local account ready. You can log in on this device.");
                     registerErrorText.color = new Color32(72, 187, 120, 255);
-                    registerErrorText.text = "Saved locally. Cloud was offline — you can still log in on this device.";
+                    registerErrorText.text = "Saved locally. Cloud was offline - you can still log in on this device.";
                 }
                 else
                 {

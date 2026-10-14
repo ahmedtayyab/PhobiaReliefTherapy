@@ -19,7 +19,7 @@ namespace PhobiaReliefTherapy.Therapy
         public Material crowdSkyboxMaterial;
 
         [Header("Settings")]
-        public float exposureDuration = 30f;
+        public float exposureDuration = 120f;
 
         private Texture2D crowdTexture;
         private Sprite crowdSprite;
@@ -64,6 +64,7 @@ namespace PhobiaReliefTherapy.Therapy
 
         private void OnAdaptiveStageChanged(int stage)
         {
+            ApplyStageTexture(Mathf.Clamp(stage, 1, 3));
             TherapySessionHelper.ApplyDifficultyToSkyboxMaterial(RenderSettings.skybox);
         }
 
@@ -162,46 +163,95 @@ namespace PhobiaReliefTherapy.Therapy
             return result != null ? result : AutoBindHelper.FindComponentByName<T>(objectName);
         }
 
-        private Texture2D LoadCrowdTexture()
+        private Texture2D LoadCrowdTextureForStage(int stage)
         {
-            Debug.Log("Loading crowd texture...");
-            // Try loading from Resources using different name conventions
-            Texture2D tex = Resources.Load<Texture2D>("crowd_image");
-            if (tex != null) { Debug.Log("Loaded 'crowd_image' from Resources."); return tex; }
+            string baseName = "crowd_image";
+            if (stage == 2) baseName = "crowd_image2";
+            if (stage == 3) baseName = "crowd_image3";
 
-            Sprite sprite = Resources.Load<Sprite>("crowd_image");
-            if (sprite != null && sprite.texture != null) { Debug.Log("Loaded 'crowd_image' sprite from Resources."); return sprite.texture; }
+            Debug.Log($"Loading crowd texture for stage {stage} (resource: {baseName})...");
 
-            tex = Resources.Load<Texture2D>("crowd_image.jpg");
-            if (tex != null) { Debug.Log("Loaded 'crowd_image.jpg' from Resources."); return tex; }
+            Texture2D tex = Resources.Load<Texture2D>(baseName);
+            if (tex != null) { Debug.Log($"Loaded '{baseName}' from Resources."); return tex; }
 
-            sprite = Resources.Load<Sprite>("crowd_image.jpg");
-            if (sprite != null && sprite.texture != null) { Debug.Log("Loaded 'crowd_image.jpg' sprite from Resources."); return sprite.texture; }
+            Sprite sprite = Resources.Load<Sprite>(baseName);
+            if (sprite != null && sprite.texture != null) { Debug.Log($"Loaded '{baseName}' sprite from Resources."); return sprite.texture; }
 
-            tex = Resources.Load<Texture2D>("crowd_image.jpg.jpeg");
-            if (tex != null) { Debug.Log("Loaded 'crowd_image.jpg.jpeg' from Resources."); return tex; }
+            if (stage == 1)
+            {
+                tex = Resources.Load<Texture2D>("crowd_image.jpg");
+                if (tex != null) { Debug.Log("Loaded 'crowd_image.jpg' from Resources."); return tex; }
 
-            sprite = Resources.Load<Sprite>("crowd_image.jpg.jpeg");
-            if (sprite != null && sprite.texture != null) { Debug.Log("Loaded 'crowd_image.jpg.jpeg' sprite from Resources."); return sprite.texture; }
+                sprite = Resources.Load<Sprite>("crowd_image.jpg");
+                if (sprite != null && sprite.texture != null) { Debug.Log("Loaded 'crowd_image.jpg' sprite from Resources."); return sprite.texture; }
 
-            tex = Resources.Load<Texture2D>("crowd");
-            if (tex != null) { Debug.Log("Loaded 'crowd' from Resources."); return tex; }
+                tex = Resources.Load<Texture2D>("crowd_image.jpg.jpeg");
+                if (tex != null) { Debug.Log("Loaded 'crowd_image.jpg.jpeg' from Resources."); return tex; }
 
-            sprite = Resources.Load<Sprite>("crowd");
-            if (sprite != null && sprite.texture != null) { Debug.Log("Loaded 'crowd' sprite from Resources."); return sprite.texture; }
+                sprite = Resources.Load<Sprite>("crowd_image.jpg.jpeg");
+                if (sprite != null && sprite.texture != null) { Debug.Log("Loaded 'crowd_image.jpg.jpeg' sprite from Resources."); return sprite.texture; }
 
-            // Fallbacks to relative paths on filesystem
-            tex = LoadTextureFromFileSystem("Resources/crowd_image.jpg.jpeg");
-            if (tex != null) { Debug.Log("Loaded 'Resources/crowd_image.jpg.jpeg' from fallback."); return tex; }
+                tex = Resources.Load<Texture2D>("crowd");
+                if (tex != null) { Debug.Log("Loaded 'crowd' from Resources."); return tex; }
 
-            tex = LoadTextureFromFileSystem("Assets/Resources/crowd_image.jpg.jpeg");
-            if (tex != null) { Debug.Log("Loaded 'Assets/Resources/crowd_image.jpg.jpeg' from fallback."); return tex; }
+                sprite = Resources.Load<Sprite>("crowd");
+                if (sprite != null && sprite.texture != null) { Debug.Log("Loaded 'crowd' sprite from Resources."); return sprite.texture; }
 
-            tex = LoadTextureFromFileSystem("../images/crowd.JPG.jpeg");
-            if (tex != null) { Debug.Log("Loaded '../images/crowd.JPG.jpeg' from fallback."); return tex; }
+                tex = LoadTextureFromFileSystem("Resources/crowd_image.jpg.jpeg");
+                if (tex != null) { Debug.Log("Loaded 'Resources/crowd_image.jpg.jpeg' from fallback."); return tex; }
 
-            Debug.LogError("Failed to load crowd texture from any source!");
+                tex = LoadTextureFromFileSystem("Assets/Resources/crowd_image.jpg.jpeg");
+                if (tex != null) { Debug.Log("Loaded 'Assets/Resources/crowd_image.jpg.jpeg' from fallback."); return tex; }
+
+                tex = LoadTextureFromFileSystem("../images/crowd.JPG.jpeg");
+                if (tex != null) { Debug.Log("Loaded '../images/crowd.JPG.jpeg' from fallback."); return tex; }
+            }
+            else
+            {
+                string suffix = stage == 2 ? "2" : "3";
+                tex = LoadTextureFromFileSystem($"Resources/crowd_image{suffix}.jpeg");
+                if (tex != null) return tex;
+                tex = LoadTextureFromFileSystem($"Assets/Resources/crowd_image{suffix}.jpeg");
+                if (tex != null) return tex;
+            }
+
+            if (stage != 1)
+                return LoadCrowdTextureForStage(1);
+
+            Debug.LogError($"Failed to load crowd texture for stage {stage}!");
             return null;
+        }
+
+        private void ApplyStageTexture(int stage)
+        {
+            Texture2D tex = LoadCrowdTextureForStage(stage);
+            if (tex != null)
+            {
+                crowdTexture = tex;
+
+                if (RenderSettings.skybox != null)
+                {
+                    RenderSettings.skybox.SetTexture("_MainTex", crowdTexture);
+                    DynamicGI.UpdateEnvironment();
+                    Debug.Log($"Applied Stage {stage} 3D Skybox texture.");
+                }
+
+                if (customBackgroundGO != null)
+                {
+                    Image bgImgComponent = customBackgroundGO.GetComponent<Image>();
+                    if (bgImgComponent != null)
+                    {
+                        if (crowdSprite != null)
+                        {
+                            Destroy(crowdSprite);
+                        }
+                        crowdSprite = Sprite.Create(crowdTexture, new Rect(0, 0, crowdTexture.width, crowdTexture.height), new Vector2(0.5f, 0.5f));
+                        bgImgComponent.sprite = crowdSprite;
+                        bgImgComponent.color = Color.white;
+                        Debug.Log($"Applied Stage {stage} 2D Fallback background sprite.");
+                    }
+                }
+            }
         }
 
         private Texture2D LoadTextureFromFileSystem(string relativePath)
@@ -288,7 +338,7 @@ namespace PhobiaReliefTherapy.Therapy
                 img.raycastTarget = false;
             }
 
-            crowdTexture = LoadCrowdTexture();
+            crowdTexture = LoadCrowdTextureForStage(1);
 
             // 1. 3D Panoramic Skybox setup
             Material skyboxMat = crowdSkyboxMaterial;
@@ -373,7 +423,7 @@ namespace PhobiaReliefTherapy.Therapy
                     timerRect.sizeDelta = new Vector2(300f, 80f);
 
                     timerText = timerGO.GetComponent<TextMeshProUGUI>();
-                    timerText.text = "30s";
+                    timerText.text = $"{SessionTiming.ExposureSeconds:0}s";
                     timerText.alignment = TextAlignmentOptions.TopRight;
 
                     ThemeableUI timerTheme = timerGO.AddComponent<ThemeableUI>();
@@ -463,6 +513,8 @@ namespace PhobiaReliefTherapy.Therapy
             isTimerRunning = true;
             int stage = TherapySessionHelper.GetAssignedExposureStage();
             UserData.CurrentStage = stage;
+
+            ApplyStageTexture(stage);
             TherapySessionHelper.ApplyDifficultyToSkyboxMaterial(RenderSettings.skybox);
 
             float remaining = SessionTiming.ExposureSeconds;

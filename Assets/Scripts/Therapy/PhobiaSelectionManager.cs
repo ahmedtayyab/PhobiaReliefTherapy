@@ -84,16 +84,16 @@ namespace PhobiaReliefTherapy.Therapy
             ClinicalUIFactory.Anchor(instructionText.rectTransform, new Vector2(0.08f, 0.82f), new Vector2(0.92f, 0.94f));
 
             heightPhobiaButton = ClinicalUIFactory.CreateButton("HeightButton", card.transform, "Height Phobia");
-            ClinicalUIFactory.Anchor(heightPhobiaButton.GetComponent<RectTransform>(), new Vector2(0.15f, 0.62f), new Vector2(0.85f, 0.62f), new Vector2(0, 58));
+            ClinicalUIFactory.Anchor(heightPhobiaButton.GetComponent<RectTransform>(), new Vector2(0.18f, 0.62f), new Vector2(0.82f, 0.62f), new Vector2(0, 58));
 
             darknessPhobiaButton = ClinicalUIFactory.CreateButton("DarknessButton", card.transform, "Darkness Phobia");
-            ClinicalUIFactory.Anchor(darknessPhobiaButton.GetComponent<RectTransform>(), new Vector2(0.15f, 0.46f), new Vector2(0.85f, 0.46f), new Vector2(0, 58));
+            ClinicalUIFactory.Anchor(darknessPhobiaButton.GetComponent<RectTransform>(), new Vector2(0.18f, 0.46f), new Vector2(0.82f, 0.46f), new Vector2(0, 58));
 
             crowdPhobiaButton = ClinicalUIFactory.CreateButton("CrowdButton", card.transform, "Crowd Phobia");
-            ClinicalUIFactory.Anchor(crowdPhobiaButton.GetComponent<RectTransform>(), new Vector2(0.15f, 0.30f), new Vector2(0.85f, 0.30f), new Vector2(0, 58));
+            ClinicalUIFactory.Anchor(crowdPhobiaButton.GetComponent<RectTransform>(), new Vector2(0.18f, 0.30f), new Vector2(0.82f, 0.30f), new Vector2(0, 58));
 
             var back = ClinicalUIFactory.CreateButton("BackDashButton", card.transform, "Back to dashboard", false);
-            ClinicalUIFactory.Anchor(back.GetComponent<RectTransform>(), new Vector2(0.3f, 0.12f), new Vector2(0.7f, 0.12f), new Vector2(0, 48));
+            ClinicalUIFactory.Anchor(back.GetComponent<RectTransform>(), new Vector2(0.32f, 0.12f), new Vector2(0.68f, 0.12f), new Vector2(0, 48));
             back.onClick.AddListener(() => SceneLoader.Instance.LoadScene("DashboardScene"));
             browseRoot = card;
         }
@@ -101,7 +101,7 @@ namespace PhobiaReliefTherapy.Therapy
         private void ShowPhobiaDetail(string phobiaType)
         {
             pendingPhobia = phobiaType;
-            UserData.SelectedPhobia = phobiaType;
+            UserData.SelectedPhobia = PhobiaCatalog.Normalize(phobiaType);
             UpdateSelectedPhobiaText();
             CacheBrowseRoot();
             SetBrowseVisible(false);
@@ -117,22 +117,21 @@ namespace PhobiaReliefTherapy.Therapy
             ClinicalUIFactory.Anchor(title.rectTransform, new Vector2(0.08f, 0.86f), new Vector2(0.92f, 0.96f));
 
             var body = ClinicalUIFactory.CreateText("DetailBody", card.transform,
-                PhobiaCatalog.Description(phobiaType) + "\n\n" +
                 PhobiaCatalog.RecommendedStart(phobiaType) + "\n\n" +
                 PhobiaCatalog.PreSessionInstructions(),
                 18, TextAlignmentOptions.TopLeft);
             ClinicalUIFactory.Anchor(body.rectTransform, new Vector2(0.08f, 0.42f), new Vector2(0.92f, 0.84f));
 
             var beginner = ClinicalUIFactory.CreateButton("BeginnerBtn", card.transform, "Beginner");
-            ClinicalUIFactory.Anchor(beginner.GetComponent<RectTransform>(), new Vector2(0.06f, 0.28f), new Vector2(0.32f, 0.28f), new Vector2(0, 52));
+            ClinicalUIFactory.Anchor(beginner.GetComponent<RectTransform>(), new Vector2(0.18f, 0.28f), new Vector2(0.37f, 0.28f), new Vector2(0, 52));
             beginner.onClick.AddListener(() => ConfirmSelection("Low"));
 
             var intermediate = ClinicalUIFactory.CreateButton("IntermediateBtn", card.transform, "Intermediate", false);
-            ClinicalUIFactory.Anchor(intermediate.GetComponent<RectTransform>(), new Vector2(0.37f, 0.28f), new Vector2(0.63f, 0.28f), new Vector2(0, 52));
+            ClinicalUIFactory.Anchor(intermediate.GetComponent<RectTransform>(), new Vector2(0.405f, 0.28f), new Vector2(0.595f, 0.28f), new Vector2(0, 52));
             intermediate.onClick.AddListener(() => ConfirmSelection("Medium"));
 
             var advanced = ClinicalUIFactory.CreateButton("AdvancedBtn", card.transform, "Advanced", false);
-            ClinicalUIFactory.Anchor(advanced.GetComponent<RectTransform>(), new Vector2(0.68f, 0.28f), new Vector2(0.94f, 0.28f), new Vector2(0, 52));
+            ClinicalUIFactory.Anchor(advanced.GetComponent<RectTransform>(), new Vector2(0.63f, 0.28f), new Vector2(0.82f, 0.28f), new Vector2(0, 52));
             advanced.onClick.AddListener(() => ConfirmSelection("High"));
 
             bool showManualStage = UserData.AllowManualStageSelection;
@@ -146,7 +145,7 @@ namespace PhobiaReliefTherapy.Therapy
             start.gameObject.SetActive(!showManualStage);
 
             var cancel = ClinicalUIFactory.CreateButton("CancelPhobia", card.transform, "Back", false);
-            ClinicalUIFactory.Anchor(cancel.GetComponent<RectTransform>(), new Vector2(0.35f, 0.10f), new Vector2(0.65f, 0.10f), new Vector2(0, 46));
+            ClinicalUIFactory.Anchor(cancel.GetComponent<RectTransform>(), new Vector2(0.32f, 0.10f), new Vector2(0.68f, 0.10f), new Vector2(0, 46));
             cancel.onClick.AddListener(() =>
             {
                 if (detailRoot != null)
@@ -190,7 +189,7 @@ namespace PhobiaReliefTherapy.Therapy
 
         private void ConfirmSelection(string difficulty)
         {
-            UserData.SelectedPhobia = pendingPhobia;
+            UserData.SelectedPhobia = PhobiaCatalog.Normalize(pendingPhobia);
             UserData.SelectedDifficulty = UserData.AllowManualStageSelection ? difficulty : "High";
             UserData.CurrentStage = UserData.AllowManualStageSelection
                 ? PhobiaCatalog.StageFromDifficulty(difficulty)

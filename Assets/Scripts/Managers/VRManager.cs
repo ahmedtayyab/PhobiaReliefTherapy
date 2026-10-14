@@ -177,6 +177,8 @@ namespace PhobiaReliefTherapy.Managers
                 CacheRigTransform();
 
             Vector2 moveInput = GetMoveInput();
+            if (PhobiaReliefTherapy.VR.VrScrollRelay.BlockLocomotion)
+                moveInput.y = 0f;
             if (moveInput.sqrMagnitude > deadZone * deadZone)
             {
                 Vector3 forward = GetFlatForward();

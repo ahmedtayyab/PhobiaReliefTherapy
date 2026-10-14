@@ -1,3 +1,5 @@
+using PhobiaReliefTherapy.Data;
+
 namespace PhobiaReliefTherapy.Therapy
 {
     public static class PhobiaCatalog
@@ -75,6 +77,34 @@ namespace PhobiaReliefTherapy.Therapy
             if (stage >= 3) return "High";
             if (stage == 2) return "Medium";
             return "Low";
+        }
+
+        public static string Normalize(string phobia)
+        {
+            if (string.IsNullOrEmpty(phobia))
+                return "None";
+            if (LocalSessionStore.IsHeight(phobia))
+                return "Height";
+            if (LocalSessionStore.IsDarkness(phobia))
+                return "Darkness";
+            if (LocalSessionStore.IsCrowd(phobia))
+                return "Crowd";
+            return phobia.Trim();
+        }
+
+        public static string ExposureSceneName(string phobia)
+        {
+            switch (Normalize(phobia))
+            {
+                case "Height":
+                    return "HeightScene";
+                case "Darkness":
+                    return "DarknessScene";
+                case "Crowd":
+                    return "CrowdScene";
+                default:
+                    return "";
+            }
         }
     }
 }
