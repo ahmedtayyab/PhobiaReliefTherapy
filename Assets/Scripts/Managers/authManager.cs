@@ -523,7 +523,7 @@ namespace PhobiaReliefTherapy.Managers
             }
 
             loginButton.interactable = false;
-            loginErrorText.text = "Loading...";
+            loginErrorText.text = "Signing in...";
             StartCoroutine(LoginCoroutine(email, pass));
         }
 
