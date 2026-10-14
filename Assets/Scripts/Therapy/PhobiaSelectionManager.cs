@@ -122,15 +122,15 @@ namespace PhobiaReliefTherapy.Therapy
                 18, TextAlignmentOptions.TopLeft);
             ClinicalUIFactory.Anchor(body.rectTransform, new Vector2(0.08f, 0.42f), new Vector2(0.92f, 0.84f));
 
-            var beginner = ClinicalUIFactory.CreateButton("BeginnerBtn", card.transform, "Beginner");
+            var beginner = ClinicalUIFactory.CreateButton("BeginnerBtn", card.transform, "Beginner (Stage 1)");
             ClinicalUIFactory.Anchor(beginner.GetComponent<RectTransform>(), new Vector2(0.18f, 0.28f), new Vector2(0.37f, 0.28f), new Vector2(0, 52));
             beginner.onClick.AddListener(() => ConfirmSelection("Low"));
 
-            var intermediate = ClinicalUIFactory.CreateButton("IntermediateBtn", card.transform, "Intermediate", false);
+            var intermediate = ClinicalUIFactory.CreateButton("IntermediateBtn", card.transform, "Intermediate (Stage 2)", false);
             ClinicalUIFactory.Anchor(intermediate.GetComponent<RectTransform>(), new Vector2(0.405f, 0.28f), new Vector2(0.595f, 0.28f), new Vector2(0, 52));
             intermediate.onClick.AddListener(() => ConfirmSelection("Medium"));
 
-            var advanced = ClinicalUIFactory.CreateButton("AdvancedBtn", card.transform, "Advanced", false);
+            var advanced = ClinicalUIFactory.CreateButton("AdvancedBtn", card.transform, "Advanced (Stage 3)", false);
             ClinicalUIFactory.Anchor(advanced.GetComponent<RectTransform>(), new Vector2(0.63f, 0.28f), new Vector2(0.82f, 0.28f), new Vector2(0, 52));
             advanced.onClick.AddListener(() => ConfirmSelection("High"));
 
@@ -195,7 +195,9 @@ namespace PhobiaReliefTherapy.Therapy
                 ? PhobiaCatalog.StageFromDifficulty(difficulty)
                 : 1;
             UserData.ResetSessionState();
-            UserData.AiStageRecommendation = "";
+            UserData.AiStageRecommendation = UserData.AllowManualStageSelection
+                ? "Selected difficulty: " + PhobiaCatalog.ToDifficultyLabel(difficulty) + "."
+                : "";
             SetBrowseVisible(false);
             if (detailRoot != null)
             {
