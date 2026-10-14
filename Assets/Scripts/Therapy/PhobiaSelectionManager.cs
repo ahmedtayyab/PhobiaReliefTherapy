@@ -195,7 +195,9 @@ namespace PhobiaReliefTherapy.Therapy
                 ? PhobiaCatalog.StageFromDifficulty(difficulty)
                 : 1;
             UserData.ResetSessionState();
-            UserData.AiStageRecommendation = "";
+            UserData.AiStageRecommendation = UserData.AllowManualStageSelection
+                ? "Selected difficulty: " + PhobiaCatalog.ToDifficultyLabel(difficulty) + "."
+                : "";
             SetBrowseVisible(false);
             if (detailRoot != null)
             {
