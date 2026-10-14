@@ -504,9 +504,15 @@ namespace PhobiaReliefTherapy.Managers
 
             loginErrorText.color = new Color32(229, 62, 62, 255);
 
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(pass))
+            if (string.IsNullOrEmpty(email))
             {
-                loginErrorText.text = "Email and password cannot be empty!";
+                loginErrorText.text = "Email cannot be empty.";
+                return;
+            }
+
+            if (string.IsNullOrEmpty(pass))
+            {
+                loginErrorText.text = "Password cannot be empty.";
                 return;
             }
 
